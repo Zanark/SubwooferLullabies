@@ -1,0 +1,530 @@
+// YEET THAT GLOW STICK - MAIN THEME: "Keep Climbing"
+// A standalone, through-composed journey, always from Blim's perspective.
+// 60 written bars + 4 bars of echo tail. 92 BPM. Total export: 2:46.957.
+// Export: Start 0, End 64, 48000 Hz, Multi Channel Orbits OFF.
+// Stop, then Play from the beginning. This plays ONCE; it is not a gameplay loop.
+//
+// 0:00 First Light     0:20.87 Someone Was Here    0:41.74 The Long Climb
+// 1:02.61 Locker C-19  1:13.04 Floodwater          1:33.91 Roots and Air
+// 1:54.78 The Last Journal                       2:15.65 Daylight / One Last Throw
+//
+// The first four bars quote the approved menu; every later section is new.
+// Motifs develop rather than restarting verses. No section is replayed.
+// Water keeps the current menu's gain 0.6 and ALL of its envelope/echo settings.
+// This is an instrumental story summary, not timed VO or a replacement scene cue.
+
+setcpm(92 / 4);
+
+// Each phrase begins on its own bar zero and can run only once.
+const once = (start, bars, phrase) => phrase
+  .filterWhen(t => t >= 0 && t < bars)
+  .late(start);
+
+// Keep the approved menu's core instruments. Development comes from the writing.
+const bass = phrase => phrase.sound("triangle")
+  .attack(0.005).decay(0.15).sustain(0.15).release(0.06)
+  .gain(0.4).orbit(0).room(0).delay(0);
+
+const lead = phrase => phrase.sound("square")
+  .attack(0.005).decay(0.12).sustain(0).release(0.06)
+  .lpf(2200).vib(5).vibmod(0.12)
+  .gain(0.12).orbit(1).room(0).delay(0);
+
+const drums = phrase => phrase.bank("RolandTR707").lpf(2600)
+  .gain(0.22).orbit(2).room(0).delay(0);
+
+const water = phrase => phrase.sound("sine")
+  .attack(0.001).decay(0.08).sustain(0).release(0.12)
+  .gain(0.6).orbit(3)
+  .delay(0.45).delaytime(45 / 92).delayfeedback(0.5)
+  .room(0.6).roomsize(2).roomfade(0.1);
+
+// Human traces are something Blim discovers, never a cut to the Guide's life.
+const traces = phrase => phrase.sound("triangle").fm(0.8).fmh(2).lpf(2200)
+  .attack(0.01).decay(0.2).sustain(0).release(0.22)
+  .gain(0.05).orbit(4).room(0.38).roomsize(2).roomfade(0.1).delay(0);
+
+const warmth = phrase => phrase.sound("triangle").lpf(1400)
+  .attack(0.25).decay(0.4).sustain(0.22).release(0.5)
+  .clip(0.65).gain(0.035)
+  .orbit(5).room(0.4).roomsize(2).roomfade(0.1).delay(0);
+
+const glimmer = phrase => phrase.sound("triangle")
+  .attack(0.02).decay(0.18).sustain(0).release(0.16)
+  .clip(0.65).lpf(2800).gain(0.035)
+  .orbit(6).delay(0).room(0.22).roomsize(2).roomfade(0.1);
+
+const machinery = phrase => phrase.hpf(350).lpf(1500)
+  .attack(0.002).decay(0.055).sustain(0).release(0.025)
+  .gain(0.012).orbit(7).room(0).delay(0);
+
+// 0-8 | Rain, the fall, and the first small path made out of light.
+const firstLight = stack(
+  bass(note(`<
+    [d2 ~ d3 a2 d2 ~ c3 a2]
+    [bb1 ~ bb2 f2 bb1 ~ a2 f2]
+    [g2 ~ d3 g2 ~ bb2 a2 g2]
+    [a2 ~ e3 a2 ~ bb2 a2 e2]
+    [d2 a1 d1 ~ ~ ~ ~ ~]
+    [d2 ~ ~ ~ a2 ~ d3 ~]
+    [bb1 ~ f2 ~ d3 ~ c3 a2]
+    [a1 ~ e2 ~ a2 ~ c#3 ~]
+  >`)),
+
+  lead(note(`<
+    [d5 ~ a4 ~ f5 e5 d5 ~]
+    [f5 ~ d5 ~ bb4 a4 f4 ~]
+    [g4 ~ bb4 d5 ~ c5 bb4 ~]
+    [a4 ~ bb4 a4 ~ c#5 e5 ~]
+    [d5 a4 f4 e4 d4 ~ ~ ~]
+    [~ ~ d4 ~ e4 ~ a4 ~]
+    [f4 ~ a4 c5 ~ d5 e5 ~]
+    [e5 ~ c#5 a4 ~ e5 ~ ~]
+  >`)).gain("<0.12 0.12 0.12 0.12 0.105 0.105 0.105 0.105>"),
+
+  drums(sound(`<
+    [bd ~ rim [~ bd], hh*8]
+    [bd ~ rim [~ bd], hh*8]
+    [bd ~ rim [~ bd], hh*8]
+    [bd ~ rim [~ bd], hh*8]
+    [bd ~ ~ ~]
+    [~ ~ rim ~, ~ hh ~ hh]
+    [bd ~ rim ~, hh ~ hh hh]
+    [bd ~ rim [bd ~], hh*4]
+  >`)),
+
+  water(note(`<
+    [~ ~ d6 ~ ~ ~ ~ ~]
+    [~ a6 ~ ~ ~ ~ f6 ~]
+    [~ ~ ~ ~ g6 ~ ~ ~]
+    [~ ~ ~ e6 ~ ~ ~ ~]
+    [~ ~ ~ ~ ~ ~ d6 ~]
+    [~ ~ a5 ~ ~ ~ ~ ~]
+    [~ ~ ~ ~ ~ f6 ~ ~]
+    [~ e6 ~ ~ ~ ~ ~ ~]
+  >`)),
+
+  glimmer(note(`<
+    ~ ~ ~ ~ ~
+    [~ ~ ~ ~ ~ a4 ~ d5]
+    [~ d5 ~ ~ f5 ~ ~ ~]
+    [~ ~ ~ a5 ~ ~ e5 ~]
+  >`))
+);
+
+// 8-16 | A wrapper, painted arrows, a voice. Curiosity before sorrow.
+const someoneWasHere = stack(
+  bass(note(`<
+    [f2 ~ c3 ~ f2 ~ a2 ~]
+    [d2 ~ a2 d3 ~ ~ c3 a2]
+    [bb1 ~ ~ f2 bb2 ~ a2 ~]
+    [c2 ~ g2 ~ e3 ~ d3 ~]
+    [g1 ~ d2 g2 ~ a2 bb2 ~]
+    [d2 ~ f2 ~ a2 ~ d3 c3]
+    [e2 ~ bb2 ~ g2 ~ d3 ~]
+    [a1 ~ e2 a2 ~ g2 c#3 ~]
+  >`)),
+
+  lead(note(`<
+    [~ ~ ~ ~ a4 ~ c5 ~]
+    [d5 ~ e5 f5 ~ e5 a4 ~]
+    [bb4 ~ d5 ~ f5 ~ d5 c5]
+    [e5 ~ g5 e5 d5 ~ c5 ~]
+    [d5 g5 ~ f5 ~ d5 bb4 a4]
+    [a4 ~ d5 e5 f5 a5 ~ f5]
+    [g5 ~ e5 d5 ~ bb4 g4 ~]
+    [a4 c#5 ~ e5 g5 ~ e5 ~]
+  >`)).gain(0.105),
+
+  drums(sound(`<
+    [bd ~ rim ~, hh ~ hh ~]
+    [bd ~ ~ rim, ~ hh hh hh]
+    [bd ~ rim ~, hh ~ ~ hh]
+    [bd ~ rim [~ bd], hh*4]
+    [bd ~ ~ bd ~ rim ~ ~, hh*4]
+    [bd ~ rim ~, hh hh ~ hh]
+    [~ bd rim ~, hh ~ hh hh]
+    [bd ~ rim [rim ~], hh*4]
+  >`)),
+
+  water(note(`<
+    [~ ~ ~ a5 ~ ~ ~ ~]
+    [~ d6 ~ ~ ~ ~ ~ ~]
+    [~ ~ ~ ~ ~ f6 ~ ~]
+    [~ ~ e6 ~ ~ ~ g6 ~]
+    [~ ~ ~ ~ d6 ~ ~ ~]
+    [~ ~ ~ a6 ~ ~ ~ ~]
+    [~ g6 ~ ~ ~ ~ ~ ~]
+    [~ ~ ~ ~ ~ e6 ~ ~]
+  >`)),
+
+  traces(note(`<
+    [a4 ~ c5 ~ d5 e5 ~ ~]
+    [~ a4 ~ ~ ~ d5 ~ ~]
+    [f4 ~ ~ a4 ~ d5 ~ ~]
+    [~ ~ g4 ~ c5 ~ e5 ~]
+    [bb4 ~ ~ a4 ~ g4 ~ d5]
+    [~ ~ a4 c5 ~ f5 e5 ~]
+    [g4 ~ bb4 ~ d5 ~ ~ ~]
+    [~ e5 ~ c#5 ~ a4 ~ ~]
+  >`)),
+
+  warmth(note(`<
+    [f3,a3,e4] ~ [bb2,f3,a3] ~
+    [g3,bb3,d4] ~ [e3,g3,bb3] [a2,e3,g3]
+  >`))
+);
+
+// 16-24 | Longer shafts, wrong turns, remembered routes; no headlamp yet.
+const theLongClimb = stack(
+  bass(note(`<
+    [d2 a2 d3 ~ f2 a2 c3 a2]
+    [c2 g2 d3 c3 ~ g2 a2 c3]
+    [bb1 f2 bb2 ~ d3 f2 a2 bb2]
+    [a1 e2 a2 c3 f3 ~ c3 a2]
+    [g1 d2 g2 bb2 ~ d3 bb2 a2]
+    [f2 a2 d3 a2 f2 ~ e3 d3]
+    [e2 bb2 e3 ~ g2 d3 bb2 g2]
+    [a1 e2 a2 c#3 e3 ~ ~ ~]
+  >`)),
+
+  lead(note(`<
+    [d5 e5 f5 ~ a5 f5 e5 a5]
+    [g5 ~ e5 d5 e5 g5 c6 ~]
+    [f5 a5 bb5 ~ a5 f5 d5 f5]
+    [e5 f5 a5 c6 ~ a5 g5 f5]
+    [g5 a5 bb5 d6 ~ c6 bb5 a5]
+    [a5 f5 e5 d5 f5 a5 d6 e6]
+    [d6 ~ bb5 g5 e5 g5 bb5 ~]
+    [c#6 e6 ~ a5 g5 e5 ~ ~]
+  >`)).gain("<0.12 0.12 0.12 0.12 0.075 0.075 0.075 0.075>"),
+
+  drums(sound(`<
+    [bd ~ rim [~ bd], hh*8]
+    [bd [~ bd] rim ~, hh*8]
+    [bd ~ rim [bd bd], hh*8]
+    [bd ~ [rim ~] bd, hh hh [hh hh] hh]
+    [bd ~ rim bd ~ rim bd ~, hh*8]
+    [bd [bd ~] rim [~ bd], hh*8]
+    [bd ~ rim [rim bd], hh hh hh [hh hh]]
+    [bd rim [bd rim] ~, hh hh hh ~]
+  >`)),
+
+  water(note(`<
+    [~ ~ d6 ~ ~ ~ a6 ~]
+    [~ ~ ~ ~ ~ g6 ~ ~]
+    [~ f6 ~ ~ ~ ~ d6 ~]
+    [~ ~ ~ a6 ~ ~ ~ ~]
+    [~ ~ g6 ~ ~ ~ ~ d6]
+    [~ ~ ~ ~ a6 ~ ~ ~]
+    [~ g6 ~ ~ ~ ~ e6 ~]
+    ~
+  >`)),
+
+  glimmer(note(`<
+    [~ d5 ~ f5 ~ a5 ~ e5]
+    [c5 ~ e5 ~ g5 ~ d6 ~]
+    [~ f5 ~ bb5 ~ d6 ~ a5]
+    [a4 c5 ~ f5 a5 ~ c6 ~]
+    [~ g5 ~ bb5 d6 ~ a5 ~]
+    [d5 f5 a5 ~ d6 a5 ~ f5]
+    [~ e5 g5 bb5 ~ d6 ~ g5]
+    [a4 ~ c#5 ~ e5 ~ ~ ~]
+  >`))
+);
+
+// 24-28 | C-19, late in the climb: the promise, the lamp still there, the weak beam.
+// No upgrade fanfare. Leave a whole bar with no new attacks; echoes may linger.
+const lockerC19 = stack(
+  bass(note("<[d2 ~ ~ ~ ~ ~ ~ ~] ~ ~ [a1 ~ ~ ~ ~ ~ ~ ~]>")),
+  traces(note("<[a4 c5 d5 e5 ~ ~ ~ ~] ~ ~ [~ ~ a4 ~ ~ e5 ~ ~]>")),
+  warmth(note("<[f3,a3,e4] ~ [d3,f3,a3] [a2,e3]>")),
+  glimmer(note("<~ ~ [d5 ~ e5 ~ ~ a4 ~ ~] [~ ~ ~ ~ e5 ~ ~ ~]>")),
+  water(note("<~ ~ ~ [~ ~ ~ ~ ~ ~ e6 ~]>"))
+);
+
+// 28-36 | Moving water and machinery. Uneven accents, not a boss battle.
+const floodwater = stack(
+  bass(note(`<
+    [d2 ~ a2 d3 ~ a2 f2 ~]
+    [c2 g2 ~ c3 ~ bb2 g2 ~]
+    [bb1 ~ f2 bb2 ~ ~ d3 f2]
+    [eb2 bb2 ~ g2 ~ eb3 bb2 ~]
+    [g1 ~ d2 g2 bb2 ~ d3 ~]
+    [a1 ~ d2 a2 ~ f3 d3 ~]
+    [bb1 f2 ~ d3 c3 ~ bb2 a2]
+    [a1 ~ e2 a2 ~ c#3 e3 ~]
+  >`)),
+
+  lead(note(`<
+    [d4 ~ a4 d5 ~ f5 e5 d5]
+    [c5 g4 ~ bb4 ~ c5 d5 e5]
+    [f5 ~ d5 bb4 a4 ~ f4 ~]
+    [g4 bb4 eb5 ~ d5 bb4 g4 ~]
+    [g4 ~ bb4 d5 g5 ~ f5 d5]
+    [e5 d5 ~ a4 f5 ~ e5 a4]
+    [bb4 d5 ~ f5 e5 d5 c5 ~]
+    [c#5 ~ e5 g5 ~ e5 c#5 a4]
+  >`)).gain(0.105),
+
+  drums(sound(`<
+    [bd ~ ~ bd ~ ~ rim ~, hh*4]
+    [bd ~ rim ~ ~ bd ~ rim, hh ~ hh hh]
+    [bd ~ ~ rim bd ~ rim ~, hh*4]
+    [bd ~ rim bd ~ ~ rim ~, ~ hh hh ~]
+    [bd ~ bd ~ rim ~ ~ bd, hh*8]
+    [bd ~ ~ rim ~ bd rim ~, hh hh ~ hh]
+    [bd rim ~ bd ~ ~ rim bd, hh*4]
+    [bd ~ rim ~ bd rim [bd ~] ~, hh*4]
+  >`)),
+
+  water(note(`<
+    [~ d6 ~ ~ ~ a5 ~ ~]
+    [~ ~ g6 ~ ~ ~ ~ ~]
+    [~ ~ ~ f6 ~ ~ d6 ~]
+    [~ ~ ~ ~ ~ g6 ~ ~]
+    [~ d6 ~ ~ ~ ~ g6 ~]
+    [~ ~ a6 ~ ~ ~ ~ ~]
+    [~ ~ ~ ~ f6 ~ ~ d6]
+    [~ ~ e6 ~ ~ ~ ~ ~]
+  >`)),
+
+  warmth(note(`<
+    [d3,f3,a3] ~ [bb2,d3,f3] [eb3,g3,bb3]
+    ~ [a2,d3,f3] ~ [a2,c#3,g3]
+  >`)),
+
+  glimmer(note(`<
+    [~ a4 d5 ~ ~ f5 ~ a4]
+    [g4 ~ ~ c5 ~ e5 ~ ~]
+    [~ f4 ~ bb4 d5 ~ ~ f5]
+    [bb4 ~ ~ g4 ~ eb5 ~ ~]
+    [~ ~ g4 bb4 ~ d5 ~ g5]
+    [a4 ~ d5 ~ ~ f5 e5 ~]
+    [~ f4 bb4 ~ d5 ~ c5 ~]
+    [e4 ~ ~ a4 ~ c#5 ~ ~]
+  >`)),
+
+  machinery(sound(`<
+    [~ ~ white ~ ~ ~ ~ white]
+    ~
+    [~ white ~ ~ ~ ~ white ~]
+    [~ ~ ~ ~ white ~ ~ ~]
+    ~
+    [~ ~ white ~ ~ white ~ ~]
+    [~ ~ ~ white ~ ~ ~ ~]
+    ~
+  >`))
+);
+
+// 36-44 | Roots, fresh air, distant daylight. F-major warmth, not the ending yet.
+const rootsAndAir = stack(
+  bass(note(`<
+    [f2 ~ c3 a2 ~ f3 ~ c3]
+    [e2 ~ g2 c3 ~ e3 ~ g2]
+    [d2 a2 ~ f3 ~ d3 a2 ~]
+    [bb1 ~ f2 d3 ~ a2 ~ f2]
+    [g1 d2 ~ g2 bb2 ~ d3 ~]
+    [a1 ~ c3 f3 ~ e3 c3 ~]
+    [c2 ~ g2 e3 ~ d3 ~ c3]
+    [a1 ~ e2 g2 ~ c#3 ~ e3]
+  >`)),
+
+  lead(note(`<
+    [f5 ~ a5 c6 ~ a5 g5 f5]
+    [e5 g5 ~ c6 d6 ~ c6 g5]
+    [f5 ~ e5 a5 d6 c6 ~ a5]
+    [bb5 a5 f5 ~ d6 ~ c6 a5]
+    [g5 ~ d6 bb5 a5 g5 ~ d5]
+    [a5 c6 ~ f6 e6 ~ c6 a5]
+    [g5 c6 d6 ~ e6 d6 c6 ~]
+    [e6 ~ c#6 a5 g5 ~ e5 ~]
+  >`)).gain(0.075),
+
+  drums(sound(`<
+    [bd ~ rim ~, hh*4]
+    [bd ~ rim [~ bd], hh hh ~ hh]
+    [bd ~ ~ rim, hh*4]
+    [bd ~ rim ~, ~ hh ~ hh]
+    [bd ~ rim [bd ~], hh*4]
+    [bd ~ ~ rim, hh ~ hh hh]
+    [bd ~ rim ~, hh hh hh ~]
+    [bd ~ ~ ~, hh ~ ~ ~]
+  >`)),
+
+  water(note(`<
+    [~ ~ ~ a6 ~ ~ ~ ~]
+    [~ ~ e6 ~ ~ ~ ~ g6]
+    [~ d6 ~ ~ ~ ~ ~ ~]
+    [~ ~ ~ ~ f6 ~ ~ ~]
+    [~ ~ g6 ~ ~ ~ d6 ~]
+    [~ ~ ~ ~ ~ a6 ~ ~]
+    [~ e6 ~ ~ ~ ~ ~ ~]
+    ~
+  >`)),
+
+  warmth(note(`<
+    [f3,a3,c4] [e3,g3,c4] [d3,f3,a3] [bb2,f3,a3]
+    [g3,bb3,d4] [a3,c4,f4] [c3,g3,e4] [a2,e3,g3]
+  >`)),
+
+  glimmer(note(`<
+    [~ c5 ~ f5 ~ a5 c6 ~]
+    [g4 ~ c5 ~ e5 ~ g5 ~]
+    [~ a4 d5 ~ f5 a5 ~ d6]
+    [f5 ~ ~ d5 ~ a5 ~ f5]
+    [~ d5 g5 ~ bb5 ~ a5 ~]
+    [c5 ~ f5 a5 ~ c6 ~ e6]
+    [~ g5 ~ c6 ~ e6 ~ d6]
+    [~ ~ a4 ~ ~ ~ ~ ~]
+  >`))
+);
+
+// 44-52 | Blim hears the final encouragement, then chooses the last ladder.
+// The human-traces voice steps forward; percussion returns only with that choice.
+const theLastJournal = stack(
+  bass(note(`<
+    [d2 ~ ~ ~ ~ ~ ~ ~]
+    ~
+    [bb1 ~ ~ ~ f2 ~ ~ ~]
+    [g1 ~ ~ ~ d2 ~ ~ ~]
+    [d2 ~ a2 ~ ~ d3 ~ ~]
+    [c2 ~ g2 ~ c3 ~ e3 ~]
+    [g1 ~ d2 g2 ~ bb2 d3 ~]
+    [a1 e2 ~ a2 c#3 ~ e3 ~]
+  >`)),
+
+  lead(note(`<
+    ~
+    ~
+    [~ ~ ~ ~ d5 ~ c5 a4]
+    [bb4 ~ g4 ~ a4 ~ d5 ~]
+    [d5 ~ f5 a5 ~ e5 d5 a4]
+    [e5 ~ g5 c6 ~ g5 e5 d5]
+    [g5 bb5 ~ a5 g5 d5 ~ e5]
+    [a5 ~ c#6 e6 d6 c#6 a5 ~]
+  >`)).gain("<0.105 0.105 0.105 0.105 0.12 0.12 0.12 0.075>"),
+
+  drums(sound(`<
+    ~ ~ ~ ~
+    [bd ~ ~ ~, ~ ~ hh ~]
+    [bd ~ rim ~, hh ~ hh ~]
+    [bd ~ rim [~ bd], hh*4]
+    [bd [~ bd] rim ~, hh hh [hh hh] ~]
+  >`)),
+
+  water(note(`<
+    [~ ~ ~ ~ ~ ~ a5 ~]
+    ~
+    [~ ~ ~ ~ d6 ~ ~ ~]
+    [~ ~ ~ ~ ~ ~ g6 ~]
+    [~ d6 ~ ~ ~ ~ ~ ~]
+    [~ ~ ~ ~ ~ e6 ~ ~]
+    [~ ~ g6 ~ ~ ~ ~ d6]
+    [~ ~ ~ e6 ~ ~ ~ ~]
+  >`)),
+
+  traces(note(`<
+    [a4 ~ ~ c5 ~ d5 ~ e5]
+    [~ ~ d5 ~ c5 ~ a4 ~]
+    [f4 a4 ~ d5 ~ ~ f5 ~]
+    [g4 ~ bb4 ~ ~ d5 c5 ~]
+    [a4 c5 d5 ~ e5 ~ a5 ~]
+    [~ c5 ~ e5 ~ g5 ~ d5]
+    [bb4 ~ d5 ~ g5 ~ a5 ~]
+    [a4 ~ c#5 ~ e5 g5 ~ ~]
+  >`)),
+
+  warmth(note(`<
+    [d3,a3,e4] ~ [bb2,d3,a3] [g2,bb2,d3]
+    [d3,f3,a3] [c3,e3,g3] [g2,bb2,f3] [a2,c#3,e3]
+  >`))
+);
+
+// 52-60 | The surface belongs to Blim. F becomes F#: relief, not a victory march.
+// The last little drop is the nearly spent glowstick thrown back down.
+const daylight = stack(
+  bass(note(`<
+    [d2 ~ a2 d3 ~ f#3 a2 ~]
+    [b1 ~ f#2 ~ b2 ~ d3 ~]
+    [g1 ~ d2 g2 ~ b2 d3 ~]
+    [a1 ~ e2 a2 c#3 ~ e3 ~]
+    [b1 ~ ~ f#2 ~ d3 ~ ~]
+    [g1 ~ d2 ~ ~ b2 ~ ~]
+    [a1 ~ e2 ~ d3 ~ ~ ~]
+    [d2@2 ~@6]
+  >`)),
+
+  lead(note(`<
+    [d5 ~ a4 ~ f#5 e5 d5 a5]
+    [f#5 a5 ~ b5 d6 ~ a5 f#5]
+    [g5 ~ b5 d6 ~ a5 g5 f#5]
+    [e5 a5 ~ c#6 b5 a5 e5 ~]
+    [a5 ~ c#6 d6 ~ e6 d6 b5]
+    [d6 a5 f#5 ~ e5 d5 ~ b4]
+    [e5 ~ c#5 a4 d5 ~ f#5 ~]
+    [d5@3 ~@5]
+  >`)).gain("<0.105 0.105 0.105 0.105 0.075 0.075 0.105 0.105>"),
+
+  drums(sound(`<
+    [bd ~ rim ~, hh*4]
+    [bd ~ rim [~ bd], hh ~ hh hh]
+    [bd ~ rim ~, hh hh ~ hh]
+    [bd ~ ~ rim, hh*4]
+    [bd ~ rim ~, ~ hh ~ ~]
+    [bd ~ ~ ~, hh ~ ~ ~]
+    [~ ~ rim ~]
+    ~
+  >`)),
+
+  water(note(`<
+    [~ ~ d6 ~ ~ ~ f#6 ~]
+    [~ ~ ~ ~ a6 ~ ~ ~]
+    [~ g6 ~ ~ ~ ~ b5 ~]
+    [~ ~ ~ e6 ~ ~ ~ ~]
+    [~ ~ f#6 ~ ~ ~ ~ ~]
+    [~ ~ ~ ~ g6 ~ ~ ~]
+    [~ ~ e6 ~ ~ ~ ~ ~]
+    [~ ~ ~ ~ d6 ~ ~ ~]
+  >`)),
+
+  warmth(note(`<
+    [d3,f#3,a3] [b2,d3,f#3] [g2,b2,d3] [a2,c#3,e3]
+    [b2,f#3,a3] [g2,b2,e3] [a2,e3,g3] [d3,f#3,a3,e4]
+  >`)),
+
+  traces(note(`<
+    ~
+    [~ ~ b4 ~ d5 ~ f#5 ~]
+    ~
+    [~ a4 ~ c#5 ~ e5 ~ ~]
+    [b4 ~ d5 e5 ~ f#5 ~ ~]
+    ~
+    [~ ~ a4 ~ ~ ~ e5 ~]
+    [~ ~ ~ ~ ~ ~ d5 ~]
+  >`)),
+
+  glimmer(note(`<
+    [~ a5 ~ d6 ~ f#6 e6 ~]
+    [f#5 ~ a5 ~ d6 ~ b5 ~]
+    [~ d5 g5 ~ b5 d6 ~ a5]
+    [e5 ~ a5 c#6 ~ b5 a5 ~]
+    [~ f#5 ~ b5 ~ d6 ~ ~]
+    [d5 ~ g5 ~ ~ b5 ~ ~]
+    [~ ~ e5 ~ ~ a5 ~ ~]
+    ~
+  >`))
+);
+
+stack(
+  once(0, 8, firstLight),
+  once(8, 8, someoneWasHere),
+  once(16, 8, theLongClimb),
+  once(24, 4, lockerC19),
+  once(28, 8, floodwater),
+  once(36, 8, rootsAndAir),
+  once(44, 8, theLastJournal),
+  once(52, 8, daylight)
+).pan(0.5);
+
+// No new notes after cycle 60. Export through 64 so the loved echoes can settle.

@@ -1,0 +1,162 @@
+MAIN MENU -> LEVEL 1: ONE RUNNING PIECE, TWO ARRANGEMENTS
+2026-09-19 | Blim story revision; not installed Unity playback
+
+FILES
+
+000_MainMenu.strudel - "Under the Grates: Waiting at the Door"
+L01_Level01.strudel  - "First Light" / Blim's first exploration
+
+Both are standalone and can be pasted directly into Strudel. The complete score
+engine is deliberately identical; only their introductory comments/default mode differ.
+Do not play both complete mixes simultaneously: that doubles the common music.
+
+WHAT STAYS / WHAT CHANGES
+
+The first four main-menu bars retain the supplied tune's exact pitches, rhythm,
+instruments and envelopes. Tempo stays 92 BPM. The triangle bass, TR707
+rhythm and original four-bar sine-drop pattern continue through the longer form.
+
+Requested droplet boost: gain is now 0.15 instead of 0.10 (1.5x), matched in both
+sources so the shared bed does not change level during the menu/Level01 handoff.
+The drops retain delay 0.45 and room 0.6. Published SuperDough defaults are made
+explicit: dotted-eighth echo interval 45/92 seconds, feedback 0.5, room size 2 and
+room fade parameter 0.1. The wet drops have their own fixed orbit so another layer
+cannot overwrite their reverb/delay settings during the transition.
+
+The 32-bar menu form develops the old tune rather than just slowing it down:
+  Bars  1- 4: Original theme.
+  Bars  5- 8: Answering phrase.
+  Bars  9-12: Theme returns; a delicate upper answer appears.
+  Bars 13-16: Higher-register variation, with lower gain.
+  Bars 17-20: Fewer melody notes; let the lingering echoes breathe.
+  Bars 21-24: Answering phrase.
+  Bars 25-28: Higher-register return.
+  Bars 29-32: Original theme brings the form home.
+
+Level 1 retains the SAME complete common bed at the SAME position. The menu's
+occasional upper answer fades away; hesitant, lower-register fragments and little
+ascending steps fade in. Quiet open fifths enter intermittently rather than
+making the darkness feel completely safe. Blim is learning to trust a thrown light
+and remember a route, not remembering the Guide or receiving a headlamp.
+The pattern variations suggest attempts and growing competence; they do not
+automatically announce a first throw, successful jump, or completed tutorial.
+
+The story rewrite changes only Level01 detail inside the menu source, keeping its
+embedded handoff/stem exports current. The default MENU's audible arrangement,
+original tune, upper answer and echo parameters are unchanged.
+
+HEAR THE HANDOFF IN STRUDEL
+
+1. Paste 000_MainMenu.strudel into the REPL.
+2. At the top, change ONLY const mode = 'menu' to const mode = 'handoff'.
+3. Keep render = 'full'. Stop playback, then Play from the beginning.
+
+Keep the single quotes on mode/render values. Strudel treats double-quoted strings
+as musical mini-notation; these selectors need ordinary JavaScript strings.
+
+Default preview:
+  transitionAt = 7.375 cycles = about 19.239 seconds, deliberately mid-phrase.
+  transitionCycles = 2 cycles = about 5.217 seconds.
+
+The common bed never fades, changes tempo, rewinds, or rebuilds its echo bus.
+Only the two arrangement layers change level using a smoothstep curve.
+The preview remains in Level 1 after the transition, including subsequent loops.
+
+Try another nonnegative transitionAt for a different entry point. For example,
+31.75 starts just before the full form wraps. The value is an absolute cycle on
+the running clock, not "seconds from when I last pressed Update".
+To repeat a scheduled preview, Stop and Play; updating after its scheduled time
+does not restart it. Set mode back to 'menu' or 'level1' for standalone playback.
+
+This live preview changes new notes' layer gains over the fade; already-started
+notes decay naturally. It demonstrates musical continuity, not a Unity audio mix.
+
+QUICK LISTENING EXPORT
+
+Set the appropriate mode and leave render = 'full'.
+  Main menu filename: YTGS_MainMenu
+  Level 1 filename:   YTGS_Level01
+  Start cycle:       0
+  End cycle:         32
+  Sample rate:       48000
+  Maximum polyphony: 1024
+  Multi Channel Orbits: UNCHECKED
+
+Each preview is 32 cycles, approximately 83.478 seconds. The echo/reverb has a
+history, so a cold 0-32 WAV is a listening export, NOT a certified seamless loop.
+An ordinary fade-out at the end would remove the echoes that you want to keep.
+
+THE RELIABLE GAME HANDOFF: THREE SYNCHRONIZED STEMS
+
+Two independently restarted WAVs cannot guarantee a seamless transition at an
+arbitrary button press, even if both are in the same key. A cold incoming reverb
+and a cut outgoing echo are separate problems from tempo/harmony.
+
+Both sources include the same three raw stem export modes:
+  render = 'shared'       -> YTGS_MenuL1_Shared
+  render = 'menu-layer'   -> YTGS_MenuL1_MenuDetail
+  render = 'level1-layer' -> YTGS_MenuL1_Level01Detail
+
+Use either file for all three exports. Stem exports ignore mode and preview time;
+the requested stem is rendered at its intended level, without a baked transition.
+Render the shared stem ONCE and reuse that exact WAV in both states.
+
+Tail-aware preparation for each stem:
+1. Render Start 0, End 96 at 48000 Hz: three complete passes.
+2. In an audio editor, retain the middle 32-bar pass (nominal cycles 32-64).
+   This lets previous notes/echoes feed the beginning and avoids a cold reverb.
+   Simply exporting Start 32 is NOT proof that Strudel warmed the preceding audio.
+3. Keep precisely the same start frame and frame count for every stem, including
+   all silent regions in the detail stems. Disable automatic leading-silence trim.
+4. At 48000 Hz the ideal pass length is 4,006,956.5217 sample frames. Round once to
+   a common 4,006,957-frame length for ALL stems. If the renderer starts exactly
+   at cycle 0, the nominal middle-pass start rounds to frame 4,006,957 as well.
+   Confirm actual export alignment before trimming; never round each stem's
+   audible start/end independently.
+5. Inspect/listen to the loop joins and mix against footsteps, stick impacts and UI.
+   A renderer/exporter or importer can still add padding or damage the join.
+
+Unity handoff for the programming chat (NOT implemented by these score files):
+- Keep one persistent music transport across Main Menu -> First Light scene loading.
+- Schedule the three prepared stereo AudioSources with the same DSP start time,
+  equal sample rate, equal frame count and loop enabled.
+- Shared stem plays at constant level. Menu detail starts audible; Level01 detail
+  starts at zero volume but keeps running on that same transport.
+- When Start is requested, record DSP time immediately. Gameplay need not wait
+  for a bar boundary or for the fade to finish.
+- Over 120/23 seconds (~5.217s), let x be elapsed/fadeDuration clamped to [0,1],
+  then a = x*x*(3-2*x). Menu detail volume becomes 1-a; Level01 detail becomes a.
+  Apply the user's music/master volume separately. Never fade the shared stem.
+- Do not Stop, reset timeSamples, recreate the persistent source, or clear its
+  effects when the menu closes. Muted detail tracks must remain sample-aligned.
+  If playback infrastructure virtualizes/restarts silent tracks, explicitly
+  restore incoming sample phase before raising its volume.
+- Validate imported clips, DSP start alignment and scene-load behavior. Avoid
+  formats/import settings that add inconsistent encoder padding.
+- If a full rendered mix is already playing, do NOT also add the shared stem.
+
+This arrangement contains no location-driven panning or hidden-platform hints.
+The music is not a replacement for audible throw/landing feedback or its visual
+accessibility alternatives. Keep its overall mix below essential gameplay SFX.
+
+SCOPE / PROVENANCE
+
+The developer explicitly selected the supplied menu tune and especially liked
+its lingering echoes. This longer arrangement and its Level01 variation still
+need audition. No claim is made that the assistant heard the playback.
+
+The pair keeps the existing RolandTR707 bank rather than replacing its percussion.
+Unlike Levels 02-05 and the cinematic/item synth-only drafts, this pair uses drum
+samples. Record the actual sample provenance/license before release; no sample
+license is asserted here. No external sample URL or new recorded audio was added.
+
+This describes DIRECT menu-to-Level01 entry. If the opening cinematic is inserted
+between them, decide that route explicitly: its 19-22s blackout must not acquire
+this continuously playing bed by accident. The opening score was not changed.
+
+This shared-clock promise is specific to Menu/Level01. Levels 02-05 have different
+scores and tempos; they are not further stems of this transport. Their story-state
+and cassette handoffs are described in CUE_SHEET.txt, not implemented here.
+
+Only composition sources and audio handoff documentation changed. There is no
+new Unity music manager, scene wiring, WAV rendering or approved final mix yet.

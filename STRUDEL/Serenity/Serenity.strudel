@@ -1,0 +1,193 @@
+// YEET THAT GLOW STICK - "Keep Climbing: Still Water"
+// Deep-calm rewrite of the underwater jazz theme. Always Blim's perspective.
+// 60 BPM, no drums or swing. Sparse piano, suspended jazz harmony, rounded bass.
+// 40 written bars + 4 tail bars = 2:56.000. Each story section occurs once.
+// Export: Start 0, End 44, 48000 Hz, Multi Channel Orbits OFF.
+// Let the sampled instruments load, then Stop and Play from the beginning.
+//
+// 0:00 First Light       0:24 Someone Was Here    0:48 The Long Climb
+// 1:12 Locker C-19       1:28 Floodwater          1:44 Roots and Air
+// 2:00 Last Journal      2:16 Daylight            2:40-2:56 Echo tail
+//
+// Calm comes from fewer attacks, longer spaces and gentle changes, not BPM alone.
+// The user's current droplet gain is 0.1; keep it, along with the original echoes.
+// T01 and the main menu are untouched. Research and source notes: CUE_SHEET.txt.
+
+setcpm(60 / 4);
+
+const once = (start, bars, phrase) => phrase
+  .filterWhen(t => t >= 0 && t < bars)
+  .late(start);
+
+// Slow, note-to-note changes in muffling; no bright opening-up or pulsing effect.
+const submergedCutoff = sine.range(850, 1150).slow(16);
+const piano = phrase => phrase.sound("piano")
+  .attack(0.05).decay(1.2).sustain(0.25).release(0.8).clip(0.9)
+  .lpf(submergedCutoff).lpq(0.3).hpf(100)
+  .gain(0.28).pan(0.46).orbit(1)
+  .delay(0).room(0.48).roomsize(3).roomfade(1);
+
+// One soft voicing roughly every eight seconds. No repeated offbeat comping.
+// n(1) selects the FluidR3 variants from Strudel's built-in GM soundfont map.
+const chords = phrase => phrase.sound("gm_epiano1").n(1)
+  .attack(0.14).decay(1.8).sustain(0.3).release(1.2).clip(0.82)
+  .lpf(850).lpq(0.2).hpf(140)
+  .gain(0.12).pan(0.56).orbit(2)
+  .delay(0).room(0.5).roomsize(3.5).roomfade(1.2);
+
+// A single, softly rounded root per harmony, not a walking line or heartbeat.
+const bass = phrase => phrase.sound("gm_acoustic_bass").n(1)
+  .attack(0.04).decay(1.2).sustain(0).release(0.4).clip(0.6)
+  .lpf(580).hpf(40).gain(0.35).pan(0.5).orbit(0)
+  .delay(0).room(0.12).roomsize(1.5).roomfade(0.6);
+
+// The droplet timbre stays intact. Only its placement becomes much more spacious.
+const water = phrase => phrase.sound("sine")
+  .attack(0.001).decay(0.08).sustain(0).release(0.12)
+  .gain(0.1).pan(0.5).orbit(3)
+  .delay(0.45).delaytime(45 / 92).delayfeedback(0.5)
+  .room(0.6).roomsize(2).roomfade(0.1);
+
+// 0-6 | The D-A-F-E-D contour unfolds across twelve seconds, not one quick bar.
+const firstLight = stack(
+  piano(note(`<
+    [d4@2 ~ a3]
+    [f4@2 e4 ~]
+    [d4@3 ~]
+    [f4@2 ~ d4]
+    [bb3@3 ~]
+    [d4@2 ~ ~]
+  >`)),
+  chords(note("<[f3,a3,c4,e4] [d3,f3,a3,c4] [bb2,d3,f3,a3]>").slow(2)),
+  bass(note("<d2 bb1 g2>").slow(2)),
+  water(note(`<
+    [~@2 d6 ~] ~
+    [~@2 f6 ~] ~
+    [~@2 g6 ~] ~
+  >`))
+);
+
+// 6-12 | Human traces: a gentle question, with room to hear the answer.
+const someoneWasHere = stack(
+  piano(note(`<
+    [a3@2 c4 ~]
+    [d4@2 ~ e4]
+    [f4@3 ~]
+    [e4@2 d4 ~]
+    [c4@2 ~ a3]
+    [d4@3 ~]
+  >`)),
+  chords(note("<[a3,c4,e4,g4] [f3,a3,c4,e4] [d3,g3,a3,c4]>").slow(2)),
+  bass(note("<f2 d2 bb1>").slow(2)),
+  water(note("<~ [~@2 a5 ~] ~ ~ [~@2 d6 ~] ~>"))
+);
+
+// 12-18 | The climb rises by register, never by speed, volume, or a drum build.
+const theLongClimb = stack(
+  piano(note(`<
+    [d4@2 ~ e4]
+    [f4@2 a4 ~]
+    [g4@3 ~]
+    [f4@2 ~ d4]
+    [e4@2 g4 ~]
+    [d4@2 ~ c4]
+  >`)),
+  chords(note("<[f3,a3,c4,e4] [bb2,d3,f3,a3] [e3,a3,d4,g4]>").slow(2)),
+  bass(note("<d2 g2 c2>").slow(2)),
+  water(note("<~ [~@2 a5 ~] ~ ~ [~@2 e6 ~] ~>"))
+);
+
+// 18-22 | C-19: a question, an empty bar, then a little warmth. No dramatic stab.
+const lockerC19 = stack(
+  piano(note(`<
+    [a3@2 c4 ~]
+    ~
+    [d4@2 ~ e4]
+    [a3@3 ~]
+  >`)),
+  chords(note(`<
+    [[a3,c4,e4]@2 ~@2]
+    ~
+    [[f3,a3,b3,e4]@3 ~]
+    ~
+  >`)),
+  bass(note("<[f2@2 ~@2] ~ [d2@2 ~@2] ~>")),
+  water(note("<~ ~ ~ [~@2 e6 ~]>"))
+);
+
+// 22-26 | Floodwater is a slow current here, not an obstacle-course rhythm.
+const floodwater = stack(
+  piano(note(`<
+    [d4@2 ~ a3]
+    [c4@3 ~]
+    [bb3@2 d4 ~]
+    [f4@2 ~ d4]
+  >`)),
+  chords(note("<[f3,a3,c4,e4] [d3,f3,a3,c4]>").slow(2)),
+  bass(note("<d2 bb1>").slow(2)),
+  water(note("<[~@2 d6 ~] ~ [~@2 f6 ~] ~>"))
+);
+
+// 26-30 | F6/9 and Cmaj9 allow a little air without a brighter or louder mix.
+const rootsAndAir = stack(
+  piano(note(`<
+    [f4@2 ~ a4]
+    [g4@3 ~]
+    [e4@2 d4 ~]
+    [c4@2 ~ g3]
+  >`)),
+  chords(note("<[a3,d4,g4] [e3,g3,b3,d4]>").slow(2)),
+  bass(note("<f2 c2>").slow(2)),
+  water(note("<~ [~@2 a5 ~] ~ ~>"))
+);
+
+// 30-34 | Blim receives the final words. A suspended chord, not an anxious cadence.
+const theLastJournal = stack(
+  piano(note(`<
+    [a3@2 c4 ~]
+    [d4@2 ~ e4]
+    [d4@3 ~]
+    [a3@2 ~ g3]
+  >`)),
+  chords(note("<[f3,a3,c4,e4] [g3,b3,d4,e4]>").slow(2)),
+  bass(note("<d2 a1>").slow(2)),
+  water(note("<~ ~ [~@2 d6 ~] ~>"))
+);
+
+// 34-40 | A quiet D6/9 arrival. No flourish; the last drop is the glowstick toss.
+const daylight = stack(
+  piano(note(`<
+    [d4@2 a3 ~]
+    [f#4@2 e4 ~]
+    [d4@3 ~]
+    [b3@2 ~ a3]
+    [e4@2 ~ f#4]
+    [d4@2 ~@2]
+  >`)),
+  chords(note("<[f#3,a3,b3,e4] [b2,d3,f#3,a3] [f#3,a3,b3,e4]>").slow(2)),
+  bass(note("<d2 g2 d2>").slow(2)),
+  water(note("<~ [~@2 a5 ~] ~ ~ ~ [~ d6 ~@2]>"))
+);
+
+// A barely present, non-pulsing water wash. No rhythmic brush/noise layer remains.
+const belowTheSurface = sound("brown")
+  .filterWhen(t => t >= 0 && t < 1).slow(40)
+  .attack(6).decay(4).sustain(0.6).release(4).clip(1)
+  .hpf(120).lpf(300).gain(0.004).pan(0.5).orbit(5)
+  .delay(0).room(0.15).roomsize(2.5).roomfade(1.2);
+
+stack(
+  once(0, 6, firstLight),
+  once(6, 6, someoneWasHere),
+  once(12, 6, theLongClimb),
+  once(18, 4, lockerC19),
+  once(22, 4, floodwater),
+  once(26, 4, rootsAndAir),
+  once(30, 4, theLastJournal),
+  once(34, 6, daylight),
+  belowTheSurface
+);
+
+// Nothing new triggers after cycle 40. Export to 44 for a sixteen-second landing.
+// Salamander piano: Alexander Holm, CC BY 3.0. GM instruments: FluidR3 variants.
+// Low-arousal design is a musical intention, not a guaranteed physiological effect.

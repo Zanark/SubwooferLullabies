@@ -1,0 +1,88 @@
+// YEET THAT GLOW STICK - LEVEL 4: "Flood Levels"
+// Blim: unstable water, a little dependable light, and the choice to keep going.
+// 32 bars at 80 BPM (96s). Lamp and glowsticks coexist; neither conquers the dark.
+// Preview export: 0-32, 48000 Hz, Multi Channel Orbits OFF. See CUE_SHEET.txt.
+
+const listening = false; // true for a quieter, lead-free cassette preview.
+
+setcpm(80 / 4);
+if (typeof listening !== 'boolean') {
+  throw new Error('listening must be true or false.');
+}
+
+const keepMoving = note(`<
+  [d5 ~ ~ a4 ~ ~ f5 ~]
+  [e5 ~ d5 ~ ~ ~ ~ ~]
+  [g4 ~ ~ bb4 ~ d5 ~ ~]
+  [e5 ~ ~ d5 ~ ~ a4 ~]
+  [f5 ~ e5 d5 ~ ~ ~ ~]
+  [f4 ~ ~ a4 ~ d5 ~ ~]
+  [bb4 ~ ~ g4 ~ ~ d5 ~]
+  [e5 ~ ~ ~ c#5 ~ ~ ~]
+>`);
+const takeABreath = note(`<
+  [~ d5 ~ ~ ~ a4 ~ ~]
+  [~ f5 ~ ~ d5 ~ ~ ~]
+  [~ ~ bb4 ~ ~ g4 ~ ~]
+  [a4 ~ ~ ~ ~ ~ ~ ~]
+  [~ a4 ~ ~ d5 ~ ~ ~]
+  [~ ~ f5 ~ e5 ~ d5 ~]
+  [~ g4 ~ ~ bb4 ~ ~ ~]
+  [e5 ~ ~ ~ ~ ~ ~ ~]
+>`);
+const melody = arrange(
+  [8, keepMoving], [8, takeABreath], [8, silence], [8, keepMoving]
+);
+
+stack(
+  note(`<
+    [d2 ~ ~ a2 ~ ~ d2 ~] [bb1 ~ ~ f2 ~ ~ bb1 ~]
+    [g1 ~ ~ d2 ~ ~ g1 ~] [a1 ~ ~ e2 ~ ~ a1 ~]
+    [f2 ~ ~ a2 ~ ~ f2 ~] [bb1 ~ ~ f2 ~ ~ bb1 ~]
+    [g1 ~ ~ d2 ~ ~ g1 ~] [a1 ~ ~ e2 ~ ~ a1 ~]
+  >`)
+    .sound("triangle").lpf(850)
+    .attack(0.012).decay(0.2).sustain(0.12).release(0.08)
+    .clip(0.65).gain(0.28)
+    .orbit(0).room(0).delay(0),
+
+  melody.sound("square").lpf(1700).vib(3).vibmod(0.06)
+    .attack(0.025).decay(0.2).sustain(0).release(0.2)
+    .clip(0.7).gain(listening ? 0 : 0.08)
+    .orbit(1).room(0.3).roomsize(2).roomfade(0.1).delay(0),
+
+  note("<[d3,a3,e4] [bb2,f3,a3] [g2,d3,a3] [a2,e3,g3] [f3,a3,d4] [bb2,f3,a3] [g2,d3,a3] [a2,e3,g3]>")
+    .sound("triangle").lpf(1100)
+    .attack(0.28).decay(0.4).sustain(0.2).release(0.5)
+    .clip(0.65).gain(0.04)
+    .orbit(2).room(0.45).roomsize(2).roomfade(0.1).delay(0),
+
+  note(`<
+    [~ ~ d6 ~ ~ ~ ~ ~] [~ ~ ~ ~ f6 ~ ~ ~]
+    [~ ~ ~ g5 ~ ~ ~ ~] [~ e6 ~ ~ ~ ~ ~ ~]
+    [~ ~ ~ ~ a5 ~ ~ ~] [~ ~ f6 ~ ~ ~ ~ ~]
+    [~ ~ ~ ~ d6 ~ ~ ~] [~ ~ ~ e6 ~ ~ ~ ~]
+  >`)
+    .sound("sine")
+    .attack(0.001).decay(0.08).sustain(0).release(0.12)
+    .gain(0.075).orbit(3)
+    .delay(0.45).delaytime(45 / 80).delayfeedback(0.5)
+    .room(0.6).roomsize(2).roomfade(0.1),
+
+  // A 3+3+2 undercurrent is musical motion, not positional water/ledge feedback.
+  note("<[d3 a3 e4 a3 e4 a3 d3 a3] [bb2 f3 a3 f3 a3 f3 bb2 f3] [g2 d3 a3 d3 a3 d3 g2 d3] [a2 e3 g3 e3 g3 e3 a2 e3] [f3 a3 d4 a3 d4 a3 f3 a3] [bb2 f3 a3 f3 a3 f3 bb2 f3] [g2 d3 a3 d3 a3 d3 g2 d3] [a2 e3 g3 e3 g3 e3 a2 e3]>")
+    .sound("sine").lpf(1300)
+    .attack(0.012).decay(0.1).sustain(0).release(0.05)
+    .gain("[0.055 0.022 0.018 0.05 0.022 0.018 0.045 0.022]")
+    .orbit(4).room(0.2).roomsize(2).roomfade(0.1).delay(0),
+
+  note("[d2 ~ ~ ~ d2 ~ ~ ~]")
+    .sound("sine").penv(10).pdecay(0.05).lpf(600)
+    .attack(0.001).decay(0.13).sustain(0).release(0.03)
+    .gain(0.11).orbit(5).room(0).delay(0),
+
+  sound("[~ ~ white ~ ~ ~ ~ white]")
+    .hpf(1600).lpf(3000)
+    .attack(0.006).decay(0.06).sustain(0).release(0.025)
+    .gain(listening ? 0 : 0.018).orbit(6).room(0).delay(0)
+).mul(gain(listening ? 0.3 : 1)).pan(0.5);

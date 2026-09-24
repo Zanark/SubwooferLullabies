@@ -1,0 +1,116 @@
+[
+  {
+    "title": "Anticipation", "source": "000_MainMenu.strudel", "role": "Main menu",
+    "original_title": "Under the Grates: Waiting at the Door",
+    "emotion": "Blim's suspended curiosity before entering the unknown.",
+    "caption": "BEFORE THE FIRST STEP", "genre": "RETRO AMBIENT", "scene": "threshold",
+    "palette": ["07191f", "123c43", "66d8bd", "dfc88f"],
+    "sample_group": "tr707", "bpm": 92, "end_cycle": 32, "kind": "loop"
+  },
+  {
+    "title": "Dismay", "source": "C01_CINEMATIC_Opening.strudel", "role": "Opening cinematic",
+    "original_title": "A Very Bad Shortcut",
+    "emotion": "An ordinary walk breaks into shock, disorientation and fragile survival.",
+    "caption": "THE GROUND GIVES WAY", "genre": "RETRO CINEMATIC", "scene": "fracture",
+    "palette": ["151728", "303347", "d2a774", "83aabb"],
+    "sample_group": "synth", "bpm": 80, "end_cycle": 10, "kind": "one-shot"
+  },
+  {
+    "title": "Vulnerability", "source": "L01_Level01.strudel", "role": "Level 1 / First Light",
+    "original_title": "First Light",
+    "emotion": "Small and alone, Blim learns to trust a path revealed by a fading light.",
+    "caption": "ONE LIGHT IN ALL THIS DARK", "genre": "RETRO EXPLORATION", "scene": "ledge",
+    "palette": ["08121e", "152b43", "8bddd1", "768fa5"],
+    "sample_group": "tr707", "bpm": 92, "end_cycle": 32, "kind": "loop"
+  },
+  {
+    "title": "Delight", "source": "001_ItemFound.strudel", "role": "Item discovery stinger",
+    "original_title": "Something Useful",
+    "emotion": "A small, useful discovery brings a moment of satisfaction rather than victory.",
+    "caption": "SOMETHING WORTH KEEPING", "genre": "RETRO STINGER", "scene": "discovery",
+    "palette": ["17231e", "244b3b", "dcdf91", "72bea7"],
+    "sample_group": "synth", "bpm": 120, "end_cycle": 1, "kind": "one-shot"
+  },
+  {
+    "title": "Curiosity", "source": "L02_Level02.strudel", "role": "Level 2 / Someone Was Here",
+    "original_title": "Someone Was Here",
+    "emotion": "Wrappers, arrows and a recorded voice make Blim wonder who travelled here first.",
+    "caption": "A VOICE BEYOND THE TURN", "genre": "RETRO MYSTERY", "scene": "cassette",
+    "palette": ["211b22", "49382f", "dbb47b", "6eb9af"],
+    "sample_group": "synth", "bpm": 88, "end_cycle": 32, "kind": "loop"
+  },
+  {
+    "title": "Determination", "source": "L03_Level03.strudel", "role": "Level 3 / The Long Climb",
+    "original_title": "The Long Climb",
+    "emotion": "Repeated effort and wrong turns become Blim's decision to continue upward.",
+    "caption": "ONE MORE REACH", "genre": "RETRO ASCENT", "scene": "ladder",
+    "palette": ["151823", "353242", "cc9d76", "92bbb0"],
+    "sample_group": "synth", "bpm": 96, "end_cycle": 32, "kind": "loop"
+  },
+  {
+    "title": "Loss", "source": "C02_CINEMATIC_Headlamp.strudel", "role": "Late-Level-3 C-19 cinematic",
+    "original_title": "You Were Coming Back",
+    "emotion": "The waiting headlamp makes an unreturned promise real to Blim.",
+    "caption": "SOMETHING LEFT WAITING", "genre": "QUIET CINEMATIC", "scene": "locker",
+    "palette": ["121e24", "283c43", "b5c6bd", "c0a274"],
+    "sample_group": "synth", "bpm": 96, "end_cycle": 8, "kind": "one-shot"
+  },
+  {
+    "title": "Courage", "source": "003_HeadlampFound.strudel", "role": "Legacy headlamp discovery proposal",
+    "original_title": "A Little More Courage",
+    "emotion": "The earlier upgrade sketch imagines a little more confidence, not complete safety.",
+    "caption": "A LITTLE MORE LIGHT", "genre": "RETRO STINGER", "scene": "beam",
+    "palette": ["252020", "534333", "edcd84", "b7c9af"],
+    "sample_group": "synth", "bpm": 96, "end_cycle": 3, "kind": "one-shot",
+    "usage_note": "Legacy proposal retained as its own cue; Loss is the current C-19 cinematic score."
+  },
+  {
+    "title": "Resilience", "source": "L04_Level04.strudel", "role": "Level 4 / Flood Levels",
+    "original_title": "Flood Levels",
+    "emotion": "Against moving water and machinery, Blim's persistence grows quieter rather than louder.",
+    "caption": "THE CURRENT DOES NOT CHOOSE", "genre": "RETRO UNDERCURRENT", "scene": "current",
+    "palette": ["061c2a", "0f4151", "75c5cf", "d2b590"],
+    "sample_group": "synth", "bpm": 80, "end_cycle": 32, "kind": "loop"
+  },
+  {
+    "title": "Hope", "source": "L05_Level05.strudel", "role": "Level 5 / Near the Surface",
+    "original_title": "Near the Surface",
+    "emotion": "Roots, fresh air and light turn the possibility of escape into something tangible.",
+    "caption": "THERE IS AIR ABOVE", "genre": "RETRO DAWN", "scene": "roots",
+    "palette": ["112721", "385347", "d9dc9e", "9dd2b5"],
+    "sample_group": "synth", "bpm": 88, "end_cycle": 32, "kind": "loop"
+  },
+  {
+    "title": "Relief", "source": "C03_CINEMATIC_Surface.strudel", "role": "Surface ending",
+    "original_title": "Sky, At Last",
+    "emotion": "Blim reaches ordinary daylight and completes a climb the unseen Guide could not.",
+    "caption": "THE WORLD KEPT TURNING", "genre": "RETRO RESOLUTION", "scene": "surface",
+    "palette": ["2c4142", "77938a", "f2ddb2", "b5dfcf"],
+    "sample_group": "synth", "bpm": 80, "end_cycle": 9, "kind": "one-shot"
+  },
+  {
+    "title": "Perseverance", "source": "T01_THEME_KeepClimbing.strudel", "role": "Complete game theme",
+    "original_title": "Keep Climbing",
+    "emotion": "Blim carries uncertainty, human traces and loss through the whole journey toward daylight.",
+    "caption": "CARRY THE LIGHT FORWARD", "genre": "RETRO STORY SUITE", "scene": "journey",
+    "palette": ["102124", "354442", "dcbd82", "69bbae"],
+    "sample_group": "tr707", "bpm": 92, "end_cycle": 64, "kind": "one-shot"
+  },
+  {
+    "title": "Serenity", "source": "T02_THEME_KeepClimbing_UnderwaterJazz.strudel", "role": "Deep-calm underwater jazz theme",
+    "original_title": "Keep Climbing: Still Water",
+    "emotion": "The same journey is held in stillness, with space to rest between small gestures.",
+    "caption": "NOTHING NEEDS TO HURRY", "genre": "UNDERWATER JAZZ", "scene": "stillness",
+    "palette": ["06262e", "1a4d56", "98d1c8", "e0d5ac"],
+    "sample_group": "jazz", "bpm": 60, "end_cycle": 44, "kind": "one-shot"
+  },
+  {
+    "title": "Euphoria", "source": "Euphoria.strudel", "role": "Original Eurodance learning loop",
+    "original_title": "Original Eurodance-style learning loop",
+    "emotion": "Buoyant dance-floor energy; independent of the game story.",
+    "caption": "LIGHT WITHOUT A CEILING", "genre": "EURODANCE SKETCH", "scene": "pulse",
+    "palette": ["18102c", "462751", "eea8ae", "76d7d0"],
+    "sample_group": "tr909", "bpm": 128, "end_cycle": 4, "kind": "loop",
+    "usage_note": "Recovered from the original chat example. This is an original learning loop, not a transcription of Better Off Alone."
+  }
+]

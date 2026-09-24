@@ -1,0 +1,93 @@
+// YEET THAT GLOW STICK - "You Were Coming Back"
+// Blim's POV: curiosity, an unreturned promise, a little light, then keep climbing.
+// Timed to Scene2_LastMaintenanceLocker.gif: 20.000s / 300 authored frames.
+// Export: Start 0, End 8, 48000 Hz, Multi Channel Orbits OFF. 96 BPM, 2.5s/cycle.
+// Stop, then Play from the beginning. This is a one-shot, not a gameplay loop.
+// Cassette VO, recorder/locker/equip sounds and room ambience are separate.
+
+// Keep 0 for the supplied GIF. If the FINAL film holds for VO, enter only the
+// EXTRA hold duration here. Export through ceil((20 + hold) / 2.5) cycles.
+const cassetteHoldSeconds = 0;
+
+const bpm = 96;
+const secondsPerCycle = 240 / bpm;
+const endSeconds = 20 + cassetteHoldSeconds;
+setcpm(bpm / 4);
+
+if (!Number.isFinite(cassetteHoldSeconds) || cassetteHoldSeconds < 0) {
+  throw new Error('cassetteHoldSeconds must be a finite, nonnegative number.');
+}
+
+// A one-cycle phrase, stretched into a finite window at an exact film time.
+const at = (seconds, span, phrase) => phrase
+  .filterWhen(t => t >= 0 && t < 1)
+  .slow(span / secondsPerCycle)
+  .late(seconds / secondsPerCycle);
+const afterTape = seconds => seconds + cassetteHoldSeconds;
+
+// Two written echo taps, rather than a feedback/reverb bus that could spill over
+// the cassette, its silence, or the film's end. Each copy has a finite release.
+const echoAt = (seconds, span, phrase) => stack(
+  at(seconds, span, phrase),
+  at(seconds + 45 / bpm, span, phrase.mul(gain(0.42))),
+  at(seconds + 90 / bpm, span, phrase.mul(gain(0.16)))
+);
+
+stack(
+  // SH210, 0-4s: let the room arrive first, then a tired fragment of First Light.
+  at(0.6, 3, note("[d3,a3]")
+    .sound("triangle").lpf(1000)
+    .attack(0.22).decay(0.5).sustain(0.14).release(0.4)
+    .clip(0.75).gain(0.055)),
+
+  echoAt(1, 2.2, note("d4 ~ a3 ~ e4 ~ ~ ~")
+    .sound("sine")
+    .attack(0.012).decay(0.14).sustain(0).release(0.12)
+    .clip(0.7).gain(0.08)),
+
+  // SH220: small efforts at the two pulls. Clear the actual 5.93s locker clang.
+  at(4.33, 0.6, note("d4 e4 ~ ~")
+    .sound("triangle").fm(0.4).fmh(2).lpf(1500)
+    .attack(0.004).decay(0.045).sustain(0).release(0.08)
+    .clip(0.6).gain(0.055)),
+
+  at(5.33, 0.18, note("[a3,e4]")
+    .sound("triangle").lpf(1200)
+    .attack(0.008).decay(0.06).sustain(0).release(0.08)
+    .clip(0.7).gain(0.045)),
+
+  // SH230, 7-11s: A-C-D-E recalls the human traces Blim noticed in Level 2.
+  // It asks a question; it does not announce the Guide's fate before the tape.
+  at(7, 2.75, note("[f3,a3,e4]")
+    .sound("triangle").lpf(1200)
+    .attack(0.2).decay(0.4).sustain(0.16).release(0.3)
+    .clip(0.75).gain(0.04)),
+
+  echoAt(7.25, 2.2, note("a4 c5 d5 e5")
+    .sound("triangle").fm(0.8).fmh(2).lpf(2200)
+    .attack(0.015).decay(0.14).sustain(0).release(0.16)
+    .clip(0.55).gain(0.075)),
+
+  // All preceding notes/echoes release by about 10.30s.
+  // No music through the 11.40s recorder click, tape, 14s realization and
+  // 16.13s lamp clip. An optional VO hold extends this gap, never the performance.
+
+  // SH250: warmth begins at the ACTUAL weak-light activation, 16.60s, not at 15s.
+  at(afterTape(16.6), 1.25, note("[d4,f4,a4]")
+    .sound("triangle").lpf(1400)
+    .attack(0.12).decay(0.2).sustain(0.12).release(0.25)
+    .clip(0.75).gain(0.04)),
+
+  echoAt(afterTape(16.6), 1.2, note("d5 ~ e5 a4")
+    .sound("sine").lpf(2400)
+    .attack(0.015).decay(0.1).sustain(0).release(0.14)
+    .clip(0.55).gain(0.07)),
+
+  // SH260, 18-20s: the shaft is still immense. Leave an open fifth, not a fanfare.
+  at(afterTape(18), 1, note("[a3,e4]")
+    .sound("triangle").lpf(1000)
+    .attack(0.1).decay(0.25).sustain(0.08).release(0.4)
+    .clip(0.65).gain(0.038))
+)
+  .orbit(0).room(0).delay(0).pan(0.5)
+  .filterWhen(t => t >= 0 && t < endSeconds / secondsPerCycle);

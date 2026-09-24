@@ -1,0 +1,70 @@
+// YEET THAT GLOW STICK - "A Very Bad Shortcut"
+// Original retro score draft for the approved 30-second OpeningCinematicV2.
+// Export: Start cycle 0, End cycle 10. 80 BPM; one cycle = 3 seconds.
+// Stop playback before pressing Play: this is a one-shot, not a repeating song.
+// Rain, humming VO, cracks, splash and "Ow." are separate sound-design tracks.
+
+setcpm(80 / 4);
+
+// Place a one-cycle phrase at an exact film time, stretching it to the given span.
+const at = (seconds, span, phrase) => phrase
+  .slow(span / 3)
+  .filterWhen(t => t >= 0 && t < span / 3)
+  .late(seconds / 3);
+
+stack(
+  // 0-1.5s: leave room for rain. 1.5-7s: an unsuspecting, hummable walk.
+  stack(
+    at(1.5, 5.3, note("d5 e5 a5 f#5 e5 ~ d5 a4")
+      .sound("square")
+      .attack(0.008).decay(0.12).sustain(0.12).release(0.04)
+      .clip(0.55).lpf(2000).gain(0.1)),
+    at(1.5, 5.3, note("[d3,a3] ~ [g3,b3] ~")
+      .sound("triangle")
+      .attack(0.015).decay(0.2).sustain(0.12).release(0.08)
+      .clip(0.5).gain(0.065))
+  ).orbit(0).room(0).delay(0),
+
+  // The tune breaks before the 7s pavement crack; no musical "pickup" occurs.
+  stack(
+    at(9.2, 1.5, note("[d4,eb4] ~ a3 ~")
+      .sound("triangle")
+      .attack(0.01).decay(0.16).sustain(0).release(0.05)
+      .clip(0.45).gain(0.08)),
+    at(11, 3, note("d6 a5 f5 e5 d5 a4 f4 e4")
+      .sound("square")
+      .attack(0.004).decay(0.07).sustain(0).release(0.025)
+      .clip(0.55).lpf(1900).gain(0.085)),
+    at(14, 2.8, note("d5 c5 a4 f4 e4 d4 c4 a3 f3 e3 d3 a2")
+      .sound("triangle").fm(1.2).fmh(1.5)
+      .attack(0.004).decay(0.08).sustain(0).release(0.025)
+      .clip(0.6).gain(0.11)),
+    at(11, 6, note("d2 ~ d2 ~ a1 ~ a1 ~")
+      .sound("triangle")
+      .attack(0.006).decay(0.12).sustain(0).release(0.05)
+      .clip(0.3).gain(0.13))
+  ).orbit(1).room(0).delay(0),
+
+  // 17-22s: no music. Splash owns 17-19s; black and "Ow." own 19-22s.
+  // 22-30s: survival, the red fixture, then noticing the stationary ground stick.
+  stack(
+    at(22, 4, note("[d3,a3] ~ [d4,e4] ~")
+      .sound("triangle")
+      .attack(0.03).decay(0.3).sustain(0.12).release(0.12)
+      .clip(0.5).gain(0.065)),
+    at(24.4, 2.2, note("d5 ~ e5 a5 ~ f5 ~ ~")
+      .sound("sine").fm(0.6).fmh(2)
+      .attack(0.005).decay(0.12).sustain(0).release(0.05)
+      .clip(0.6).gain(0.09)),
+    at(26.4, 2.1, note("d4 ~ a4 e4 ~ a4")
+      .sound("triangle")
+      .attack(0.008).decay(0.1).sustain(0).release(0.04)
+      .clip(0.5).gain(0.075)),
+    at(28.8, 0.5, note("[a4,e5]")
+      .sound("triangle")
+      .attack(0.015).decay(0.2).sustain(0).release(0.12)
+      .gain(0.055))
+  ).orbit(2).room(0.16).roomsize(0.8).roomfade(0.35).delay(0)
+)
+  .pan(0.5)
+  .filterWhen(t => t >= 0 && t < 10);

@@ -1,0 +1,601 @@
+YEET THAT GLOW STICK - ORIGINAL MUSIC DRAFTS
+Draft 7 | 2026-09-22 | Deep-calm underwater jazz rewrite | Sources, not rendered WAVs
+Current location: YeetThatGlowStick\Assets\Audio\Music\Strudel (from repository root)
+
+READ AND PLAY
+
+Open https://strudel.cc/, stop playback, and replace the entire editor with ONE
+.strudel file. Press Play / Ctrl+Enter from a stopped clock. Do not paste multiple
+files together: each has its own final pattern.
+
+Both standalone themes, opening, item, headlamp and ending cues play once, then stop creating notes.
+The REPL clock may keep running in silence. Stop, then Play to hear them again;
+updating a one-shot on an already-running clock will not necessarily restart it.
+MainMenu and all five levels repeat continuously. Ctrl+. stops playback.
+The menu/Level01 pair additionally has a shared-clock handoff preview and stem
+exports; read MENU_LEVEL01_TRANSITION.txt before preparing game loops.
+
+These are proposed compositions for audition, not developer-approved final music.
+No Unity scene, playback trigger, mixer, saved state or gameplay rule is changed.
+Levels 02-05 and the cinematic/item drafts use built-in oscillators/noise. The menu/Level01 pair
+and T01 theme retain the supplied tune's RolandTR707 drum bank; its sample provenance/license
+must be recorded before release. T02 instead uses sampled piano/GM instruments and
+soft synthesized noise; its instrument sources are documented below.
+No song transcription, recorded voice or franchise jingle is included.
+
+SHARED MUSICAL IDENTITY
+
+The selected menu's D-A-F-E-D opening shape stays intact in Level01 and returns in
+Level05. The earlier cues' D-E-A-F contour also appears in Level05. A new A-C-D-E
+answer in Level02 expresses Blim noticing human traces; its timbre returns after
+the final journal, when those traces mean something different to Blim.
+These are musical associations, not recordings, hidden navigation clues or an
+off-screen Guide theme. Square melody, triangle bass and sine glints link the set.
+
+The lingering dotted-eighth sine echoes remain a signature across all levels.
+Their delay interval follows each tempo; the wet sends, feedback and room character
+stay related. Only menu/Level01 share the exact uninterrupted bed. The other levels
+are separate scores, not stems of the menu transport.
+
+All music follows BLIM THE SCOUT. The Guide's biography is composer context only.
+The score must not grieve an ending that Blim has not learned or reenact her shift,
+entrapment or exhaustion. The headlamp arrives toward the END of Level03.
+
+The original palette suggests old-console music rather than emulating one console exactly.
+It is not a loud dance track or horror jump-scare score. Intent: a curious little
+scout, wet cramped space, the cost of giving away light, then earned relief.
+T02 is a separately requested non-chiptune alternative: submerged, soothing jazz.
+
+EXPORT SETTINGS
+
+File name                   Start   End   BPM   Export duration
+YTGS_Theme_KeepClimbing         0    64     92  166.957 seconds (one-shot, includes tails)
+YTGS_Theme_UnderwaterJazz       0    44     60  176.000 seconds (one-shot, includes tails)
+YTGS_MainMenu                   0    32     92   83.478 seconds (listening preview)
+YTGS_Level01                    0    32     92   83.478 seconds (listening preview)
+YTGS_Level02                    0    32     88   87.273 seconds (listening preview)
+YTGS_Level03                    0    32     96   80.000 seconds (listening preview)
+YTGS_Level04                    0    32     80   96.000 seconds (listening preview)
+YTGS_Level05                    0    32     88   87.273 seconds (listening preview)
+YTGS_OpeningCinematic           0    10     80   30.000 seconds
+YTGS_HeadlampCinematic          0     8     96   20.000 seconds (current GIF; hold = 0)
+YTGS_ItemFound                  0     1    120    2.000 seconds
+YTGS_HeadlampFound              0     3     96    7.500 seconds
+YTGS_Surface                    0     9     80   27.000 seconds
+
+For every cue: sample rate 48000, maximum polyphony 1024 (leave the default),
+Multi Channel Orbits UNCHECKED, then Export to WAV. Orbits in these files separate
+effect buses; a listening export should be mixed stereo, not multichannel orbits.
+
+The opening, item, headlamp and surface ranges include deliberate silence/tail
+space. Do not trim the opening's black-screen pause as if it were an export error.
+The ending contains an eight-bar musical phrase and one bar of tail space.
+
+All level forms span 32 cycles. Use End 64 for two passes of any level.
+Level03's after-locker and Level05's after-final-journal variants have the same
+tempo and export range as their respective normal mixes; give them distinct names.
+Do not export Level03's locker-cinematic as another song: it silences GAMEPLAY music
+while the separate C02_CINEMATIC_Headlamp.strudel cue accompanies the film.
+
+All five levels now have wet tails. A cold 0-32 export is a listening draft, not a
+certified seamless game loop. For game loops render 0-96, retain the middle 32-bar
+pass with its preceding echo history, and inspect the actual rendered loop join.
+Do not assume that exporting Start 32 prewarms earlier notes or reverbs.
+At 48000 Hz, common rounded 32-bar frame counts are:
+  Menu/Level01: 4,006,957.  Level02/05: 4,189,091.
+  Level03: 3,840,000.       Level04: 4,608,000.
+Confirm the exporter's actual cycle-zero alignment and retain the same start frame,
+frame count and leading silence for every related variant/stem. A frame count alone
+does not prove a click-free join or a good mix against speech and gameplay SFX.
+Do not loop either standalone theme, cinematic, discovery stingers, or surface ending in Unity.
+MainMenu and Level01 share a 32-cycle form. Their long wet tails need the separate
+stem/middle-pass export workflow in MENU_LEVEL01_TRANSITION.txt for game use.
+
+T01 - KEEP CLIMBING (STANDALONE GAME THEME)
+
+T01_THEME_KeepClimbing.strudel | 92 BPM | 60 written bars + 4 bars of tail
+Export Start 0, End 64: 166.957 seconds (2:46.957). Start from a stopped clock.
+This is an independent instrumental theme, not a gameplay loop, menu replacement,
+shared-transport stem, or cue synchronized to one of the existing films.
+
+Each section occurs once. The opening four bars quote the current approved menu,
+including its bass, melody, percussion and water. Thereafter the melody, bass lines,
+drum accents and replies are newly written, not another pass through the menu loop.
+Recurring musical ideas change rhythm, register, harmony or context; repeated notes,
+rhythmic vocabulary and the loved delay echoes remain part of the musical language.
+
+Timeline (cycle zero is the beginning; the final four cycles contain no new notes):
+  0-8     0:00.00-0:20.87   First Light: rain, falling, learning to throw the light.
+  8-16    0:20.87-0:41.74   Someone Was Here: curiosity, wrappers, arrows, a voice.
+  16-24   0:41.74-1:02.61   The Long Climb: rising register and physical effort.
+  24-28   1:02.61-1:13.04   C-19: an unreturned promise, then a small weak beam.
+  28-36   1:13.04-1:33.91   Floodwater: uneven accents, machinery, persistence.
+  36-44   1:33.91-1:54.78   Roots and Air: open F-major colors, still below ground.
+  44-52   1:54.78-2:15.65   The Last Journal: encouragement, then the last ladder.
+  52-60   2:15.65-2:36.52   Daylight: D major, ordinary relief, one last throw.
+  60-64   2:36.52-2:46.96   Let the echo/reverb tail settle; no restart.
+
+Everything follows what BLIM experiences or learns. The C-19 passage is after the
+long climb, never an early lamp reward. Its empty attack bar allows lingering echoes,
+not sample-exact silence. It is not a retiming of the separate C-19 cinematic.
+The final journal comes after roots/fresh air; relief arrives only at the surface.
+No off-screen Guide scene, added dialogue, or imagined reunion is included.
+
+Water uses the currently approved menu values: gain 0.6, attack 0.001, decay 0.08,
+sustain 0, release 0.12; delay 0.45, delaytime 45/92, feedback 0.5; room 0.6,
+roomsize 2, roomfade 0.1. The core bass, lead and drum timbres also retain the menu
+settings. Added FM replies, triangle harmony/glimmers and quiet machine textures
+provide contrast; rests and changing density shape the arc instead of a new water mix.
+The last water note starts at cycle 59.5 (2:35.217), with over 11 seconds until
+the export boundary. Do not hard-cut at cycle 60 or use a loop-prewarming export.
+
+The source is delivered for audition. No theme WAV or Unity playback integration
+is added, and final audible balance/tail approval still requires the rendered mix.
+
+T02 - KEEP CLIMBING: STILL WATER (DEEP-CALM UNDERWATER JAZZ)
+
+T02_THEME_KeepClimbing_UnderwaterJazz.strudel | 60 BPM | 2:56.000 including tails
+Export Start 0, End 44, 48000 Hz, Multi Channel Orbits OFF.
+Independent, paste-ready copy: no import of T01, no changes to any existing score.
+This replaces the earlier 92-BPM jazz arrangement after the developer found it too
+fast. It is a substantial rewrite, not that arrangement played back at a lower rate.
+The earlier jazz source, including the user's intervening water-gain edit, is saved
+in this music session's strudel-check/underwater-jazz-before-calm-20260922.strudel.
+
+The new score has 40 written bars and four tail bars. Its eight story sections are
+still one-time Blim perspectives, but their timing is now:
+  0-6     0:00-0:24   First Light: the familiar contour unfolds slowly.
+  6-12    0:24-0:48   Someone Was Here: a small question and a gentle answer.
+  12-18   0:48-1:12   The Long Climb: higher notes, not a rhythmic build.
+  18-22   1:12-1:28   C-19: an empty attack bar, then weak-lamp warmth.
+  22-26   1:28-1:44   Floodwater: a slow current rather than an obstacle rhythm.
+  26-30   1:44-2:00   Roots and Air: softly opening harmony.
+  30-34   2:00-2:16   Last Journal: encouragement over a suspended chord.
+  34-40   2:16-2:40   Daylight: quiet D6/9, then the final glowstick.
+  40-44   2:40-2:56   Release and echo tail; no new notes.
+
+WHAT CHANGED FOR CALM
+
+  - 60 BPM instead of 92. This is a compositional choice, not a magic heart-rate
+    target. Simply stretching the old 60-bar form would also exceed three minutes.
+  - 66 piano notes instead of 295; approximately 0.41 attacks/second instead of
+    1.88 across the active score. Notes are at least a second long, with long rests.
+    Piano range is now G3-A4, rather than D4-F6.
+  - 20 chord attacks and 20 bass roots over 160 active seconds, normally one per
+    eight seconds. No walking bass, offbeat chord repetitions, chromatic bass runs,
+    swing, brushed beat, drum build or fast ornaments.
+  - Open minor/major ninths, sixths and suspended voicings retain jazz color.
+    Altered dominant/b9 tension is removed. The music develops through small melody
+    and harmony changes, not louder or busier sections.
+  - Piano attack is softened to 50ms; electric-piano chords bloom over 140ms.
+    Instrument gains are lower, without treating quietness alone as relaxation.
+    Extra keyboard delays are removed so echoes do not refill all the new space.
+  - The sparse source arrangement has 121 attack clusters instead of 685, counting
+    simultaneous chord tones as one attack per instrument. This is about an 83%
+    reduction in attacks per second. It is a score measurement, not a stress score.
+
+Underwater treatment remains throughout, including the ending. Piano cutoff varies
+slowly per note between 850-1150 Hz, electric piano is filtered at 850 Hz, and bass
+at 580 Hz. Narrow stereo placement and separate soft reverbs provide distance.
+A quieter, non-pulsing 120-300 Hz brown-noise wash adds water-like softness. These
+are sound-design choices, not a physical underwater simulation or breathing guide.
+
+The developer lowered water gain to 0.1 after the first jazz pass. This rewrite
+preserves that CURRENT gain, the exact envelope and the loved delay/reverb settings:
+delay 0.45, delaytime 45/92 seconds, feedback 0.5, room 0.6, roomsize 2, roomfade 0.1.
+There are now 14 isolated droplets instead of 69. Pitch placement/timing is newly
+written, but the droplet treatment stays intact on orbit 3; no band filter affects it.
+The 45/92 delay time intentionally remains in seconds rather than slowing with BPM.
+The low wash releases over four seconds after cycle 40. Export all the way to 44.
+
+RESEARCH BASIS FOR THE DEEP-CALM REWRITE
+
+The evidence supports broad low-arousal design directions, not a guaranteed result
+for this listener or a uniquely calming tempo. The user's report that the previous
+arrangement felt fast is the decisive local feedback. Sixty BPM, eight-second chord
+changes and the new note counts are composer-chosen targets, not clinical thresholds.
+
+1. Eerola, Friberg & Bresin (2013), "Emotional expression in music: contribution,
+   linearity, and additivity of primary musical cues."
+   https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2013.00487/full
+   Full text reviewed. In a controlled synthesized-excerpt experiment, lower musical
+   speed, softer dynamics, darker timbre and more legato articulation supported
+   perceived peacefulness. The speed cue was non-simultaneous onsets per second,
+   not simply metronome BPM. This motivates thinning the score as well as slowing it;
+   it does not prove that density independently matters more than beat tempo.
+   Higher register also supported peacefulness in that experiment. Our lower piano
+   register is an arrangement choice, not a claim that low notes are always calmer;
+   the isolated high droplets retain their sparkle.
+
+2. Bernardi, Porta & Sleight (2006), "Cardiovascular, cerebrovascular, and respiratory
+   changes induced by different types of music in musicians and non-musicians:
+   the importance of silence."
+   https://pmc.ncbi.nlm.nih.gov/articles/PMC1860846/
+   Full text reviewed. Faster selections accompanied greater activation in a small
+   study; a two-minute silent pause produced particularly clear reductions.
+   This supports taking space seriously, but two-second musical rests are NOT the
+   studied two-minute pause. No reliable one-to-one heartbeat/breath entrainment or
+   ideal BPM is established. Our rests are compositional breathing room only.
+
+3. Gomez & Danuser (2007), "Relationships between musical structure and
+   psychophysiological measures of emotion."
+   https://doi.org/10.1037/1528-3542.7.2.377
+   https://europepmc.org/article/MED/17516815
+   Indexed abstract reviewed; full text not verified. Faster, more accented and
+   staccato excerpts were associated with greater activation. This supports removing
+   driving rhythmic layers and strong accents; it does not make brushes inherently
+   agitating or establish a particular synthesizer attack time as therapeutic.
+
+4. Witek et al. (2014), "Syncopation, Body-Movement and Pleasure in Groove Music."
+   https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0094446
+   Full text reviewed. Moderate syncopation in funk drum patterns produced strong
+   pleasure and desire to move. Groove can be enjoyable without serving this request
+   for stillness. Removing continuous swing/brush subdivisions is a brief-specific
+   decision; the paper does not establish a relaxation-specific swing ratio.
+
+5. Lahdelma & Eerola (2016), "Mild Dissonance Preferred Over Consonance in Single
+   Chord Perception."
+   https://pmc.ncbi.nlm.nih.gov/articles/PMC4934671/
+   Full text reviewed. Major ninth, minor ninth and minor seventh chords were highly
+   preferred, while the major triad had the lowest tension. Preference is not the
+   same outcome as relaxation. T02 keeps gentle jazz extensions but avoids altered
+   dominant stabs, dense low-register clusters and frequent harmonic surprises.
+
+6. Cheung et al. (2019), "Uncertainty and Surprise Jointly Predict Musical Pleasure
+   and Amygdala, Hippocampus, and Auditory Cortex Activity."
+   https://doi.org/10.1016/j.cub.2019.09.067
+   https://europepmc.org/article/MED/31708393
+   Abstract reviewed; full text inaccessible during research. Pleasure depended on
+   the interaction of uncertainty and surprise, not a rule that maximum repetition
+   or novelty is best. Our through-composed sections retain recognizable contours
+   and tonal centers, developing without increasing density. The study was not a
+   relaxation or underwater-music trial.
+
+7. Adiasto et al. (2022), "Music listening and stress recovery in healthy individuals:
+   A systematic review with meta-analysis of experimental studies."
+   https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0270031
+   https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9205498/fullTextXML
+   Full-text XML reviewed. The pooled effect across 14 studies was not statistically
+   significant and was heterogeneous. This is not proof that music cannot help;
+   it cautions against guaranteed stress reduction or a universal tempo prescription.
+
+SYNTHESIS AND LIMITS
+
+The rewrite combines less musical activity, longer spaces, soft entrances, restrained
+accents and stable jazz colors. Bass and chord entrances coincide rather than
+alternating to create a faster hidden pulse. Only the loved water keeps audible
+feedback echoes; fewer fresh drops give those echoes room.
+
+Exact EQ cutoffs, reverb sizes, envelope milliseconds and underwater noise settings
+are sound-design judgments, not findings from the papers above. No claim is made
+for 432-Hz tuning, breathing control, sleep induction or a universally "most relaxing"
+song. The developer's audition remains the arbiter of whether this version feels
+calming, unrushed and underwater; source-event counts cannot measure that experience.
+
+PLAYBACK AND INSTRUMENT PROVENANCE
+
+Use the normal strudel.cc REPL, whose default setup registers these sounds:
+  piano                 Salamander Grand Piano by Alexander Holm, CC BY 3.0.
+  gm_epiano1, n(1)       0040_FluidR3_GM_sf2_file (electric piano).
+  gm_acoustic_bass, n(1) 0320_FluidR3_GM_sf2_file (acoustic bass).
+  sine / brown          Built-in synthesis for droplets and low water; no brushes.
+
+The sampled instruments require network access on first use. Strudel lazily loads
+audio, so let the instruments load, then Stop and Play from zero for a complete
+audition/export. A plain core-only embed must register the REPL's piano map and GM
+soundfonts first. Do not substitute a waveform if a sampled instrument fails to load.
+
+Source references:
+  https://strudel.cc/learn/samples/
+  https://codeberg.org/uzu/strudel/src/branch/main/website/src/repl/prebake.mjs
+  https://codeberg.org/uzu/strudel/src/branch/main/packages/soundfonts/gm.mjs
+  https://strudel.b-cdn.net/piano.json
+  https://archive.org/details/SalamanderGrandPianoV3
+  https://creativecommons.org/licenses/by/3.0/
+  https://felixroos.github.io/webaudiofontdata/sound/
+
+Keep the piano attribution in release credits, and archive the chosen GM font's
+license/provenance before distribution. Availability in the REPL is not a blanket
+license clearance. No third-party sample files were copied into the Unity project.
+The composition is delivered as Strudel source, not a rendered WAV or a Unity
+integration; final audible balance and underwater character remain for audition.
+
+000 / LEVEL01 - UNDER THE GRATES / FIRST LIGHT
+
+000_MainMenu.strudel elongates the liked four-bar tune into a 32-bar form: original
+theme, answering phrase, return, upper variation, echo space, answer, lift, home.
+The original first four-bar tune is retained at 92 BPM. The initial requested
+droplet change was 0.10 to 0.15 (1.5x) in both menu and Level01. The developer has
+since tuned the menu to 0.6; the new standalone theme takes that current menu as
+its reference without changing either gameplay source. Shared menu/Level01 stems
+must still have matching mix values when preparing a seamless runtime handoff.
+
+L01_Level01.strudel is Blim's First Light: common bass, melody, rhythm and echoes
+continue unchanged while hesitant lower-register attempts replace the menu detail.
+Small ascending replies suggest learning to remember a route. Open fifths come
+and go, so the accompaniment offers fragile footing rather than complete safety.
+No Guide knowledge, headlamp warmth or victory moment is introduced.
+
+The menu source's embedded Level01 detail was updated to match this rewrite.
+Its default menu arrangement and loved echoes are otherwise unchanged.
+
+To preview the transition, set mode = 'handoff' in either file, leave render =
+'full', then Stop and Play. It begins mid-phrase at cycle 7.375 and changes layers
+over two cycles without resetting the score. The default modes remain 'menu' and
+'level1' respectively. Preserve these single quotes: double-quoted strings are
+musical mini-notation in Strudel, not ordinary JavaScript selector values.
+
+For an arbitrary-time game transition, preserve the shared stem and musical phase.
+Restarting a separate Level01 WAV at zero will NOT provide the intended continuity.
+The persistent, synchronized Unity playback handoff is documented but not wired.
+
+LEVEL02 - SOMEONE WAS HERE
+
+L02_Level02.strudel | 88 BPM | 32 bars
+Warm F-major/D-minor colors, a questioning square-wave melody and a soft metallic
+answer. A fresh wrapper, old tools and painted directions make the silence feel
+inhabited. The music asks "Could somebody be ahead of me?" rather than announcing
+what happened to that person. This replaces the previous copied Level01 placeholder.
+
+Cassettes encountered here: Shift 43, Power Out, Learning to Climb.
+Blim discovers a person through what is left behind; the score never changes POV.
+
+LEVEL03 - THE LONG CLIMB
+
+L03_Level03.strudel | 96 BPM | 32 bars per gameplay variant
+More insistent triangle bass, climbing melodic intervals and interrupted answers.
+This is physical effort and uncertainty, not a chase or a boss encounter.
+Wrong Turn gives the markings context; Locker C-19 precedes the late-level reveal.
+
+At the top of the source:
+  const scene = 'climbing';          Most of Level03. NO headlamp layer.
+  const scene = 'locker-cinematic';  No gameplay notes; use the separate film cue.
+  const scene = 'after-locker';      Gameplay AFTER the late-Level03 cutscene.
+
+After-locker thins the lead and percussion and adds a small steady warmth.
+Blim has gained a weak lamp and realized its owner never returned for it. The
+music carries that unsettled knowledge, not a triumphant upgrade or a full account
+of the Guide's fate. It can continue while the player finishes the level.
+
+The developer's later 2026-09-19 request explicitly commissions music for the supplied
+C-19 GIF, superseding the earlier silence-only direction for this music draft.
+Fade the GAMEPLAY music bus, including its already-ringing effects, before starting
+C02_CINEMATIC_Headlamp.strudel at film time zero. Do not layer the old
+003_HeadlampFound.strudel reward candidate on top. The film score reserves its own
+cassette/revelation silence. Setting this Level03 preset cannot erase existing tails.
+Resume after-locker gameplay music only when the actual film ends, including any VO
+hold; do not resume automatically at 20s if the animation is still waiting for speech.
+
+LEVEL04 - FLOOD LEVELS
+
+L04_Level04.strudel | 80 BPM | 32 bars
+A slower, heavier pulse under an uneven 3+3+2 current. The familiar melody has more
+space around it; a narrow warm harmony holds against the larger, colder echoes.
+Blim is navigating moving water with both the weak lamp and glowsticks.
+
+Cassettes: I Can Hear Something and Getting Tired. They affect what Blim understands,
+not whose perspective the score follows. There is no fake traffic recording,
+off-screen reenactment of the Guide tiring, or musical declaration that Blim is safe.
+
+LEVEL05 - NEAR THE SURFACE
+
+L05_Level05.strudel | 88 BPM | 32 bars per variant
+Open F-major harmony, higher answers and less low-end pressure suggest roots,
+fresh air and real sunlight through cracks. The old menu melody becomes recognizable
+in a less enclosed setting. Hope is earned, but the manhole is still above Blim.
+The earlier generic 104-BPM, 16-bar, dry "Keep Your Nerve" draft is superseded.
+
+  const scene = 'ascent';               Default. Roots/air/light; Almost There.
+  const scene = 'after-final-journal';  ONLY after Blim hears Whoever Finds This.
+
+The final-journal aftermath removes the drum pulse, lowers the melodic register
+and recalls Level02's human-traces answer. It is quiet resolve: take the words with
+you and keep climbing. Not a funeral, not a victory. The loop stays open rather
+than using the surface cue's settled D-major arrival.
+
+EVENT STATES AND CASSETTE SPACE
+
+In Levels02-05, const listening = true previews a quieter accompaniment without
+the main lead or noise percussion. Level02's answering voice and Level05's memory
+voice also step aside. Use false for normal gameplay. For the final journal itself,
+keep scene = 'ascent' and listening = true; choose the aftermath only after hearing it.
+
+These are MANUAL COMPOSITION PRESETS, not gameplay detection. Stop/play the source
+to audition a preset. Changing it live affects newly triggered notes, not samples
+that are already ringing. Production must duck the whole music/effects mix beneath
+cassette speech and restore it deliberately; quieter new notes alone are insufficient.
+The files contain no cassette VO, real water, traffic, recorder hiss or triggers.
+
+Locker and final-journal states NEVER advance because the music reaches bar 16/32.
+Select them from actual cinematic/cassette progress, not a timer or merely entering
+Level03/05. Preview listening/state variants share their own level's musical phase;
+runtime fades, saved story progress and scene routing still need implementation.
+Levels02-05 are separate pieces with different tempos, so the menu/Level01
+arbitrary-time shared-stem handoff is not a claim about every level transition.
+
+C02_CINEMATIC_Headlamp.strudel - YOU WERE COMING BACK
+
+A new, original one-shot for the supplied Scene2_LastMaintenanceLocker.gif.
+Its 20.000-second encoded duration agrees with the sprite timeline's 300 authored
+frames at nominal 15 FPS. The GIF stores 274 encoded frames with variable delays;
+frame count divided by 15 is NOT its runtime. Export cycles 0-8 at 96 BPM.
+
+The score stays with Blim: a tired breath, curiosity at the empty spaces, silence
+while the recording changes what those objects mean, then a very small warmth when
+the weak lamp actually lights. No triumphant power-up and no omniscient memorial.
+The A-C-D-E phrase recalls Level02's human traces; the ending stays in the sewer's
+minor/open-fifth language rather than borrowing the surface's D-major resolution.
+
+Film time       Treatment / actual asset event
+ 0.00- 0.60s   Leave the room's first breath to ambience.
+ 0.60- 4.00s   Low open harmony; a small sine phrase with two fading echo copies.
+ 4.33 / 5.33s Short hesitant fragments with the two physical pulls.
+ 5.60- 7.00s  Musical space around the 5.93s door release / clang.
+ 7.00-10.30s  Warm but questioning human-traces phrase over the exposed empty slots.
+10.30-16.60s  Music clears: click at 11.40, authored tape end at 14.00,
+               realization, and the mechanical lamp clip at 16.13.
+16.60-18.00s  Small soft chord and a remembered light fragment at beam activation.
+18.00-20.00s  An unresolved fifth as Blim looks up; releases finish around 19.05s.
+
+Echoes are finite written note copies at dotted-eighth spacing. This cue deliberately
+has no feedback delay or reverb bus: a supposedly silent passage must not retain
+uncontrolled musical tails. It still has an echo character, but not the menu's
+continuous wet ambience. It contains no cassette VO or real-world sound effects.
+
+VO UPDATE: The older art-side Audio/Cassette_Cues.json still marks the recording
+NOT_PRODUCED, but the developer has since supplied nine M4A recordings. Processed
+cassette-style WAV copies are now in Assets\Audio\VoiceActing\Cassette (Unity root).
+The art manifest allows a hold within frames 177-209 until the voice finishes.
+Do not rush the performance to fit the preview's short slot. The music composition
+did not synthesize or include VO; the later voice-processing pass preserved the
+supplied recording and did not claim a listening/transcription review.
+
+The untrimmed casette_5 recording is 12.480 seconds. If it starts at 11.40s, the
+extra hold is 9.88s and the film becomes 29.88s. For that timing, set
+cassetteHoldSeconds = 9.88 and export through cycle 12 (30s, including final padding).
+Any additional recorder click/static lead-in needs its own timing allowance.
+The score remains at hold = 0 for the unchanged 20-second GIF; this processing pass
+did not retime the artwork, alter that default or install voice playback.
+See VoiceActing\Cassette\READ_ME.txt for the voice variants and full timing note.
+
+For the current GIF, keep const cassetteHoldSeconds = 0.
+For a finalized longer film, set it to the EXTRA seconds inserted by that hold,
+not the total speech duration. All post-cassette music moves later by that amount,
+and the silent middle grows without changing pitch/tempo or stretching the voice.
+Export Start 0, End ceil((20 + cassetteHoldSeconds) / 2.5). For example, a 5-second
+extra hold uses End 10 for a 25-second film. Non-bar-aligned holds may leave export
+padding; retain the exact film duration in the final audio edit. At 48kHz the
+default 20-second cue occupies 960,000 frames, before any exporter padding.
+
+This setting does not detect or control runtime holds. If hold length is unknown,
+drive audio from the film's logical time, pausing within this cue's silent middle.
+If the visual hold resumes at frame 210, align the cue to 14.00s before continuing;
+the separately played cassette must not be paused with the music. Use either a
+pre-extended render OR runtime pausing, not both. A fixed unadjusted WAV must not
+play the lamp response over a still-running cassette. That integration is not
+installed. Stop then Play for REPL auditions; never loop this cue.
+
+The latest music commission overrides only the earlier music-free direction.
+The supplied art, director prompt, cassette text and timelines remain unmodified.
+
+UNCHANGED EARLIER CINEMATIC AND DISCOVERY DRAFTS
+
+The four sources below predate the full Guide/Blim story and were preserved during
+this five-level rewrite. Their musical proposals are not automatically approved
+for the newly described films. Current filenames follow the developer's renames.
+
+C01_CINEMATIC_Opening.strudel - A VERY BAD SHORTCUT
+
+Score target: the approved OpeningCinematicV2 revision
+opening-v2-never-carried-glowstick-2026-09-18-1959, 30s / 450 samples / nominal 15fps.
+
+Film interval   Musical treatment
+ 0.0- 3.0s     Leave the first 1.5s to rain; introduce a tiny humming-like chip tune.
+ 3.0- 7.0s     Innocent walking phrase, light accompaniment, no heroic fanfare.
+ 7.0- 9.0s     Break the tune for the pavement crack and stopped humming.
+ 9.0-11.0s     Small uneasy interval for recognition; not an explosive jump scare.
+11.0-14.0s     Descending square-wave fragments as the street collapses.
+14.0-17.0s     One continuing descent, lowered register, no rapid-cut stingers.
+17.0-19.0s     Music clears for water impact and its muffled aftermath.
+19.0-22.0s     No music during blackout; preserve room for the quiet "Ow." near 21s.
+22.0-26.0s     Tentative open harmony; a small green-light motif reappears.
+26.0-30.0s     Cautious approach and an unresolved question, not acquisition/victory.
+
+In the previously approved visual revision, the scout never carries a glow stick.
+It is already on the ground beside the closed door under the red fixture. The final approach does not
+collect it. Do not add the item stinger automatically at the end of this film.
+The character is handless and begins without a headlamp.
+
+The later chat outline instead says the glowstick is backpack-clipped. That visual
+continuity difference is not resolved by this level-music rewrite; neither the
+opening score nor its approved artwork was silently revised.
+
+This file is BGM only. Real rain, footsteps, humming, cracks, splash, drips and
+"Ow." are separate, unproduced sound-design/VO layers. Shot-level timing is based
+on the notes; frame-exact sync still belongs to the cinematic integration pass.
+
+001_ItemFound.strudel - SOMETHING USEFUL / ORDINARY ITEM DISCOVERY
+
+A small rising three-note recognition followed by an open chord. Deliberately
+shorter and less triumphant than the headlamp. Generic proposed trigger: a new,
+meaningful item discovery. Item taxonomy and pickup pacing are not yet defined.
+Do not play a reward jingle on every routine glow-stick retrieval or inventory tick.
+This cue does not change the opening's empty-inventory ending.
+
+003_HeadlampFound.strudel - A LITTLE MORE COURAGE / LEGACY HEADLAMP CANDIDATE
+
+A tentative beginning opens into a higher version of the motif and warmer
+three-note harmony, then settles without the final surface cadence.
+This older upgrade-oriented proposal is NOT the score for Locker C-19. The new
+20-second C02_CINEMATIC_Headlamp.strudel replaces it for that film. Keep this
+7.5-second source as an unused candidate, not an automatic equip cue.
+
+Any reuse would need a separately approved context; do not layer it over the new
+C-19 score or its intentional silence. It does not define lamp power or
+battery mechanics, or imply that glow-stick strategy stops mattering.
+
+C03_CINEMATIC_Surface.strudel - SKY, AT LAST / TRUE SURFACE ARRIVAL
+
+Relief first, celebration second. The same little tune returns in D major, with
+warmer sustained harmony and a settled final tonic instead of sewer suspense.
+The proposed 27s duration is not an approved ending-film runtime.
+
+Trigger only at the actual surface/escape ending. The top grates in Drainfall and
+Pipeworks explicitly mark local level completion; neither is the surface.
+The developer now specifies daylight, an ordinary street, the final glowstick toss
+and the title. This unchanged candidate has NOT been resynchronized to those shots
+or rescored for Blim's final-journal knowledge. The developer has renamed it C03,
+matching the surface scene's place in the story.
+
+READING THE CODE
+
+setcpm(BPM / 4) sets the clock; this collection treats a cycle as a four-beat bar.
+stack(...) mixes parallel layers, equivalent in purpose to multiple "$:" lines.
+note(...) describes pitches; sound(...) chooses synthesized timbre or noise.
+Spaces sequence notes; commas inside brackets make chords; "~" means a rest.
+<...> advances one element each bar; [ ... ] subdivides that element.
+arrange([8, phrase], ...) places musical sections; arrange itself repeats.
+filterWhen(t => t >= 0 && t < N) makes the other cues finite on a fresh clock.
+The opening's at(seconds, span, phrase) helper places phrases against film timing.
+clip and the ADSR controls shape note length; gain balances the instruments.
+orbit isolates shared reverb/delay. Keep Multi Channel Orbits off for stereo WAVs.
+
+SOURCE BASIS AND OPEN LIMITS
+
+The original draft used the 44 TODO files present then, the root README, Context
+Mesh and zmem ep_141. This revision uses the developer's full five-level timeline,
+nine cassette summaries, explicit BLIM-only POV correction and late-Level03 lamp
+placement. The later C-19 music commission uses the actual GIF, sprite timeline,
+storyboard and cassette cues for timing, superseding the brief's earlier no-music rule.
+The mesh does not register this repository as a context base. No new context
+store was created and no sibling store was modified.
+
+Most relevant sources:
+- Developer story and perspective instructions in this Strudel/music chat:
+  First Light -> Someone Was Here -> The Long Climb -> Flood Levels -> Near the Surface.
+- TODO\ARTWORK\CINEMATICS\SCENE_2\01_PRODUCTION_PROMPT.md:
+  abandoned headlamp, weak practical light and cassette revelation; its older
+  music-free direction is superseded by the explicit request for this new score.
+- YeetThatGlowStick\Assets\Art\Narrative\CINEMATICS\SCENE_2:
+  Scene2_LastMaintenanceLocker.gif, Scene2_LastMaintenanceLocker_Timeline.json,
+  Preview storyboard/motion strips and Audio\Cassette_Cues.json: actual visual
+  timing, 20-second preview, unproduced VO and optional future speech-fit hold.
+- TODO\ARTWORK\CINEMATICS\SCENE_1\01_PRODUCTION_PROMPT.md,
+  02_PRODUCTION_REVIEW.md and 03_ART_CHAT_HANDOFF.md in the same folder:
+  current locations of the opening production documents. The original score
+  targeted the specific revision in zmem ep_141, approved at 20:30 IST on 2026-09-18;
+  see the unresolved opening-continuity note above.
+- TODO\01_PRODUCT_DECISIONS.todo and 09_HEADLAMP_UPGRADE.todo:
+  earlier level-3 progression gate; the later story fixes late-level discovery.
+- TODO\12_AUDIO.todo and ARTWORK\14_AUDIO_VISUAL_SUPPORT.todo:
+  original audio, dark traversal feedback, mix clarity and non-audio alternatives.
+- TODO\18_FUTURE_CONTENT.todo and 19_LEVELS_01_02.todo:
+  historical scope limits; the later chat now supplies the five-level story.
+- TODO\ARTWORK\13_NARRATIVE_CINEMATICS.todo:
+  earlier narrative-artwork scope and programming handoff, not a fresh production-status audit.
+
+Authorship: original composition/code drafted in the Strudel/music chat
+b4df7612-ff6d-495d-aa91-657f085a31e4 at the developer's request.
+These files are not an audio mix approval, a listening review, or a shipped asset.
+No location-driven panning or musical sonar is included. Balance all music against
+real throws, landings and speech, with non-audio alternatives for critical feedback.

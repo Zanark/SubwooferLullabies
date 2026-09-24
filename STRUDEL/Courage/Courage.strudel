@@ -1,0 +1,41 @@
+// YEET THAT GLOW STICK - "A Little More Courage"
+// Original 7.5-second upgrade cue for the headlamp reserved for level 3.
+// Export: Start cycle 0, End cycle 3. 96 BPM; one cycle = 2.5 seconds.
+// Proposed timing: recognition -> opening harmony -> settle and tail.
+// No battery, permanent-power or exact equip-animation behavior is implied.
+// Stop, then Play to audition from the beginning.
+
+setcpm(96 / 4);
+
+stack(
+  note(`<
+    [~ d5 e5 a5 f5 a5 d6 ~]
+    [a5 ~ g5 f5 e5 ~ d5 ~]
+    ~
+  >`)
+    .sound("square")
+    .attack(0.008).decay(0.1).sustain(0.12).release(0.08)
+    .clip(0.65).lpf(3400).gain(0.12)
+    .orbit(0).room(0.1).roomsize(0.8).roomfade(0.45).delay(0),
+
+  // Warmer and broader than an ordinary find; the final suspended D is not escape.
+  note("<[bb3,d4,f4] [g3,a3,d4] [[d4,a4,e5] ~ ~ ~]>")
+    .sound("triangle")
+    .attack(0.04).decay(0.3).sustain(0.22).release(0.22)
+    .clip(0.6).gain(0.1)
+    .orbit(1).room(0.18).roomsize(1).roomfade(0.6).delay(0),
+
+  note("<[bb2 ~ f3 ~] [g2 ~ a2 ~] [d3 ~ ~ ~]>")
+    .sound("triangle")
+    .attack(0.008).decay(0.18).sustain(0).release(0.05)
+    .clip(0.5).gain(0.18)
+    .orbit(2).room(0).delay(0),
+
+  note("<[~ ~ ~ ~ d6 e6 a6 ~] [~ ~ f6 ~ e6 ~ ~ ~] ~>")
+    .sound("sine")
+    .attack(0.004).decay(0.08).sustain(0).release(0.05)
+    .clip(0.5).gain(0.045)
+    .orbit(3).room(0.13).roomsize(0.7).roomfade(0.3).delay(0)
+)
+  .pan(0.5)
+  .filterWhen(t => t >= 0 && t < 3);

@@ -1,0 +1,159 @@
+// YEET THAT GLOW STICK - "Under the Grates: Waiting at the Door"
+// 32-bar main-menu arrangement of the tune you liked. 92 BPM, 83.478 seconds.
+// Quick preview export: cycles 0-32, 48000 Hz, Multi Channel Orbits OFF.
+// Loop/stem preparation and the Unity handoff: MENU_LEVEL01_TRANSITION.txt.
+
+// Single quotes keep these selectors as JavaScript strings, not mini-notation.
+const mode = 'menu'; // 'menu', 'level1', or 'handoff'
+const render = 'full'; // 'full', 'shared', 'menu-layer', or 'level1-layer'
+const transitionAt = 7.375; // Handoff preview only: any cycle, even mid-beat.
+const transitionCycles = 2; // 5.217-second transition; the score never restarts.
+
+// Shared score is intentionally identical in both standalone, paste-ready files.
+setcpm(92 / 4);
+
+if (!['menu', 'level1', 'handoff'].includes(mode)) {
+  throw new Error('mode must be "menu", "level1", or "handoff"');
+}
+if (!['full', 'shared', 'menu-layer', 'level1-layer'].includes(render)) {
+  throw new Error('render must be "full", "shared", "menu-layer", or "level1-layer"');
+}
+if (!Number.isFinite(transitionAt) || transitionAt < 0 ||
+    !Number.isFinite(transitionCycles) || transitionCycles <= 0) {
+  throw new Error('Use a nonnegative transitionAt and a positive transitionCycles.');
+}
+
+const descent = signal(t => {
+  if (mode === 'menu') return 0;
+  if (mode === 'level1') return 1;
+  const x = Math.max(0, Math.min(1, (Number(t) - transitionAt) / transitionCycles));
+  return x * x * (3 - 2 * x);
+});
+const waiting = descent.mul(-1).add(1);
+
+// The first four bars preserve the original melody, rhythm and synth settings.
+const theme = note(`<
+  [d5 ~ a4 ~ f5 e5 d5 ~]
+  [f5 ~ d5 ~ bb4 a4 f4 ~]
+  [g4 ~ bb4 d5 ~ c5 bb4 ~]
+  [a4 ~ bb4 a4 ~ c#5 e5 ~]
+>`);
+
+const reply = note(`<
+  [d5 ~ f5 e5 d5 ~ a4 ~]
+  [f5 ~ d5 bb4 ~ a4 f4 ~]
+  [g4 bb4 ~ d5 c5 ~ bb4 ~]
+  [a4 ~ e5 c#5 ~ bb4 a4 ~]
+>`);
+
+const lift = note(`<
+  [d5 ~ a5 ~ f5 e5 d5 ~]
+  [f5 ~ d6 ~ bb5 a5 f5 ~]
+  [g5 ~ bb5 d6 ~ c6 bb5 ~]
+  [a5 ~ bb5 a5 ~ c#6 e6 ~]
+>`);
+
+const breathingRoom = note(`<
+  [d5 ~ ~ ~ ~ e5 d5 ~]
+  [f5 ~ ~ ~ bb4 ~ f4 ~]
+  [g4 ~ ~ d5 ~ ~ bb4 ~]
+  [a4 ~ ~ ~ ~ c#5 e5 ~]
+>`);
+
+// A / reply / A / lift / echo space / reply / lift / home: eight four-bar chapters.
+const melody = arrange(
+  [4, theme], [4, reply], [4, theme], [4, lift],
+  [4, breathingRoom], [4, reply], [4, lift], [4, theme]
+);
+const melodyGain = "<0.12 0.105 0.12 0.075 0.085 0.105 0.075 0.12>/4";
+
+// This entire bed, especially orbit 3's echoes, continues unchanged into Level 1.
+const shared = stack(
+  note(`<
+    [d2 ~ d3 a2 d2 ~ c3 a2]
+    [bb1 ~ bb2 f2 bb1 ~ a2 f2]
+    [g2 ~ d3 g2 ~ bb2 a2 g2]
+    [a2 ~ e3 a2 ~ bb2 a2 e2]
+  >`)
+    .sound("triangle")
+    .attack(0.005).decay(0.15).sustain(0.15).release(0.06)
+    .gain(0.4).orbit(0).room(0).delay(0),
+
+  melody.sound("square")
+    .attack(0.005).decay(0.12).sustain(0).release(0.06)
+    .lpf(2200).vib(5).vibmod(0.12)
+    .gain(melodyGain).orbit(1).room(0).delay(0),
+
+  sound("bd ~ rim [~ bd], hh*8")
+    .bank("RolandTR707").lpf(2600)
+    .gain(0.22).orbit(2).room(0).delay(0),
+
+  note(`<
+    [~ ~ d6 ~ ~ ~ ~ ~]
+    [~ a6 ~ ~ ~ ~ f6 ~]
+    [~ ~ ~ ~ g6 ~ ~ ~]
+    [~ ~ ~ e6 ~ ~ ~ ~]
+  >`)
+    .sound("sine")
+    .attack(0.001).decay(0.08).sustain(0).release(0.12)
+    .gain(0.6).orbit(3)
+    // Keep the original wet levels; explicitly lock the original engine defaults.
+    .delay(0.45).delaytime(45 / 92).delayfeedback(0.5)
+    .room(0.6).roomsize(2).roomfade(0.1)
+);
+
+// Menu-only upper answer. Silent for the first eight bars so the old tune leads.
+const menuLayer = note(`<
+  [~ ~ a5 ~ ~ d6 ~ ~]
+  [~ ~ f5 ~ ~ bb5 ~ ~]
+  [~ ~ d5 ~ ~ g5 ~ ~]
+  [~ ~ e5 ~ ~ a5 ~ ~]
+>`)
+  .mask("<0!8 1!8 0!8 1!8>")
+  .sound("triangle")
+  .attack(0.02).decay(0.18).sustain(0).release(0.16)
+  .clip(0.65).lpf(2800).gain(0.035)
+  .orbit(4).delay(0).room(0.22).roomsize(2).roomfade(0.1);
+
+// Blim's first attempts leave gaps; the reply takes small, more certain steps.
+// This only changes Level 1 detail, not the approved default menu mix.
+const unsureFooting = note(`<
+  [~ d4 ~ ~ a3 ~ e4 ~]
+  [~ bb3 ~ ~ ~ d4 ~ ~]
+  [g3 ~ ~ d4 ~ ~ bb3 ~]
+  [~ a3 ~ ~ e4 ~ ~ ~]
+>`);
+const rememberedPath = note(`<
+  [d4 ~ e4 f4 ~ a3 ~ d4]
+  [bb3 ~ d4 ~ f4 ~ d4 ~]
+  [g3 ~ a3 bb3 ~ d4 ~ bb3]
+  [a3 ~ e4 ~ c#4 ~ a3 ~]
+>`);
+const level1Layer = stack(
+  arrange(
+    [4, unsureFooting], [4, silence], [4, rememberedPath], [4, unsureFooting],
+    [4, silence], [4, rememberedPath], [4, unsureFooting], [4, silence]
+  )
+    .sound("triangle").fm(0.5).fmh(2)
+    .attack(0.018).decay(0.14).sustain(0).release(0.1)
+    .clip(0.55).lpf(1400).gain(0.065)
+    .orbit(5).delay(0).room(0.12).roomsize(1).roomfade(0.1),
+
+  note("<[d3,a3] [bb2,f3] [g2,d3] [a2,e3]>")
+    .mask("<1 0 1 0>/4")
+    .sound("sine")
+    .attack(0.2).decay(0.3).sustain(0.12).release(0.25)
+    .clip(0.6).gain(0.028)
+    .orbit(6).delay(0).room(0.1).roomsize(1).roomfade(0.1)
+);
+
+// Export raw stems at full intended level, independent of mode/preview timing.
+const full = stack(
+  shared,
+  menuLayer.mul(gain(waiting)),
+  level1Layer.mul(gain(descent))
+);
+
+(render === 'shared' ? shared :
+ render === 'menu-layer' ? menuLayer :
+ render === 'level1-layer' ? level1Layer : full).pan(0.5);

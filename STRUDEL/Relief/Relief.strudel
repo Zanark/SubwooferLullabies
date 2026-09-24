@@ -1,0 +1,77 @@
+// YEET THAT GLOW STICK - "Sky, At Last"
+// Original proposed surface-arrival ending, not the grate at the end of level 1/2.
+// Export: Start cycle 0, End cycle 9. 80 BPM; 24s phrase + 3s tail = 27s.
+// No ending storyboard is locked: this is a relief-first musical proposal.
+// D-E-A-F becomes D-E-A-F#: the opening's small tune finally feels safe again.
+// Stop, then Play to audition from the beginning.
+
+setcpm(80 / 4);
+
+stack(
+  note(`<
+    [~ d5 e5 a5 f#5 ~ e5 d5]
+    [b4 ~ d5 f#5 a5 ~ f#5 e5]
+    [g5 ~ f#5 e5 d5 ~ b4 d5]
+    [e5 ~ a5 g5 e5 ~ c#5 ~]
+    [d5 e5 a5 f#5 ~ a5 d6 ~]
+    [b5 ~ a5 f#5 e5 ~ d5 ~]
+    [g5 f#5 e5 d5 e5 ~ c#5 ~]
+    [d5@2 a4 d5 ~@4]
+    ~
+  >`)
+    .sound("square")
+    .attack(0.012).decay(0.18).sustain(0.22).release(0.15)
+    .clip(0.7).lpf(3800).gain(0.1)
+    .orbit(0).room(0.12).roomsize(1).roomfade(0.5).delay(0),
+
+  note(`<
+    [d3,f#3,a3,e4]
+    [b2,d3,f#3,a3]
+    [g2,b2,d3,a3]
+    [a2,c#3,e3,g3]
+    [d3,f#3,a3]
+    [b2,d3,f#3]
+    [g2,b2,d3]
+    [d3,f#3,a3,d4]
+    ~
+  >`)
+    .sound("triangle")
+    .attack(0.07).decay(0.3).sustain(0.38).release(0.35)
+    .clip(0.8).gain(0.065)
+    .orbit(1).room(0.22).roomsize(1.5).roomfade(0.85).delay(0),
+
+  note(`<
+    [d2 ~ a2 ~ d3 ~ a2 ~]
+    [b1 ~ f#2 ~ b2 ~ f#2 ~]
+    [g2 ~ d3 ~ g2 ~ b2 ~]
+    [a2 ~ e3 ~ a2 ~ c#3 ~]
+    [d2 ~ a2 ~ d3 ~ a2 ~]
+    [b1 ~ f#2 ~ b2 ~ f#2 ~]
+    [g2 ~ d3 ~ a2 ~ e3 ~]
+    [d2@2 ~@6]
+    ~
+  >`)
+    .sound("triangle")
+    .attack(0.01).decay(0.2).sustain(0.12).release(0.06)
+    .clip(0.6).gain(0.18)
+    .orbit(2).room(0).delay(0),
+
+  // Familiar electronic glints, no longer framed as drops in a confined tunnel.
+  note(`<
+    [~ ~ d6 ~ ~ a5 ~ ~]
+    [~ ~ f#6 ~ ~ d6 ~ ~]
+    [~ ~ g5 ~ ~ b5 ~ ~]
+    [~ ~ e6 ~ ~ a5 ~ ~]
+    [~ d6 ~ e6 ~ a6 f#6 ~]
+    [~ ~ f#6 ~ ~ d6 ~ ~]
+    [~ ~ g5 ~ ~ e6 ~ ~]
+    [d6 ~ ~ ~ ~ ~ ~ ~]
+    ~
+  >`)
+    .sound("sine")
+    .attack(0.005).decay(0.12).sustain(0).release(0.08)
+    .clip(0.6).gain(0.045)
+    .orbit(3).room(0.15).roomsize(1).roomfade(0.4).delay(0)
+)
+  .pan(0.5)
+  .filterWhen(t => t >= 0 && t < 9);

@@ -1,0 +1,113 @@
+// YEET THAT GLOW STICK - LEVEL 3: "The Long Climb"
+// Blim: effort, wrong turns, traces of company, and a shaft that keeps going.
+// 32 bars at 96 BPM (80s). The headlamp is found toward the END of this level.
+// Preview export: 0-32, 48000 Hz, Multi Channel Orbits OFF. See CUE_SHEET.txt.
+
+const scene = 'climbing'; // 'climbing', 'locker-cinematic', or 'after-locker'
+const listening = false; // true previews a quieter, lead-free cassette mix.
+
+setcpm(96 / 4);
+if (!['climbing', 'locker-cinematic', 'after-locker'].includes(scene)) {
+  throw new Error('Choose climbing, locker-cinematic, or after-locker.');
+}
+if (typeof listening !== 'boolean') {
+  throw new Error('listening must be true or false.');
+}
+const afterLocker = scene === 'after-locker';
+
+const reach = note(`<
+  [d5 ~ e5 f5 a5 ~ f5 e5]
+  [d5 ~ f5 a5 c6 ~ a5 ~]
+  [bb4 d5 f5 ~ a5 ~ f5 ~]
+  [a4 ~ c#5 e5 bb5 ~ a5 ~]
+  [g4 bb4 d5 f5 ~ d5 ~ bb4]
+  [a4 ~ d5 e5 f5 ~ e5 d5]
+  [bb4 d5 ~ f5 d5 ~ c5 ~]
+  [a4 ~ e5 d5 ~ c#5 ~ e5]
+>`);
+const findAnotherWay = note(`<
+  [a4 ~ d5 ~ f5 e5 d5 ~]
+  [a4 ~ c5 ~ d5 ~ f5 ~]
+  [f5 ~ d5 ~ bb4 ~ d5 ~]
+  [e5 ~ bb4 a4 ~ e5 ~ ~]
+  [d5 ~ bb4 g4 ~ bb4 d5 ~]
+  [a4 d5 ~ f5 ~ e5 ~ ~]
+  [f5 ~ d5 c5 bb4 ~ ~ ~]
+  [e5 ~ c#5 ~ a4 ~ e5 ~]
+>`);
+
+// Only Blim's knowledge AFTER C-19 permits this smaller, unsettled reply.
+// It is not a cinematic reward jingle or a statement of the Guide's full fate.
+const carryOn = note(`<
+  [~ d5 ~ ~ a4 ~ ~ ~]
+  [~ ~ f5 ~ e5 ~ ~ ~]
+  [d5 ~ ~ ~ f5 ~ ~ ~]
+  [e5 ~ ~ ~ ~ ~ ~ ~]
+  [~ bb4 ~ ~ d5 ~ ~ ~]
+  [a4 ~ ~ ~ f5 ~ e5 ~]
+  [d5 ~ ~ ~ ~ c5 ~ ~]
+  [a4 ~ ~ ~ e5 ~ ~ ~]
+>`);
+const melody = afterLocker
+  ? arrange([8, carryOn], [8, silence], [8, carryOn], [8, carryOn.mask("[1 0 0 0]")])
+  : arrange([8, reach], [8, findAnotherWay], [8, reach.mask("[1 0 1 0]")], [8, findAnotherWay]);
+
+const music = stack(
+  note(`<
+    [d2 ~ a2 d3 ~ a2 d2 ~] [c2 ~ a2 c3 ~ a2 c2 ~]
+    [bb1 ~ f2 bb2 ~ f2 bb1 ~] [a1 ~ e2 a2 ~ e2 a1 ~]
+    [g1 ~ d2 g2 ~ d2 g1 ~] [f2 ~ a2 d3 ~ a2 f2 ~]
+    [bb1 ~ f2 bb2 ~ f2 bb1 ~] [a1 ~ e2 a2 ~ e2 a1 ~]
+  >`)
+    .sound("triangle").lpf(1200)
+    .attack(0.005).decay(0.14).sustain(0.1).release(0.07)
+    .clip(0.7).gain(afterLocker ? 0.24 : 0.3)
+    .orbit(0).room(0).delay(0),
+
+  melody.sound("square").lpf(afterLocker ? 1700 : 2300).vib(4).vibmod(0.08)
+    .attack(0.012).decay(0.16).sustain(0).release(0.14)
+    .clip(0.6).gain(listening ? 0 : (afterLocker ? 0.065 : 0.09))
+    .orbit(1).room(0.2).roomsize(2).roomfade(0.1).delay(0),
+
+  note("<[d3,f3,a3] [c3,f3,a3] [bb2,d3,a3] [a2,e3,g3] [g2,bb2,f3] [f3,a3,d4] [bb2,d3,f3] [a2,e3,g3]>")
+    .sound("triangle").lpf(1000)
+    .attack(0.15).decay(0.3).sustain(0.18).release(0.35)
+    .clip(0.6).gain(0.033)
+    .orbit(2).room(0.35).roomsize(2).roomfade(0.1).delay(0),
+
+  note(`<
+    [~ ~ d6 ~ ~ ~ ~ ~] [~ ~ ~ ~ a5 ~ ~ ~]
+    [~ f6 ~ ~ ~ ~ ~ ~] [~ ~ ~ ~ e6 ~ ~ ~]
+    [~ ~ g5 ~ ~ ~ ~ ~] [~ ~ ~ ~ ~ a5 ~ ~]
+    [~ ~ ~ d6 ~ ~ ~ ~] [~ ~ ~ ~ e6 ~ ~ ~]
+  >`)
+    .sound("sine")
+    .attack(0.001).decay(0.08).sustain(0).release(0.12)
+    .gain(0.065).orbit(3)
+    .delay(0.45).delaytime(45 / 96).delayfeedback(0.5)
+    .room(0.6).roomsize(2).roomfade(0.1),
+
+  note("<[d2 ~ ~ d2 ~ ~ d2 ~] [d2 ~ ~ d2 ~ d2 ~ ~]>")
+    .sound("sine").penv(12).pdecay(0.045).lpf(700)
+    .attack(0.001).decay(0.1).sustain(0).release(0.03)
+    .gain(afterLocker ? 0.07 : 0.15)
+    .orbit(4).room(0).delay(0),
+
+  sound("[~ ~ white ~ ~ ~ white ~]")
+    .hpf(1800).lpf(4000)
+    .attack(0.001).decay(0.035).sustain(0).release(0.015)
+    .gain(listening ? 0 : (afterLocker ? 0.012 : 0.025))
+    .orbit(5).room(0).delay(0),
+
+  // A narrow steady warmth exists only after the weak lamp has actually been found.
+  note("<[d4,a4] [c4,a4] [bb3,f4] [a3,e4] [g3,d4] [f4,a4] [bb3,f4] [a3,e4]>")
+    .sound("sine").lpf(1500)
+    .attack(0.22).decay(0.3).sustain(0.15).release(0.2)
+    .clip(0.45).gain(afterLocker ? 0.025 : 0)
+    .orbit(6).room(0.15).roomsize(1).roomfade(0.1).delay(0)
+).mul(gain(listening ? 0.3 : 1)).pan(0.5);
+
+// Yield the gameplay bed to the separately timed C02_CINEMATIC_Headlamp score.
+// This stops new notes only: fade the gameplay bus AND its existing effect tails
+// before the film. Resume after the actual film ends, including any VO hold.
+scene === 'locker-cinematic' ? silence : music;

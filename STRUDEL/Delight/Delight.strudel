@@ -1,0 +1,29 @@
+// YEET THAT GLOW STICK - "Something Useful"
+// Original 2-second discovery stinger; not an inventory-system implementation.
+// Export: Start cycle 0, End cycle 1. 120 BPM; one cycle = 2 seconds.
+// A modest discovery, not the headlamp fanfare or routine glow-stick retrieval.
+// Stop, then Play to audition from the beginning.
+
+setcpm(120 / 4);
+
+stack(
+  stack(
+    note("d5 e5 a5 ~ ~ ~ ~ ~")
+      .sound("square")
+      .attack(0.005).decay(0.09).sustain(0).release(0.03)
+      .clip(0.5).lpf(3000).gain(0.11),
+    note("d3 ~ ~ ~ ~ ~ ~ ~")
+      .sound("triangle")
+      .attack(0.005).decay(0.09).sustain(0).release(0.02)
+      .clip(0.5).gain(0.12)
+  ).orbit(0).room(0).delay(0),
+
+  // An open, useful-sounding answer rather than a fully resolved victory chord.
+  note("~ ~ ~ [d5,a5,e6] ~ ~ ~ ~")
+    .sound("triangle")
+    .attack(0.008).decay(0.2).sustain(0.1).release(0.12)
+    .gain(0.075)
+    .orbit(1).room(0.1).roomsize(0.6).roomfade(0.25).delay(0)
+)
+  .pan(0.5)
+  .filterWhen(t => t >= 0 && t < 1);
