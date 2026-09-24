@@ -7,6 +7,14 @@
 
 Against moving water and machinery, Blim's persistence grows quieter rather than louder.
 
+## VERDICT
+
+- **YouTube:** Best estimate: it will publish normally without a copyright claim, since no external recordings were identified; mistaken matches are still possible.
+- **SoundCloud:** Best estimate: it will publish normally, since no external recordings were identified; an automated misidentification could still block it.
+
+These are low-confidence practical expectations, not measured probabilities or upload-test
+results; where sample rights remain unresolved, no most-likely outcome is asserted.
+
 ## Educated estimate
 
 **Lower identified third-party sample exposure; actual automated-claim likelihood is unknown.**
@@ -65,7 +73,8 @@ is not a guarantee of copyrightability or a licence for unrelated assets.
 - [YouTube: How Content ID works](https://support.google.com/youtube/answer/2797370?hl=en): Uploads are matched against submitted reference files; this review did not access that reference database or scan a rendered recording.
 - [YouTube: Copyright claims versus removal requests](https://support.google.com/youtube/answer/7002106?hl=en): Content ID claims and copyright-removal requests are different processes; a claim is not itself a copyright strike.
 - [YouTube: Content eligible for Content ID](https://support.google.com/youtube/answer/2605065?hl=en): References require exclusive rights and sufficiently distinctive material. Nonexclusive third-party content and production loops raise reference-eligibility issues, independently of upload permission.
-- [YouTube: Learn about Content ID claims](https://support.google.com/youtube/answer/6013276?hl=en): Review a claim before responding; disputes need a valid basis and may escalate.
+- [YouTube: Learn about Content ID claims](https://support.google.com/youtube/answer/6013276?hl=en): A Content ID match can monetize, track or block a video. Review a claim before responding; disputes need a valid basis and may escalate.
+- [SoundCloud: My own content was flagged for copyright infringement and blocked](https://help.soundcloud.com/hc/en-us/articles/4402637440539-My-own-content-was-flagged-for-copyright-infringement-and-blocked): Official help discusses owned content being flagged and blocked, with a dispute route. Reviewed via search-indexed help text; direct full-page retrieval was unavailable.
 - [U.S. Copyright Office: Copyright and artificial intelligence findings](https://www.copyright.gov/newsnet/2025/1060.html): AI assistance does not automatically bar protection, but U.S. protection requires qualifying human expression, not merely supplying prompts. This is not a rule for every jurisdiction.
 - [Strudel: Synthesizers](https://strudel.cc/learn/synths/): Documents basic waveforms and generated noise. These are distinct from external recordings, soundfonts and sample-backed wavetables.
 

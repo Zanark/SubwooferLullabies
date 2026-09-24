@@ -69,6 +69,14 @@ def rights_note(song, digest, research):
 
 {song['emotion']}
 
+## VERDICT
+
+- **YouTube:** {group['platform_verdicts']['youtube']}
+- **SoundCloud:** {group['platform_verdicts']['soundcloud']}
+
+These are low-confidence practical expectations, not measured probabilities or upload-test
+results; where sample rights remain unresolved, no most-likely outcome is asserted.
+
 ## Educated estimate
 
 **{group['verdict']}**
@@ -278,6 +286,16 @@ def verify(output):
         note = (folder / "RIGHTS.md").read_text(encoding="utf-8")
         if song["source_sha256"] not in note or "Educated estimate" not in note or "https://" not in note:
             raise ValueError(f"Incomplete rights note: {folder}")
+        if note.count("\n## VERDICT\n") != 1:
+            raise ValueError(f"Missing or duplicate platform verdict section: {folder}")
+        verdict = note.split("\n## VERDICT\n", 1)[1].split("\n## ", 1)[0]
+        lines = [line for line in verdict.splitlines() if line.startswith("- ")]
+        prefixes = ["- **YouTube:** ", "- **SoundCloud:** "]
+        if len(lines) != 2 or any(
+            not line.startswith(prefix) or not line[len(prefix):].strip()
+            for line, prefix in zip(lines, prefixes)
+        ):
+            raise ValueError(f"Expected one verdict line per platform: {folder}")
     print("14 complete bundles: preserved scores, unique 2048-square RGB covers, tailored rights notes.")
 
 

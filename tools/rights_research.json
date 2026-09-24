@@ -5,6 +5,7 @@
     "youtube-claims",
     "youtube-reference",
     "youtube-disputes",
+    "soundcloud-owned-content",
     "us-ai-authorship"
   ],
   "sources": {
@@ -26,7 +27,12 @@
     "youtube-disputes": {
       "title": "YouTube: Learn about Content ID claims",
       "url": "https://support.google.com/youtube/answer/6013276?hl=en",
-      "finding": "Review a claim before responding; disputes need a valid basis and may escalate."
+      "finding": "A Content ID match can monetize, track or block a video. Review a claim before responding; disputes need a valid basis and may escalate."
+    },
+    "soundcloud-owned-content": {
+      "title": "SoundCloud: My own content was flagged for copyright infringement and blocked",
+      "url": "https://help.soundcloud.com/hc/en-us/articles/4402637440539-My-own-content-was-flagged-for-copyright-infringement-and-blocked",
+      "finding": "Official help discusses owned content being flagged and blocked, with a dispute route. Reviewed via search-indexed help text; direct full-page retrieval was unavailable."
     },
     "us-ai-authorship": {
       "title": "U.S. Copyright Office: Copyright and artificial intelligence findings",
@@ -97,6 +103,10 @@
   "groups": {
     "synth": {
       "verdict": "Lower identified third-party sample exposure; actual automated-claim likelihood is unknown.",
+      "platform_verdicts": {
+        "youtube": "Best estimate: it will publish normally without a copyright claim, since no external recordings were identified; mistaken matches are still possible.",
+        "soundcloud": "Best estimate: it will publish normally, since no external recordings were identified; an automated misidentification could still block it."
+      },
       "rationale": "No external sample recordings are identified in this score's instrument inventory. That removes the particular drum-bank and piano/soundfont clearance issues found elsewhere in the collection. It does not establish musical uniqueness, copyright ownership, or that a platform will never match a passage to somebody else's recording.",
       "inventory": "Built-in oscillator synthesis and/or generated noise, using the cue's sine, triangle, square or white-noise voices rather than a third-party drum bank, piano recording or GM soundfont. Water effects are synthesized; no cassette dialogue recording is embedded. This assumes the normal Strudel sound registrations have not been overridden.",
       "licensing": "No track-specific third-party sample attribution obligation was identified from that inventory. A basic waveform is not being treated as a copied commercial recording. This assessment does not clear a composition's melodic resemblance, newly added assets, or all software/distribution obligations.",
@@ -109,6 +119,10 @@
     },
     "tr707": {
       "verdict": "Additional unresolved sample-licensing exposure; actual automated-claim likelihood is unknown.",
+      "platform_verdicts": {
+        "youtube": "Uncertain: TR707 sample permissions remain unresolved; it may publish normally, but a Content ID match could redirect ad revenue or block the video.",
+        "soundcloud": "Uncertain: TR707 sample permissions remain unresolved; it may publish normally, but an automated match could block it and require rights evidence to dispute."
+      },
       "rationale": "The composition is an original AI-assisted score, but its shared RolandTR707 percussion adds a rights question that the synth-only cues do not have. Research did not establish the actual drum recordings' original source or an applicable sample-data permission grant. This is a documentation gap, not a finding that the samples are infringing or that a particular drum hit will trigger a fingerprint match.",
       "inventory": "RolandTR707 kick, rim and hi-hat recordings selected through Strudel's drum bank, alongside synthesized tonal voices, water effects and, where used, generated noise. The collection contains source patterns, not copied drum sample binaries or a commercial-song recording.",
       "licensing": "The tidal-drum-machines repository explains playback but does not establish permission for these sample files; its inspected license-clarification issue remained unanswered. Neither CC0 nor a fully verified mixed-license inventory was established. CC0 credits for the neighboring VCSL library do not apply automatically to this bank. Attribution alone does not cure missing permission.",
@@ -121,6 +135,10 @@
     },
     "tr909": {
       "verdict": "Additional unresolved sample-licensing exposure; actual automated-claim likelihood is unknown.",
+      "platform_verdicts": {
+        "youtube": "Uncertain: TR909 sample permissions remain unresolved; it may publish normally, but a Content ID match could redirect ad revenue or block the video.",
+        "soundcloud": "Uncertain: TR909 sample permissions remain unresolved; it may publish normally, but an automated match could block it and require rights evidence to dispute."
+      },
       "rationale": "This is the original four-bar Eurodance teaching example, not a supplied transcription of a commercial song. Its shared RolandTR909 percussion nevertheless has an unverified original recording source and sample-permission chain. Genre resemblance and stated original intent are not an independent melody-similarity clearance. No claim probability can be inferred from the short loop or its style.",
       "inventory": "RolandTR909 kick, snare and hi-hat recordings; synthesized sawtooth bass and lead; synthesized triangle chords. Four REPL layers form the complete 128-BPM, four-bar loop. No audio from the commercial song originally mentioned in the request is embedded.",
       "licensing": "No applicable sample-data permission grant for the selected TR909 files was established in tidal-drum-machines. The repository's open license question is not a license. Public availability, the hardware bank name, or a license for another sample library does not establish CC0 or royalty-free status for these recordings.",
@@ -134,6 +152,10 @@
     },
     "jazz": {
       "verdict": "Known attribution obligations and partly verified soundfont provenance; actual automated-claim likelihood is unknown.",
+      "platform_verdicts": {
+        "youtube": "If sample permissions are valid and required credits are included, I would expect normal publication; the partly verified soundfont provenance and possible shared-sample claims remain caveats.",
+        "soundcloud": "If sample permissions are valid and required credits are included, I would expect normal publication; soundfont provenance remains partly verified, and an automated match could still block it."
+      },
       "rationale": "The default piano has a documented attribution license, and the FluidR3 upstream license is verified. These are more concrete permissions than those established for the drum banks, but the samples remain shared/nonexclusive and the exact original-SF2-to-WebAudioFont conversion chain was not fully established. Following known obligations improves release documentation; it does not establish a measured probability of claims.",
       "inventory": "Default `piano`: Salamander Grand Piano V3 by Alexander Holm. `gm_epiano1.n(1)`: `0040_FluidR3_GM_sf2_file`. `gm_acoustic_bass.n(1)`: `0320_FluidR3_GM_sf2_file`. Droplets and underwater noise use built-in `sine` and `brown` synthesis. There are no sampled drum-bank hits or voice recordings in this version.",
       "licensing": "Salamander is CC BY 3.0; include appropriate credit, its license link and a truthful processing description. No rendered-music attribution waiver was verified. CC BY is not ShareAlike and does not by itself place the entire original composition under CC BY. FluidR3's upstream README and COPYING identify MIT, not the separate GPL license for Debian packaging. Preserve its applicable notices when redistributing soundfont/sample data. No requirement to GPL-license this song or publish its composition code was established, and no explicit render-specific attribution waiver was found. The exact conversion-source chain remains partly unverified.",
