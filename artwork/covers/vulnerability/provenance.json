@@ -9,5 +9,7 @@
     256
   ],
   "editable_cells": 458752,
-  "live_studio_mutated": false
+  "live_studio_mutated": false,
+  "revision_note": "Removed only decorative droplet pixels from the saved light cel. Original palette, all other pixels and typography preserved; no whole-scene requantization.",
+  "revision_recipe_sha256": "19e8e99a2a3756d963ec0e3b1f6c61382c9113a7c0b63300d97d03d13ca2f5c6"
 }

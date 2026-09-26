@@ -4,6 +4,13 @@ Fourteen latest-version compositions and cues, including the original Eurodance 
 loop. Earlier revisions and cassette dialogue recordings are deliberately not duplicated.
 The original game sources remain untouched.
 
+## Albums and standalone tracks
+
+**[YeetThatGlowStick](YeetThatGlowStick/README.md)** groups the twelve retro/chiptune
+game tracks, from anticipation through perseverance, with its own
+[album cover](YeetThatGlowStick/cover.png) and [track gallery](YeetThatGlowStick/index.html).
+The non-chiptune **serenity** and independent **euphoria** remain separate title folders.
+
 **[Browse the cover gallery](index.html)**. Every title folder contains exactly:
 `title.strudel`, an original **2048 x 2048 PNG** `cover.png`, and a tailored `RIGHTS.md`.
 Song titles and title paths are always lowercase. The one-word titles name the intended emotion; previous working titles remain in source
@@ -11,18 +18,18 @@ comments for provenance. All game music follows **Blim**, not the Guide's off-sc
 
 | # | Title | Use | BPM | Export cycles | Duration | Artwork / note |
 |---|---|---|---:|---|---|---|
-| 01 | [anticipation](anticipation/anticipation.strudel) | Main menu | 92 | 0-32 | 1:23.478 loop preview | [Cover](anticipation/cover.png) / [Rights](anticipation/RIGHTS.md) |
-| 02 | [dismay](dismay/dismay.strudel) | Opening cinematic | 80 | 0-10 | 30.000s one-shot | [Cover](dismay/cover.png) / [Rights](dismay/RIGHTS.md) |
-| 03 | [vulnerability](vulnerability/vulnerability.strudel) | Level 1 / First Light | 92 | 0-32 | 1:23.478 loop preview | [Cover](vulnerability/cover.png) / [Rights](vulnerability/RIGHTS.md) |
-| 04 | [delight](delight/delight.strudel) | Item discovery stinger | 120 | 0-1 | 2.000s one-shot | [Cover](delight/cover.png) / [Rights](delight/RIGHTS.md) |
-| 05 | [curiosity](curiosity/curiosity.strudel) | Level 2 / Someone Was Here | 88 | 0-32 | 1:27.273 loop preview | [Cover](curiosity/cover.png) / [Rights](curiosity/RIGHTS.md) |
-| 06 | [determination](determination/determination.strudel) | Level 3 / The Long Climb | 96 | 0-32 | 1:20.000 loop preview | [Cover](determination/cover.png) / [Rights](determination/RIGHTS.md) |
-| 07 | [loss](loss/loss.strudel) | Late-Level-3 C-19 cinematic | 96 | 0-8 | 20.000s one-shot | [Cover](loss/cover.png) / [Rights](loss/RIGHTS.md) |
-| 08 | [courage](courage/courage.strudel) | Legacy headlamp discovery proposal | 96 | 0-3 | 7.500s one-shot | [Cover](courage/cover.png) / [Rights](courage/RIGHTS.md) |
-| 09 | [resilience](resilience/resilience.strudel) | Level 4 / Flood Levels | 80 | 0-32 | 1:36.000 loop preview | [Cover](resilience/cover.png) / [Rights](resilience/RIGHTS.md) |
-| 10 | [hope](hope/hope.strudel) | Level 5 / Near the Surface | 88 | 0-32 | 1:27.273 loop preview | [Cover](hope/cover.png) / [Rights](hope/RIGHTS.md) |
-| 11 | [relief](relief/relief.strudel) | Surface ending | 80 | 0-9 | 27.000s one-shot | [Cover](relief/cover.png) / [Rights](relief/RIGHTS.md) |
-| 12 | [perseverance](perseverance/perseverance.strudel) | Complete game theme | 92 | 0-64 | 2:46.957 one-shot | [Cover](perseverance/cover.png) / [Rights](perseverance/RIGHTS.md) |
+| 01 | [anticipation](YeetThatGlowStick/anticipation/anticipation.strudel) | Main menu | 92 | 0-32 | 1:23.478 loop preview | [Cover](YeetThatGlowStick/anticipation/cover.png) / [Rights](YeetThatGlowStick/anticipation/RIGHTS.md) |
+| 02 | [dismay](YeetThatGlowStick/dismay/dismay.strudel) | Opening cinematic | 80 | 0-10 | 30.000s one-shot | [Cover](YeetThatGlowStick/dismay/cover.png) / [Rights](YeetThatGlowStick/dismay/RIGHTS.md) |
+| 03 | [vulnerability](YeetThatGlowStick/vulnerability/vulnerability.strudel) | Level 1 / First Light | 92 | 0-32 | 1:23.478 loop preview | [Cover](YeetThatGlowStick/vulnerability/cover.png) / [Rights](YeetThatGlowStick/vulnerability/RIGHTS.md) |
+| 04 | [delight](YeetThatGlowStick/delight/delight.strudel) | Item discovery stinger | 120 | 0-1 | 2.000s one-shot | [Cover](YeetThatGlowStick/delight/cover.png) / [Rights](YeetThatGlowStick/delight/RIGHTS.md) |
+| 05 | [curiosity](YeetThatGlowStick/curiosity/curiosity.strudel) | Level 2 / Someone Was Here | 88 | 0-32 | 1:27.273 loop preview | [Cover](YeetThatGlowStick/curiosity/cover.png) / [Rights](YeetThatGlowStick/curiosity/RIGHTS.md) |
+| 06 | [determination](YeetThatGlowStick/determination/determination.strudel) | Level 3 / The Long Climb | 96 | 0-32 | 1:20.000 loop preview | [Cover](YeetThatGlowStick/determination/cover.png) / [Rights](YeetThatGlowStick/determination/RIGHTS.md) |
+| 07 | [loss](YeetThatGlowStick/loss/loss.strudel) | Late-Level-3 C-19 cinematic | 96 | 0-8 | 20.000s one-shot | [Cover](YeetThatGlowStick/loss/cover.png) / [Rights](YeetThatGlowStick/loss/RIGHTS.md) |
+| 08 | [courage](YeetThatGlowStick/courage/courage.strudel) | Legacy headlamp discovery proposal | 96 | 0-3 | 7.500s one-shot | [Cover](YeetThatGlowStick/courage/cover.png) / [Rights](YeetThatGlowStick/courage/RIGHTS.md) |
+| 09 | [resilience](YeetThatGlowStick/resilience/resilience.strudel) | Level 4 / Flood Levels | 80 | 0-32 | 1:36.000 loop preview | [Cover](YeetThatGlowStick/resilience/cover.png) / [Rights](YeetThatGlowStick/resilience/RIGHTS.md) |
+| 10 | [hope](YeetThatGlowStick/hope/hope.strudel) | Level 5 / Near the Surface | 88 | 0-32 | 1:27.273 loop preview | [Cover](YeetThatGlowStick/hope/cover.png) / [Rights](YeetThatGlowStick/hope/RIGHTS.md) |
+| 11 | [relief](YeetThatGlowStick/relief/relief.strudel) | Surface ending | 80 | 0-9 | 27.000s one-shot | [Cover](YeetThatGlowStick/relief/cover.png) / [Rights](YeetThatGlowStick/relief/RIGHTS.md) |
+| 12 | [perseverance](YeetThatGlowStick/perseverance/perseverance.strudel) | Complete game theme | 92 | 0-64 | 2:46.957 one-shot | [Cover](YeetThatGlowStick/perseverance/cover.png) / [Rights](YeetThatGlowStick/perseverance/RIGHTS.md) |
 | 13 | [serenity](serenity/serenity.strudel) | Deep-calm underwater jazz theme | 60 | 0-44 | 2:56.000 one-shot | [Cover](serenity/cover.png) / [Rights](serenity/RIGHTS.md) |
 | 14 | [euphoria](euphoria/euphoria.strudel) | Original Eurodance learning loop | 128 | 0-4 | 7.500s loop preview | [Cover](euphoria/cover.png) / [Rights](euphoria/RIGHTS.md) |
 
@@ -82,7 +89,8 @@ changing the live studio. No image-generation service or review proposal was use
 ## Rebuilding a separate copy
 
 The packaging inputs are in `..\tools`. The builder needs Python with Pillow and the
-saved artwork sources/exports in `..\artwork\covers`. It refuses to overwrite
+saved artwork sources/exports in `..\artwork\covers` and `..\artwork\albums`.
+Album membership and order come from `tools/album_catalog.json`. It refuses to overwrite
 an existing output, checks that source files do not change during the copy, and stages
 the collection before publishing the completed folder. It copies current checked artwork
 exports rather than regenerating earlier cover designs.

@@ -66,8 +66,8 @@
   "baseline_revision": 3,
   "baseline_project_id": "7f7aa004-e631-4910-9e58-92f6e2702594",
   "baseline_sha256": "5cb5aab8cfea938caed4423945c97dbc56aadf4b3797baeac340b4a4f227d3d2",
-  "candidate_sha256": "fa33f44f0eac690a82c112a06822e2126ce9aa54c043ceb6bc862c3fd6f1fa1d",
-  "candidate_bytes": 11032448,
+  "candidate_sha256": "d81f96f5ec62f58b579b3a1c0d519638f82089d0fd40b6f133c0f2cd5aa7625f",
+  "candidate_bytes": 11031762,
   "studio_url": "http://127.0.0.1:4180",
   "songs": [
     {
@@ -93,9 +93,9 @@
         "#353F50FF"
       ],
       "editable": "Anticipation\\Anticipation.spritecanvas.json",
-      "project_sha256": "502c9e31cf39a26ef44e2081fec32c952b84f01c766c3ffa3e3f33b65e73085f",
-      "native_sha256": "acdb4b55a92131f756a5033700f82b07daa64d092b096f1b99a61cc4f319d583",
-      "export_sha256": "8724e07efa73744480879d135fb7bab3935037ef52fc0f78dab7cdd948065dc3",
+      "project_sha256": "63125183ce2d360b13c6b1160a383f563bf402e7b3f3fcd0827f5708921cc724",
+      "native_sha256": "286b33a995f54c9aa52bf1ffb645efeed431bd0735cb0cce9fab4a5cc776809c",
+      "export_sha256": "884d767b9714cbf4d2b64766f5e6b66e32e8fd129bab3944db39424d5be289cf",
       "protected_existing_cover_sha256": "551b7675ba5f4da98b0b5e4b6b176c9612370c0d3be14e116bb7399fa5f3a5b7"
     },
     {
@@ -149,9 +149,9 @@
         "#363B4FFF"
       ],
       "editable": "Vulnerability\\Vulnerability.spritecanvas.json",
-      "project_sha256": "8cd73659aed07e04453b6b4c01e65eca2ea3f0b79ecf8d5c395e5323b900dd38",
-      "native_sha256": "cc95d8281be267dadd76aae3bc0a6c1b98404f1383c8baa372b09e4ce0d0ed64",
-      "export_sha256": "c6665e9fff25c9248c050cb0807887c6c61b7a440204e150b254a2c4279cb487",
+      "project_sha256": "ff7ee4c552fdbec268dc3a4ff7715bcf9d31e6ae4990e001a25ffebb9f125db3",
+      "native_sha256": "317507883ade2241f032f38c028b41cb56f9ed20bbc51c4020c98fc96f4d78b3",
+      "export_sha256": "d42815594e075ebc34e1f7643816e9b4c57e13c8539b62af0573cbde54a846bf",
       "protected_existing_cover_sha256": "698d9897e07c4e1d2c2a33a99f84c126acd4f4b4a9b05f8405d39eb7812ba184"
     },
     {
@@ -205,9 +205,9 @@
         "#454152FF"
       ],
       "editable": "Curiosity\\Curiosity.spritecanvas.json",
-      "project_sha256": "34839e6db81ae82a4d1a095d487cd7b7206cd7661ae75510905a7b315203068f",
-      "native_sha256": "853036f7a53399bff6c984718f1f72f5c158d52c6a8dff2698d9510bb62d08c6",
-      "export_sha256": "6e06f7b1b607747db7afacfa13cae9709eb2a624862260c425882b6862580f8a",
+      "project_sha256": "e91fe43e5e8068eb14f6f352f2c0995adb0dc471e06e78c2ef7a3f19f5a3c0c1",
+      "native_sha256": "89a76ce32238137686b11cfbafde7e2da4465176a11186704c607c8204df2b4c",
+      "export_sha256": "f5ea7922800c6b29b025c7e87eefaca40c5e41a4c43819a2a2bf31da6e405927",
       "protected_existing_cover_sha256": "d2dbf520a8d02e3dd2e1188d127bc307b28a55ce4e29c289c99a56398ebd20cb"
     },
     {
@@ -317,9 +317,9 @@
         "#344156FF"
       ],
       "editable": "Resilience\\Resilience.spritecanvas.json",
-      "project_sha256": "86303dcbb17b3a11fe231f2219b8716a555524eabbeea767a89d6a6d91eba055",
-      "native_sha256": "5b1f06c1c741271a2f24abfd0c34838e53653c3845c03e8418fcc19c48993643",
-      "export_sha256": "41603965948f2470c6bef2a35959924326ad2cac7a63aadf97393e9dd4cefe54",
+      "project_sha256": "f5f5c5eca02c36d65a631b728733133367a89b5dcc819cd625e93953047d91f3",
+      "native_sha256": "5edaaac083a73d5e6b67e0c23bb1e7b775e5428cc3b2a2aaaf1de35c4008ba62",
+      "export_sha256": "6740092c4a8e10bc90ef7dca2e176690379b56be7d973c69ae0f4f72d2125326",
       "protected_existing_cover_sha256": "78f773bb798a7f1e63fd46d714b0ed4d8d3943c06388256f165a7d951dcbed36"
     },
     {
@@ -429,9 +429,9 @@
         "#344759FF"
       ],
       "editable": "Serenity\\Serenity.spritecanvas.json",
-      "project_sha256": "2d7a1db9cad27cc9ea4b97c71f97bdfa379100bd5e9f58978f74065cb4de12db",
-      "native_sha256": "07ce78753003ed18e28b4d8b3ab850774f30883e6f38899baca3e9f9b85d4df8",
-      "export_sha256": "f09774ab75e2d743091dadb0b86a39ee173b2971dab5504e7f97a29d4729b629",
+      "project_sha256": "db6ff2e9d79314a71028ada479eaf825ffc6a767e688249f4a6b4eb268f7c018",
+      "native_sha256": "9eccb5df7e157ae78d288ba8df86834f9c6368c8d7d3a4b68d0146d0bbaf9d3e",
+      "export_sha256": "e5a37941e18fe7fc7ce7e940894daea53ec2d272fcb32a7c0c75c2256e6fb818",
       "protected_existing_cover_sha256": "05023dbe8c70710a4ac242e0346e651127e7bc281c60b2a2bf8562897a8fa792"
     },
     {
@@ -464,5 +464,5 @@
     }
   ],
   "description": "Original editable SpriteCanvas pixel art; 128x128 native, exact 16x export to 2048x2048 opaque RGBA PNG.",
-  "revision_note": "2026-09-27: all character depictions removed from the three affected archived scenes and collection frames; environment-only storytelling."
+  "revision_note": "2026-09-27: character depictions remain removed; decorative droplet symbols removed from Anticipation, Vulnerability, Curiosity, Resilience and Serenity, including native/preview/full exports and matching collection frames. Environmental water, reflections and ripples retained; nine other covers preserved byte-for-byte."
 }

@@ -1,0 +1,43 @@
+{
+  "title": "YeetThatGlowStick",
+  "description": "Original environment-only pixel artwork for the twelve-track YeetThatGlowStick game soundtrack: an abandoned cistern, worn rising stairs, broken rails, distant daylight and a cyan glowstick floating above its ripples. No characters, faces, bodies, character silhouettes or decorative droplet symbols. Seven editable native 256px layers; separately composed Cascadia Mono type.",
+  "source": "YeetThatGlowStick.spritecanvas.json",
+  "source_sha256": "ecc83d43e94bcc6a1658cf3e4935f3e80de89c8c26fddce238cdc0d5631d52c1",
+  "scene_sha256": "b7b06d121314f4ed91c3a8f096cc5fd04ff37baeaf465538237fa3bef21f9a62",
+  "design_sha256": "21fd4aec668c94f83e3f91964d4c52234a86cc676a86facba16ceb381a45838b",
+  "provenance_sha256": "c6526fb8a0127c67be9e2a3ae2e35e81418e047c1868e980d91575f2107d887f",
+  "export_sha256": "812dcd2a5917af062a15a8c8da190ba76e218fcd464db3fa805ab0d2fbc4ddc1",
+  "preview_sha256": "150f0ebc4dad612e657b36fe416a5158f3ffeac902f270abe849627bebed717f",
+  "medium": "pixel",
+  "native_size": [
+    256,
+    256
+  ],
+  "export_size": [
+    2048,
+    2048
+  ],
+  "preview_size": [
+    512,
+    512
+  ],
+  "track_count": 12,
+  "tracks": [
+    "anticipation",
+    "dismay",
+    "vulnerability",
+    "delight",
+    "curiosity",
+    "determination",
+    "loss",
+    "courage",
+    "resilience",
+    "hope",
+    "relief",
+    "perseverance"
+  ],
+  "excluded_tracks": [
+    "serenity",
+    "euphoria"
+  ]
+}

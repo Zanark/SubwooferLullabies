@@ -32,6 +32,7 @@ assert.ok(baseline.frames.every((f) => Object.values(f.cels).every((cel) => cel.
   'This composition-replacement drawing task was prepared against a blank baseline.');
 const songs = JSON.parse(readFileSync(join(root, 'tools', 'song_catalog.json'), 'utf8'));
 const producer = 'subwooferlullabies-spritecanvas-pixel-covers-v1';
+const revisionNote = '2026-09-27: character depictions remain removed; decorative droplet symbols removed from Anticipation, Vulnerability, Curiosity, Resilience and Serenity, including native/preview/full exports and matching collection frames. Environmental water, reflections and ripples retained; nine other covers preserved byte-for-byte.';
 if (existsSync(output)) {
   assert.ok(values.refresh, 'Existing output: use --refresh only for this local draft.');
   const previous = JSON.parse(readFileSync(join(output, 'manifest.json')));
@@ -195,11 +196,6 @@ class Drawing {
     this.line(x, y - size, x, y + size, tint);
     this.pixel(x, y, 14);
   }
-  drop(x, y, size = 3) {
-    this.polygon([[x, y - size * 2], [x - size, y], [x - size + 1, y + 2], [x + 2, y + 2], [x + size, y]], 7);
-    this.line(x - 1, y - size, x - 1, y, 9);
-    this.pixel(x, y + 1, 8);
-  }
   rod(x, y, dx, dy, tint = 7) {
     this.line(x - 1, y, x + dx - 1, y + dy, 4, 3);
     this.line(x, y, x + dx, y + dy, tint, 2);
@@ -268,7 +264,7 @@ function draw(song, index) {
       d.path([[8, 98], [53, 78], [75, 78], [119, 98]], 4);
       d.ripples(66, 88, 10, 3);
       d.use('lighting').rod(66, 68, -3, 12);
-      d.drop(43, 49, 2); d.specks(20, [23, 25, 84, 50], 4);
+      d.specks(20, [23, 25, 84, 50], 4);
       break;
     }
     case 'fracture': {
@@ -308,7 +304,6 @@ function draw(song, index) {
       d.line(24, 91, 32, 89, 2);
       d.use('details').path([[25, 73], [25, 64], [32, 63], [35, 65]], 5);
       d.use('lighting').rod(33, 71, 7, 2);
-      d.use('lighting').drop(80, 42, 2);
       d.use('foreground').ripples(84, 95, 12, 2, 4);
       break;
     }
@@ -353,7 +348,6 @@ function draw(song, index) {
       d.polygon([[48, 74], [86, 74], [91, 81], [43, 81]], 5);
       d.use('details').text('PLAY', 38, 47, 0);
       for (const x of [35, 96]) for (const y of [44, 75]) d.pixel(x, y, 13);
-      d.use('lighting').drop(112, 37, 2);
       d.use('foreground').path([[15, 94], [25, 90], [35, 93], [28, 96], [15, 94]], 5);
       break;
     }
@@ -460,7 +454,6 @@ function draw(song, index) {
         d.line(x, y, x + 9, y, 8);
         d.pixel(x + 11, y - 1, 6);
       }
-      d.use('lighting').drop(29, 44, 2);
       break;
     }
     case 'roots': {
@@ -558,7 +551,7 @@ function draw(song, index) {
       d.line(40, 81, 40, 89, 6); d.line(76, 81, 76, 87, 5);
       d.use('details').rect(55, 88, 12, 2, 3);
       d.rect(56, 90, 2, 4, 1); d.rect(64, 90, 2, 4, 1);
-      d.use('lighting').drop(64, 38, 3);
+      d.use('lighting');
       d.ellipse(96, 49, 2, 2, 6, false); d.ellipse(91, 37, 1, 1, 7, false);
       d.ellipse(25, 53, 1, 1, 5, false);
       d.use('foreground').ripples(62, 96, 25, 2, 4);
@@ -650,6 +643,7 @@ const manifest = {
   baseline_revision: handoff.revision, baseline_project_id: baseline.id, baseline_sha256: hash(handoffBytes),
   candidate_sha256: hash(candidateBytes), candidate_bytes: candidateBytes.length,
   studio_url: 'http://127.0.0.1:4180', songs: records,
+  revision_note: revisionNote,
 };
 writeFileSync(join(output, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
 const cards = songs.map((song, i) => `<article><img src="${song.title}/preview.png" width="512" height="512" alt="${song.title} pixel-art cover"><h2>${String(i + 1).padStart(2, '0')} / ${song.title}</h2><p>${song.emotion}</p><a href="${song.title}/${song.title}.spritecanvas.json">Editable source</a> <a href="${song.title}/native.png">128px native</a> <a href="${song.title}/cover.png">2048px PNG</a></article>`).join('\n');
@@ -657,7 +651,7 @@ writeFileSync(join(output, 'index.html'), `<!doctype html>
 <html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Subwoofer Lullabies - pixel cover collection</title>
 <style>:root{color-scheme:dark;font-family:system-ui;background:#10131d;color:#f0e9cd}body{max-width:1500px;margin:auto;padding:24px}h1{font-weight:400}main{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:24px}article{background:#1a2530;padding:12px}img{width:100%;height:auto;image-rendering:pixelated}h2{font-size:18px}p{line-height:1.5;color:#b5cacb}a{color:#83e6cb;font-size:13px;margin-right:8px}header{max-width:850px;margin-bottom:32px}</style>
-<header><h1>Fourteen small worlds.</h1><p>Original 128 x 128 pixel art. Seven editable layers per cover. The 2048px PNGs are exact 16x enlargements, not extra native detail. Each standalone project is editable in SpriteCanvas; the collection project holds the fourteen static covers as separate frames, not an animation.</p></header>
+<header><h1>Fourteen small worlds.</h1><p>Original 128 x 128 pixel art. Seven editable layers per cover. The 2048px PNGs are exact 16x enlargements, not extra native detail. Each standalone project is editable in SpriteCanvas; the collection project holds the fourteen static covers as separate frames, not an animation. Character depictions and decorative droplet symbols have been removed; environmental water and reflections remain.</p></header>
 <main>${cards}</main></html>\n`);
 assert.deepEqual(readFileSync(values.handoff), handoffBytes, 'Never alter the protected handoff.');
 console.log(JSON.stringify({

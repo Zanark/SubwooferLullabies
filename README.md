@@ -16,20 +16,34 @@ a promise that uploads will never receive automated claims.
 
 ## Songs
 
+### [YeetThatGlowStick](STRUDEL/YeetThatGlowStick/README.md)
+
+The **12-track retro game album**, with its own
+[cover](STRUDEL/YeetThatGlowStick/cover.png) and [gallery](STRUDEL/YeetThatGlowStick/index.html).
+
+![YeetThatGlowStick album cover](STRUDEL/YeetThatGlowStick/cover.png)
+
 | Song | Arrangement |
 |---|---|
-| [anticipation](STRUDEL/anticipation/anticipation.strudel) | Retro main-menu ambience |
-| [dismay](STRUDEL/dismay/dismay.strudel) | Opening cinematic |
-| [vulnerability](STRUDEL/vulnerability/vulnerability.strudel) | Level 1 / first light |
-| [delight](STRUDEL/delight/delight.strudel) | Item-discovery stinger |
-| [curiosity](STRUDEL/curiosity/curiosity.strudel) | Level 2 / human traces |
-| [determination](STRUDEL/determination/determination.strudel) | Level 3 / the long climb |
-| [loss](STRUDEL/loss/loss.strudel) | C-19 headlamp cinematic |
-| [courage](STRUDEL/courage/courage.strudel) | Legacy headlamp-discovery cue |
-| [resilience](STRUDEL/resilience/resilience.strudel) | Level 4 / floodwater |
-| [hope](STRUDEL/hope/hope.strudel) | Level 5 / near the surface |
-| [relief](STRUDEL/relief/relief.strudel) | Surface-ending cinematic |
-| [perseverance](STRUDEL/perseverance/perseverance.strudel) | Complete retro game theme |
+| [anticipation](STRUDEL/YeetThatGlowStick/anticipation/anticipation.strudel) | Retro main-menu ambience |
+| [dismay](STRUDEL/YeetThatGlowStick/dismay/dismay.strudel) | Opening cinematic |
+| [vulnerability](STRUDEL/YeetThatGlowStick/vulnerability/vulnerability.strudel) | Level 1 / first light |
+| [delight](STRUDEL/YeetThatGlowStick/delight/delight.strudel) | Item-discovery stinger |
+| [curiosity](STRUDEL/YeetThatGlowStick/curiosity/curiosity.strudel) | Level 2 / human traces |
+| [determination](STRUDEL/YeetThatGlowStick/determination/determination.strudel) | Level 3 / the long climb |
+| [loss](STRUDEL/YeetThatGlowStick/loss/loss.strudel) | C-19 headlamp cinematic |
+| [courage](STRUDEL/YeetThatGlowStick/courage/courage.strudel) | Legacy headlamp-discovery cue |
+| [resilience](STRUDEL/YeetThatGlowStick/resilience/resilience.strudel) | Level 4 / floodwater |
+| [hope](STRUDEL/YeetThatGlowStick/hope/hope.strudel) | Level 5 / near the surface |
+| [relief](STRUDEL/YeetThatGlowStick/relief/relief.strudel) | Surface-ending cinematic |
+| [perseverance](STRUDEL/YeetThatGlowStick/perseverance/perseverance.strudel) | Complete retro game theme |
+
+### Standalone tracks
+
+These non-chiptune tracks remain outside the album.
+
+| Song | Arrangement |
+|---|---|
 | [serenity](STRUDEL/serenity/serenity.strudel) | Deep-calm underwater jazz |
 | [euphoria](STRUDEL/euphoria/euphoria.strudel) | Independent Eurodance learning loop |
 
@@ -46,3 +60,7 @@ Cover storytelling is environmental only: empty spaces, weathered infrastructure
 objects and light convey the emotion, with no depicted characters.
 [Artwork sources and export instructions](artwork/covers/README.md) and the
 [artwork gallery](artwork/covers/index.html) are saved separately from the songs.
+The [album artwork sources](artwork/albums/YeetThatGlowStick/README.md) are separate
+from those individual song designs. Each song keeps its own cover, score and rights note.
+Decorative droplet symbols have been removed; water and reflections appear only as part
+of the environment. The album reorganization and artwork changes do not alter the music.

@@ -4,10 +4,16 @@
 [genre-aware collection](../../covers/README.md). Original casing, bitmap lettering,
 sources, hashes and rendered images are retained as a revision record, not current
 production artwork. On September 27, character depictions were also removed from the
-three affected archived scenes, all their exports and the browsing collection. This
-visible archive now follows the environment-only direction; it is not a byte-identical
-snapshot of the former character artwork. The first-edition exporter is not a supported
-production entry point; use the current mixed-media pipeline.
+three affected archived scenes, all their exports and the browsing collection.
+Decorative droplet symbols were subsequently removed from **Anticipation,
+Vulnerability, Curiosity, Resilience and Serenity**, including their editable layers,
+native/preview/full exports and corresponding collection frames. Actual environmental
+water, reflections and ripples remain. Only the symbol pixels were changed in the saved
+projects; unrelated artwork and all nine unaffected covers were preserved byte-for-byte.
+The shared droplet helper and its calls were also removed from the historical recipe.
+This visible archive follows the environment-only, no-decorative-droplet direction; it
+is not a byte-identical snapshot of the earlier artwork. The first-edition exporter is
+not a supported production entry point; use the current mixed-media pipeline.
 
 Original artwork drawn programmatically as editable pixels and rendered with SpriteCanvas's
 shared model and PNG renderer. SpriteCanvas is the editor/renderer, not an image-generation

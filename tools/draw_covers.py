@@ -64,13 +64,6 @@ class Canvas:
         self.layer(lambda d: d.ellipse(coord((x-radius, y-radius, x+radius, y+radius)),
                                        fill=(*c, strength)), blur=radius * 0.8)
 
-    def droplet(self, x, y, size=8, color=None):
-        c = color or self.colors[2]
-        self.glow(x, y, size * 3, 110, c)
-        self.polygon([(x, y-size*2), (x-size, y), (x, y+size), (x+size, y)], (*c, 190))
-        self.ellipse((x-size*0.72, y-size*0.1, x+size*0.72, y+size), (*c, 240),
-                     fill=(*c, 210))
-
     def ripples(self, x, y, scale=1, count=6):
         c = self.colors[2]
         for i in range(count):
@@ -131,7 +124,6 @@ def draw_scene(c):
         c.capsule(440, 557, 39, -65)
         for x, y in [(735, 624), (674, 451), (598, 335)]:
             c.polygon([(x-52, y), (x+40, y-6), (x+30, y+24), (x-40, y+26)], (*b, 25))
-        c.droplet(588, 355, 5)
         c.ripples(581, 710, 0.9, 4)
     elif scene == "discovery":
         c.glow(500, 439, 120, 55)
@@ -155,7 +147,6 @@ def draw_scene(c):
         c.polygon([(392, 554), (410, 497), (590, 497), (608, 554)], (*a, 24))
         c.line([(225, 603), (195, 603), (195, 232), (460, 232)], (*b, 130), 2)
         c.line([(440, 216), (462, 232), (440, 248)], (*b, 160), 2)
-        c.droplet(738, 268, 6, b)
     elif scene == "ladder":
         for i in range(6):
             x = 160+i*45
@@ -203,7 +194,6 @@ def draw_scene(c):
                 points.append((x, y))
             c.line(points, (*a, 24+j*3), 1.4)
         c.capsule(529, 469, 70, -38)
-        c.droplet(338, 233, 7)
     elif scene == "roots":
         c.glow(500, 196, 145, 100)
         for i in range(5):
@@ -227,7 +217,6 @@ def draw_scene(c):
                    (875, 733), (139, 733)], (18, 43, 46, 185))
         c.ellipse((342, 569, 665, 666), (*b, 140), 4, fill=(10, 29, 33, 255))
         c.ellipse((371, 585, 636, 643), (*a, 75), 1)
-        c.droplet(507, 573, 7, a)
         c.line([(423, 697), (421, 652), (577, 652), (579, 697)], (*b, 80), 2)
     elif scene == "journey":
         points = [(314, 695), (589, 653), (402, 577), (645, 515),
@@ -248,7 +237,6 @@ def draw_scene(c):
         for x in (300, 400, 510, 620, 719):
             c.polygon([(x, 162), (x+18, 162), (x+70, 610), (x-95, 657)], (*a, 5))
         c.ripples(511, 540, 1.65, 7)
-        c.droplet(511, 330, 9)
         for i in range(12):
             x = 335+i*28
             c.line([(x, 649), (x, 686+math.sin(i/3)*8)], (*b, 32), 1)

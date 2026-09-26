@@ -6,11 +6,11 @@
       "title": "anticipation",
       "medium": "pixel",
       "source": "anticipation.spritecanvas.json",
-      "source_sha256": "5d713e4c786cf460431233370d4ed2237cff69bb94a0f64689db8808dade7786",
-      "scene_sha256": "97ce4a56d0092d38efe10de012f794d3df7e218bc84fd27740931e7f256fb03a",
+      "source_sha256": "3d8304d11158066a7b2888fc21d607e0b10358fad47575511313d7b2b0dd8022",
+      "scene_sha256": "a1d0f674fc4d28b1e33abd70dc6e8e1789f7f733f17faafafd0cec0bc581db1a",
       "design_sha256": "303f3e18640f33e45806fdbcdffa3d07dd08c13ef31199ec57867772fddcffdc",
-      "provenance_sha256": "c0829f6e0f3bc2a7e64f4564396fc7ae32a21bd0350b2badc977184b0b63b74b",
-      "export_sha256": "ea04ee320adf270d05f5f9fece0b0c97241e8d7ac609215a052311f5876dfb44"
+      "provenance_sha256": "1ea39c04cfb7788b2145c455c287aa9875d2a589caebd993b650f446c3d1a3c6",
+      "export_sha256": "6c9dd9797da851240b95be9e90c5335ac556b3e97a8ecabdc44eba3dcdfdef8a"
     },
     {
       "title": "dismay",
@@ -26,11 +26,11 @@
       "title": "vulnerability",
       "medium": "pixel",
       "source": "vulnerability.spritecanvas.json",
-      "source_sha256": "26b10e8945065fd0b4957f13ffdfa65a1b2dbb447746023b71effbd0fa95cedd",
-      "scene_sha256": "f91184598f58f54d1cc64fd02ccbafb0024d0bc1d06cc04403b6adc262d2964b",
+      "source_sha256": "11e639a52e6a1794418e5634a856cc01901a5358f356be578d9d3ef371734d32",
+      "scene_sha256": "092a61be77d27d67ddf95e2de67d559d116b3a409bb7a582db5d172ba0dca846",
       "design_sha256": "58dce9c19048cd17238694bbe2ec6236aa6d2911641a93edff680fafcfcbfe3d",
-      "provenance_sha256": "89a28d4542a52637fda42c3ce63c9b44c87f6694cd6ac2cd4ca4d3242ffb1d0b",
-      "export_sha256": "afc2fd013879d3e544287e35b5ae8dc97191334ddb42bcf73984fa5acd163488"
+      "provenance_sha256": "dcfb4b6582cc1579a1c5ecac93acc1f321263420eb77fc905f074fc5d509fe9f",
+      "export_sha256": "0ae0203f213f33470e15d3c5c24bcd116795118e9b17400f50794c2b2f707c4c"
     },
     {
       "title": "delight",
@@ -46,11 +46,11 @@
       "title": "curiosity",
       "medium": "pixel",
       "source": "curiosity.spritecanvas.json",
-      "source_sha256": "72534288abb95a78a79a0e8926ac59d51514f52e7d8d413ddab1e968e3034c24",
-      "scene_sha256": "347871db7faf2e7f9b039a5c9369b81276297006ee7626aa6594fe4a33102bdf",
+      "source_sha256": "f2b7c5bad339c8e16f50c1cfbffd7182459a7f6c283270916e7bbbfc331788df",
+      "scene_sha256": "547e2ada8f6953b01050bb62c9bbcd7c7d0a43843710f0e4e9dde8683289635e",
       "design_sha256": "b8148309b4ad9a1d6a9443ac9ef5c0fa2f7ce52d4daff05b2ee251b4a0755eb8",
-      "provenance_sha256": "c0829f6e0f3bc2a7e64f4564396fc7ae32a21bd0350b2badc977184b0b63b74b",
-      "export_sha256": "e888e238fa4994c9c8dbcbfa242bd752d76fa944cce55ca7d657ba11f76aa714"
+      "provenance_sha256": "1ea39c04cfb7788b2145c455c287aa9875d2a589caebd993b650f446c3d1a3c6",
+      "export_sha256": "64c0ddf493881a1d74b2632f4b72ac451d53b437457819acf9ce41cb2b347ab5"
     },
     {
       "title": "determination",
@@ -86,11 +86,11 @@
       "title": "resilience",
       "medium": "pixel",
       "source": "resilience.spritecanvas.json",
-      "source_sha256": "8c991580aecfde1764544d586db9336a2804967237cb4c7a74719fdf4e792812",
-      "scene_sha256": "bffe588bcf6dbcc5f9ff42ab824fd47170075e182451fa51280d74495a2f0a20",
+      "source_sha256": "dcf82ba86acad2092187b2d56a253c9e61312fcbc3af1cfb8948a5cc97955d0e",
+      "scene_sha256": "93a3cfbac9b09b0e09bdcb8510d7f19b0f00b357987def90f22f88e0417662e9",
       "design_sha256": "6375ba303f440fc5cfe27c585401128a282ac860fa8ea38f8e225739e05aa5bc",
-      "provenance_sha256": "c0829f6e0f3bc2a7e64f4564396fc7ae32a21bd0350b2badc977184b0b63b74b",
-      "export_sha256": "fc9381c7d05e8ca13e7cf47bf28a253a546be6fa309b00407e7a089504878f44"
+      "provenance_sha256": "1ea39c04cfb7788b2145c455c287aa9875d2a589caebd993b650f446c3d1a3c6",
+      "export_sha256": "8cd629f00c5c25ac298dd4074af355562340513ca16b261d8afd7b1eeafab40f"
     },
     {
       "title": "hope",
@@ -126,11 +126,11 @@
       "title": "serenity",
       "medium": "image",
       "source": "scene.png",
-      "source_sha256": "f91340bff773eb14566fe37402afdada627b93a7f75881bf92fed3e8cd182c47",
-      "scene_sha256": "f91340bff773eb14566fe37402afdada627b93a7f75881bf92fed3e8cd182c47",
+      "source_sha256": "53f5ca6d282e6f401ee804a29216398db412ceb91954d420197b400c0300348b",
+      "scene_sha256": "53f5ca6d282e6f401ee804a29216398db412ceb91954d420197b400c0300348b",
       "design_sha256": "23a81fa900b7f40b22ff2b6f605272399ae7d12dc48648369357e2c70151dc4d",
-      "provenance_sha256": "f67815aeca84ba97b2f2a3f40a4a38179b176c9dd2690e8a1bd220eb46d6d370",
-      "export_sha256": "10008da247c990c14ad9d26912e649d75b81520a265a4db378a00aba4087ecaf"
+      "provenance_sha256": "b7f67bd0d5d42205072a0b171c328929ead0cbd990367035e5c4c125e2ef7f5d",
+      "export_sha256": "14f3469ab4d97eee296456df454f5919c61ff6da46d3f5613f3e4b4b99181855"
     },
     {
       "title": "euphoria",

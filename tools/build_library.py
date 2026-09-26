@@ -11,9 +11,12 @@ from pathlib import Path
 
 from PIL import Image
 
+from library_layout import ALBUMS, bundle_path, location, validate_albums
+
 ROOT = Path(__file__).resolve().parent.parent
 TOOLS = ROOT / "tools"
 ARTWORK = ROOT / "artwork" / "covers"
+ALBUM_ARTWORK = ROOT / "artwork" / "albums"
 
 
 def sha256(path):
@@ -55,6 +58,32 @@ def cover_sources(songs):
             raise ValueError(f"Stale artwork for {title}; run tools\\cover_pipeline.py.")
         covers[title] = export
     return manifest, covers
+
+
+def album_sources():
+    records = []
+    for album in ALBUMS:
+        folder = ALBUM_ARTWORK / album["title"]
+        artwork = json.loads((folder / "manifest.json").read_text(encoding="utf-8"))
+        if artwork["title"] != album["title"]:
+            raise ValueError(f"Album artwork title differs: {folder}")
+        if artwork["tracks"] != album["tracks"] or artwork["track_count"] != len(album["tracks"]):
+            raise ValueError(f"Album artwork and track order differ: {folder}")
+        files = {
+            "source_sha256": artwork["source"], "scene_sha256": "scene.png",
+            "design_sha256": "design.json", "provenance_sha256": "provenance.json",
+            "export_sha256": "cover.png",
+        }
+        for field, filename in files.items():
+            if sha256(folder / filename) != artwork[field]:
+                raise ValueError(f"Stale album artwork: {folder / filename}")
+        records.append({
+            **album, "directory": album["title"], "cover": f"{album['title']}/cover.png",
+            "cover_sha256": artwork["export_sha256"],
+            "cover_source": f"../artwork/albums/{album['title']}/{artwork['source']}",
+            "cover_design": f"../artwork/albums/{album['title']}/design.json",
+        })
+    return records
 
 
 def rights_note(song, digest, research):
@@ -181,17 +210,25 @@ def readme(songs):
     rows = []
     for index, song in enumerate(songs, 1):
         title = song["title"]
+        path = bundle_path(song).as_posix()
         kind = "loop preview" if song["kind"] == "loop" else "one-shot"
         rows.append(
-            f"| {index:02d} | [{title}]({title}/{title}.strudel) | {song['role']} | "
+            f"| {index:02d} | [{title}]({path}/{title}.strudel) | {song['role']} | "
             f"{song['bpm']} | 0-{song['end_cycle']} | {display_duration(song)} {kind} | "
-            f"[Cover]({title}/cover.png) / [Rights]({title}/RIGHTS.md) |"
+            f"[Cover]({path}/cover.png) / [Rights]({path}/RIGHTS.md) |"
         )
     return """# STRUDEL - Subwoofer Lullabies
 
 Fourteen latest-version compositions and cues, including the original Eurodance learning
 loop. Earlier revisions and cassette dialogue recordings are deliberately not duplicated.
 The original game sources remain untouched.
+
+## Albums and standalone tracks
+
+**[YeetThatGlowStick](YeetThatGlowStick/README.md)** groups the twelve retro/chiptune
+game tracks, from anticipation through perseverance, with its own
+[album cover](YeetThatGlowStick/cover.png) and [track gallery](YeetThatGlowStick/index.html).
+The non-chiptune **serenity** and independent **euphoria** remain separate title folders.
 
 **[Browse the cover gallery](index.html)**. Every title folder contains exactly:
 `title.strudel`, an original **2048 x 2048 PNG** `cover.png`, and a tailored `RIGHTS.md`.
@@ -258,7 +295,8 @@ changing the live studio. No image-generation service or review proposal was use
 ## Rebuilding a separate copy
 
 The packaging inputs are in `..\\tools`. The builder needs Python with Pillow and the
-saved artwork sources/exports in `..\\artwork\\covers`. It refuses to overwrite
+saved artwork sources/exports in `..\\artwork\\covers` and `..\\artwork\\albums`.
+Album membership and order come from `tools/album_catalog.json`. It refuses to overwrite
 an existing output, checks that source files do not change during the copy, and stages
 the collection before publishing the completed folder. It copies current checked artwork
 exports rather than regenerating earlier cover designs.
@@ -273,20 +311,38 @@ run from the repository root, not from inside STRUDEL.
 """
 
 
-def gallery(songs):
+def gallery(songs, album=None):
     cards = []
     for i, song in enumerate(songs, 1):
         t = html.escape(song["title"])
+        path = t if album else bundle_path(song).as_posix()
         cards.append(f"""<article>
-<a href="{t}/cover.png" aria-label="Open {t} cover"><img src="{t}/cover.png" alt="{t}: {html.escape(song['emotion'])}" width="2048" height="2048" loading="lazy"></a>
+<a href="{path}/cover.png" aria-label="Open {t} cover"><img src="{path}/cover.png" alt="{t}: {html.escape(song['emotion'])}" width="2048" height="2048" loading="lazy"></a>
 <div class="body"><div class="eyebrow">{i:02d} / {html.escape(song['genre'])}</div>
 <h2>{t}</h2><p>{html.escape(song['emotion'])}</p>
 <div class="meta">{song['bpm']} BPM / {display_duration(song)} / {song['kind']}</div>
-<nav><a href="{t}/{t}.strudel">Music source</a><a href="{t}/RIGHTS.md">Rights note</a></nav></div></article>""")
-    return """<!doctype html>
+<nav><a href="{path}/{t}.strudel">Music source</a><a href="{path}/RIGHTS.md">Rights note</a></nav></div></article>""")
+    if album:
+        title = html.escape(album["title"])
+        heading = f"""<h1>{title}</h1><div class="album">
+<a href="cover.png"><img src="cover.png" alt="{title} album cover" width="2048" height="2048"></a>
+<div><p>{html.escape(album['description'])}</p>
+<p>{len(songs)} editable Strudel tracks. Not rendered audio or a rights-cleared release.</p>
+<nav><a href="README.md">Album notes</a><a href="../index.html">Full collection</a></nav></div></div>"""
+    else:
+        title = "STRUDEL | Subwoofer Lullabies"
+        heading = """<h1>Small lights.<br>Long echoes.</h1>
+<p>Fourteen original AI-assisted compositions and cues. Twelve retro tracks in
+YeetThatGlowStick; serenity and euphoria remain standalone. Editable source music,
+not audio playback or a rights-cleared release.</p>
+<div class="album"><a href="YeetThatGlowStick/index.html">
+<img src="YeetThatGlowStick/cover.png" alt="YeetThatGlowStick album cover" width="2048" height="2048"></a>
+<div><h2>YeetThatGlowStick</h2><p>The twelve-track retro game soundtrack.</p>
+<nav><a href="YeetThatGlowStick/index.html">Open album</a><a href="README.md">Full catalogue</a></nav></div></div>"""
+    return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>STRUDEL | Subwoofer Lullabies</title>
-<style>
+<title>{title}</title>
+""" + """<style>
 :root{color-scheme:dark;font-family:Segoe UI,system-ui,sans-serif;background:#091d24;color:#dddcca}
 *{box-sizing:border-box}body{margin:0}header,main,footer{max-width:1440px;margin:auto;padding:48px 32px}
 header{padding-bottom:20px}h1{font-weight:300;font-size:clamp(2.5rem,6vw,5rem);margin:14px 0}
@@ -297,33 +353,139 @@ img{display:block;width:100%;height:auto;aspect-ratio:1}a{color:#a8d9cb;text-dec
 a:hover{text-decoration:underline}a:focus-visible{outline:2px solid #f0dba3;outline-offset:4px}
 .body{padding:22px}h2{font-size:1.8rem;font-weight:300;margin:10px 0}.body p{min-height:76px;line-height:1.55;color:#afbfbc}
 .meta{font-size:.75rem;color:#afbfbc}nav{display:flex;gap:20px;margin-top:22px;font-size:.8rem}
+.album{display:flex;gap:32px;align-items:center;margin-top:32px}.album>a{flex:0 0 280px}
+.album img{max-width:280px}.album p{max-width:620px}
 footer{font-size:.8rem;line-height:1.7;color:#afbfbc;border-top:1px solid #24434b}
+@media(max-width:680px){.album{display:block}.album img{max-width:100%}}
 @media(max-width:520px){header,main,footer{padding:24px 18px}}
 </style></head><body><header><div class="eyebrow">SUBWOOFER LULLABIES / THE STRUDEL COLLECTION</div>
-<h1>Small lights.<br>Long echoes.</h1>
-<p>Fourteen original AI-assisted compositions and cues. One emotion, one score and one
-original cover per folder. Editable source music; not audio playback or a rights-cleared release.</p>
-<a href="README.md">Playback and catalogue notes</a></header><main>
-""" + "\n".join(cards) + """
-</main><footer>Twelve 256px pixel scenes, two smooth illustrations, one lowercase typographic identity. Existing game scores are preserved;
+""" + heading + "</header><main>\n" + "\n".join(cards) + """
+</main><footer>Original environmental artwork; lowercase song titles. Existing game scores are preserved;
 the learning loop was recovered from the conversation. Read each rights note before publishing.
 No probability of automated claims or universal copyright clearance is promised.</footer></body></html>
 """
 
 
+def album_readme(album, songs):
+    rows = "\n".join(
+        f"| {i:02d} | [{s['title']}]({s['title']}/{s['title']}.strudel) | {s['role']} | "
+        f"[Cover]({s['title']}/cover.png) / [Rights]({s['title']}/RIGHTS.md) |"
+        for i, s in enumerate(songs, 1)
+    )
+    return f"""# {album['title']}
+
+{album['description']}
+
+![{album['title']} album cover](cover.png)
+
+**[Browse this album](index.html)** / **[Full collection](../README.md)**
+
+## Track list
+
+| # | Song | Arrangement | Artwork / note |
+|---|---|---|---|
+{rows}
+
+Only the twelve retro/chiptune tracks belong to this album. The non-chiptune
+[serenity](../serenity/serenity.strudel) and independent
+[euphoria](../euphoria/euphoria.strudel) remain outside it. Song titles stay lowercase;
+the album keeps the requested **YeetThatGlowStick** name.
+
+These are preserved Strudel sources, not a mastered audio album. See the
+[collection playback/export guide](../README.md#playback) for timing and sample loading.
+The original [cue sheet](../CUE_SHEET.txt) and
+[menu transition](../MENU_LEVEL01_TRANSITION.txt) remain at the collection root.
+courage is the legacy discovery cue; loss is the current C-19 cinematic score.
+
+## Cover and rights
+
+The original album cover uses character-free environmental pixel art and clean
+monospace lettering. [Editable source, typography and provenance](../../artwork/albums/{album['title']}/README.md)
+are saved separately; each track keeps its own individual cover.
+
+Read every track's linked rights note before publishing audio. In particular,
+anticipation, vulnerability and perseverance retain unresolved TR707 sample provenance.
+Grouping these sources into an album does not clear sample permissions, establish
+exclusive copyright or guarantee acceptance by YouTube, SoundCloud or Content ID.
+
+`album.json` records track order, local score paths and cover hashes.
+"""
+
+
+def write_collection_pages(output, manifest):
+    songs = manifest["songs"]
+    records = {song["title"]: song for song in songs}
+    for album in manifest["albums"]:
+        folder = output / album["directory"]
+        folder.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ALBUM_ARTWORK / album["title"] / "cover.png", folder / "cover.png")
+        tracks = [records[title] for title in album["tracks"]]
+        (folder / "README.md").write_text(album_readme(album, tracks), encoding="utf-8", newline="\n")
+        (folder / "index.html").write_text(gallery(tracks, album), encoding="utf-8", newline="\n")
+        (folder / "album.json").write_text(json.dumps({
+            "title": album["title"], "description": album["description"],
+            "audio_rendered": False, "cover": "cover.png", "cover_sha256": album["cover_sha256"],
+            "tracks": [{"number": i, "title": s["title"], "source": f"{s['title']}/{s['title']}.strudel",
+                        "source_sha256": s["source_sha256"], "cover_sha256": s["cover_sha256"]}
+                       for i, s in enumerate(tracks, 1)],
+        }, indent=2) + "\n", encoding="utf-8", newline="\n")
+    (output / "catalog.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8", newline="\n")
+    (output / "README.md").write_text(readme(songs), encoding="utf-8", newline="\n")
+    (output / "index.html").write_text(gallery(songs), encoding="utf-8", newline="\n")
+
+
+def verify_cover(path, expected_hash):
+    if sha256(path) != expected_hash:
+        raise ValueError(f"Cover changed: {path}")
+    with Image.open(path) as image:
+        if image.size != (2048, 2048) or image.mode not in {"RGB", "RGBA"} or image.format != "PNG":
+            raise ValueError(f"Incorrect cover format: {path}")
+        image.verify()
+    with Image.open(path) as image:
+        if image.mode == "RGBA" and image.getchannel("A").getextrema() != (255, 255):
+            raise ValueError(f"Cover background must be opaque: {path}")
+
+
 def verify(output):
     manifest = json.loads((output / "catalog.json").read_text(encoding="utf-8"))
     songs = manifest["songs"]
-    if len(songs) != 14:
-        raise ValueError("The selected collection must have 14 songs.")
+    canonical = json.loads((TOOLS / "song_catalog.json").read_text(encoding="utf-8"))
+    if len(songs) != 14 or [s["title"] for s in songs] != [s["title"] for s in canonical]:
+        raise ValueError("The selected collection must match the canonical 14-song catalog.")
+    validate_albums(songs)
     if any(not re.fullmatch(r"[a-z]+", song["title"]) for song in songs):
         raise ValueError("Every song title must be one lowercase ASCII word.")
     folders = {path.name for path in output.iterdir() if path.is_dir()}
-    if folders != {song["title"] for song in songs}:
-        raise ValueError("Unexpected or missing title folders.")
+    if folders != {bundle_path(song).parts[0] for song in songs}:
+        raise ValueError("Unexpected or missing album/standalone folders.")
+    expected_albums = album_sources()
+    if manifest.get("albums") != expected_albums:
+        raise ValueError("Stale or missing album metadata.")
+    for album in expected_albums:
+        folder = output / album["directory"]
+        expected = set(album["tracks"]) | {"cover.png", "README.md", "index.html", "album.json"}
+        if {p.name for p in folder.iterdir()} != expected:
+            raise ValueError(f"Incomplete album: {folder}")
+        verify_cover(folder / "cover.png", album["cover_sha256"])
+        info = json.loads((folder / "album.json").read_text(encoding="utf-8"))
+        tracks = [next(s for s in songs if s["title"] == t) for t in album["tracks"]]
+        expected_tracks = [
+            {"number": i, "title": s["title"], "source": f"{s['title']}/{s['title']}.strudel",
+             "source_sha256": s["source_sha256"], "cover_sha256": s["cover_sha256"]}
+            for i, s in enumerate(tracks, 1)
+        ]
+        if (info["tracks"] != expected_tracks or info["title"] != album["title"]
+                or info["cover"] != "cover.png" or info["cover_sha256"] != album["cover_sha256"]
+                or info["description"] != album["description"] or info["audio_rendered"] is not False):
+            raise ValueError(f"Stale album track list: {folder}")
+        if ((folder / "README.md").read_text(encoding="utf-8") != album_readme(album, tracks)
+                or (folder / "index.html").read_text(encoding="utf-8") != gallery(tracks, album)):
+            raise ValueError(f"Stale album documentation: {folder}")
     covers = set()
     for song in songs:
-        folder = output / song["title"]
+        if any(song.get(key) != value for key, value in location(song).items()):
+            raise ValueError(f"Incorrect album membership/path: {song['title']}")
+        folder = output / bundle_path(song)
         expected = {f"{song['title']}.strudel", "cover.png", "RIGHTS.md"}
         if {path.name for path in folder.iterdir()} != expected:
             raise ValueError(f"Incomplete bundle: {folder}")
@@ -333,13 +495,7 @@ def verify(output):
         if cover_hash != song["cover_sha256"] or cover_hash in covers:
             raise ValueError(f"Cover changed or duplicated: {folder}")
         covers.add(cover_hash)
-        with Image.open(folder / "cover.png") as image:
-            if image.size != (2048, 2048) or image.mode not in {"RGB", "RGBA"} or image.format != "PNG":
-                raise ValueError(f"Incorrect cover format: {folder}")
-            image.verify()
-        with Image.open(folder / "cover.png") as image:
-            if image.mode == "RGBA" and image.getchannel("A").getextrema() != (255, 255):
-                raise ValueError(f"Cover background must be opaque: {folder}")
+        verify_cover(folder / "cover.png", song["cover_sha256"])
         note = (folder / "RIGHTS.md").read_text(encoding="utf-8")
         if song["source_sha256"] not in note or "Educated estimate" not in note or "https://" not in note:
             raise ValueError(f"Incomplete rights note: {folder}")
@@ -353,7 +509,12 @@ def verify(output):
             for line, prefix in zip(lines, prefixes)
         ):
             raise ValueError(f"Expected one verdict line per platform: {folder}")
-    print("14 complete bundles: preserved scores, unique opaque 2048-square covers, tailored rights notes.")
+    if covers.intersection(album["cover_sha256"] for album in expected_albums):
+        raise ValueError("The album needs its own cover, not a reused song cover.")
+    if ((output / "README.md").read_text(encoding="utf-8") != readme(songs)
+            or (output / "index.html").read_text(encoding="utf-8") != gallery(songs)):
+        raise ValueError("Stale collection documentation.")
+    print("14 complete bundles: 12 album tracks, 2 standalone tracks, preserved scores and checked covers/rights.")
 
 
 def main():
@@ -377,7 +538,9 @@ def main():
         raise ValueError("Expected 14 unique titles.")
     if any(not re.fullmatch(r"[a-z]+", s["title"]) for s in songs):
         raise ValueError("Every title must be one lowercase ASCII word.")
+    validate_albums(songs)
     artwork, covers = cover_sources(songs)
+    albums = album_sources()
     art_records = {record["title"]: record for record in artwork["songs"]}
     hashes = {s["title"]: sha256(source_for(s, source_directory)) for s in songs}
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -387,15 +550,15 @@ def main():
         records = []
         for number, song in enumerate(songs, 1):
             title = song["title"]
-            folder = stage / title
-            folder.mkdir()
+            folder = stage / bundle_path(song)
+            folder.mkdir(parents=True)
             source = source_for(song, source_directory)
             shutil.copyfile(source, folder / f"{title}.strudel")
             shutil.copyfile(covers[title], folder / "cover.png")
             (folder / "RIGHTS.md").write_text(
                 rights_note(song, hashes[title], research), encoding="utf-8", newline="\n")
             records.append({
-                **song, "duration_seconds": round(duration(song), 6),
+                **song, **location(song), "duration_seconds": round(duration(song), 6),
                 "source_sha256": hashes[title], "cover_sha256": sha256(folder / "cover.png"),
                 "source_origin": "recovered-chat-example" if title == "euphoria" else "game-project-current-source",
                 "cover_source": f"..\\artwork\\covers\\{title}\\{art_records[title]['source']}",
@@ -404,15 +567,14 @@ def main():
             print(f"{number:02d}/14 {title}", flush=True)
         for name in ["CUE_SHEET.txt", "MENU_LEVEL01_TRANSITION.txt"]:
             shutil.copyfile(source_directory / name, stage / name)
-        (stage / "catalog.json").write_text(json.dumps({
+        write_collection_pages(stage, {
             "created": research["review_date"],
             "scope": "Latest version of 13 game scores/cues plus the original Eurodance learning loop.",
             "audio_rendered": False,
             "cover_art": artwork["description"],
+            "albums": albums,
             "songs": records,
-        }, indent=2) + "\n", encoding="utf-8")
-        (stage / "README.md").write_text(readme(records), encoding="utf-8", newline="\n")
-        (stage / "index.html").write_text(gallery(records), encoding="utf-8", newline="\n")
+        })
         for song in songs:
             if sha256(source_for(song, source_directory)) != hashes[song["title"]]:
                 raise RuntimeError(f"Source changed during packaging: {song['source']}; nothing published.")

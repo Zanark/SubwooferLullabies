@@ -365,40 +365,6 @@ def _serenity(n, rng):
     del reflection, alpha, shadows, broad_shadow
     image.alpha_composite(piano.render())
 
-    light = Image.new("RGB", (n, n))
-    draw = ImageDraw.Draw(light)
-    # A quiet suspended droplet, luminous meniscus, and expanding soft rings.
-    cx, cy = .472, .219
-    for i, radius in enumerate((.024, .043, .070, .096)):
-        ellipse = (n * (cx - radius), n * (cy - radius * .18),
-                   n * (cx + radius), n * (cy + radius * .18))
-        draw.arc(ellipse, 5, 166, fill=(25 - i * 3, 83 - i * 11, 78 - i * 10),
-                 width=max(1, round(n * .0008)))
-        draw.arc(ellipse, 190, 337, fill=(42 - i * 7, 100 - i * 16, 91 - i * 14),
-                 width=max(1, round(n * .0007)))
-    drop = []
-    for controls in (
-        ((cx, .171), (cx - .004, .181), (cx - .010, .188), (cx - .008, .194)),
-        ((cx - .008, .194), (cx - .003, .204), (cx + .009, .199), (cx + .009, .192)),
-        ((cx + .009, .192), (cx + .008, .185), (cx + .002, .180), (cx, .171)),
-    ):
-        drop.extend(_bezier(*(np.array(v) * n for v in controls), count=25))
-    mask = Image.new("L", (n, n))
-    ImageDraw.Draw(mask).polygon([tuple(p) for p in drop], fill=255)
-    bounds = mask.getbbox()
-    dx, dy = np.meshgrid(np.arange(bounds[0], bounds[2], dtype=np.float32) / n,
-                         np.arange(bounds[1], bounds[3], dtype=np.float32) / n)
-    dx = (dx - cx) / .009
-    dy = (dy - .192) / .012
-    fresnel = np.clip(dx * dx + dy * dy * .4, 0, 1) ** 2
-    glass = np.empty((*dx.shape, 3), dtype=np.float32)
-    glass[:] = (13, 60, 64)
-    glass += fresnel[..., None] * (58, 101, 85)
-    glass += np.exp(-((dx + .42) ** 2 / .045 + (dy + .23) ** 2 / .60))[..., None] * (122, 170, 141)
-    glass += np.exp(-((dx - .28) ** 2 / .19 + (dy - .24) ** 2 / .038))[..., None] * (60, 118, 90)
-    light.paste(_rgb_image(glass), bounds[:2], mask.crop(bounds))
-    image = _glow(image, light, ((n * .012, .30), (n * .003, .25)))
-
     particles = Image.new("RGBA", (n, n))
     draw = ImageDraw.Draw(particles)
     for i in range(62):

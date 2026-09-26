@@ -1,0 +1,22 @@
+{
+  "baseline_project_id": "7f7aa004-e631-4910-9e58-92f6e2702594",
+  "baseline_revision": 3,
+  "handoff_sha256": "5cb5aab8cfea938caed4423945c97dbc56aadf4b3797baeac340b4a4f227d3d2",
+  "baseline": "Protected blank saved handoff; original handoff kept unchanged.",
+  "recipe": "../../../tools/album_cover.py",
+  "recipe_sha256": "41062356bcdf182f8bb81b9e05ee1f919d22fbd6fd1ff2afeb4a16256ed2c1bc",
+  "drawing_helpers": "../../../tools/pixel_cover_scenes.py",
+  "drawing_helpers_sha256": "f7e3a5785ab4bba07c6c6ecf85e80c837bd562b1ca171112a1a2c21aac75b1ea",
+  "native_pixels": [
+    256,
+    256
+  ],
+  "editable_cells": 458752,
+  "frames": 1,
+  "working_palette_swatches": 53,
+  "original_composition": true,
+  "external_images": [],
+  "live_studio_mutated": false,
+  "proposal_submitted": false,
+  "font_binaries_distributed": false
+}

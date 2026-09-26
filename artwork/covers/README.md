@@ -9,6 +9,8 @@ plus an underwater piano and a neon record.
 silhouettes. Scale, broken infrastructure, worn routes, abandoned objects, water and light
 carry the narrative. The empty ledge suggests exposure; damaged rungs and polished rails
 suggest repeated effort; fading light markers lead up the switchback journey.
+Decorative droplet icons are not a collection-wide motif. Water, caustics and reflections
+remain where they belong in the environment; the music's droplet sounds are unchanged.
 
 ## Sources and media
 
@@ -44,6 +46,10 @@ The first command renders **saved** editable sources and typography. `--check` i
 read-only. `--install` replaces all fourteen song cover PNGs and synchronizes metadata,
 rights-note artwork provenance and galleries, after guarding the installed music/cover
 hashes. It does not change score bytes or music-rights conclusions.
+It respects `tools/album_catalog.json`: twelve retro bundles live under
+`STRUDEL/YeetThatGlowStick`, while serenity and euphoria remain at the collection root.
+The separate [album artwork](../albums/YeetThatGlowStick/README.md) must be exported
+before installation; the installer includes its checked cover and regenerates album pages.
 
 To intentionally regenerate scenes from their original drawing recipes, use `--draw`.
 Existing source folders require the additional explicit `--redraw` switch. These switches

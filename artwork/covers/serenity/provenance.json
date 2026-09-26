@@ -4,7 +4,8 @@
     2048,
     2048
   ],
-  "recipe_sha256": "a255336cf9a2e0b337c33a9380752898743b0413d851a5c56b24f50658cd1b98",
+  "recipe_sha256": "172cdae5322bbc94f0b6878e846f7571c3437cd2e6e516409ab7d5b4f47141d7",
   "medium": "original smooth digital illustration",
-  "external_images": []
+  "external_images": [],
+  "revision_note": "Removed the floating droplet and its symbolic rings. Piano, underwater caustics, natural bubbles, floor reflections and saved typography retained."
 }

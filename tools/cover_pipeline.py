@@ -14,6 +14,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 from pixel_cover_scenes import render_pixel_scene
+from library_layout import bundle_path, location, validate_albums
 
 ROOT = Path(__file__).resolve().parent.parent
 ART = ROOT / "artwork" / "covers"
@@ -248,18 +249,37 @@ def export(songs, selected, studio, check):
 
 
 def install(songs, manifest):
-    from build_library import gallery, readme, rights_note, verify
+    from build_library import album_sources, rights_note, verify, write_collection_pages
     if len(manifest["songs"]) != len(songs):
         raise ValueError("All fourteen covers must be exported before installation.")
     output = ROOT / "STRUDEL"
     current = read_json(output / "catalog.json")
+    validate_albums(songs)
+    albums = album_sources()
     previous = {s["title"].lower(): s for s in current["songs"]}
     records = {s["title"]: s for s in manifest["songs"]}
     research = read_json(ROOT / "tools" / "rights_research.json")
+    installed_albums = {album["title"] for album in current.get("albums", [])}
+    for album in albums:
+        folder = output / album["directory"]
+        if album["title"] not in installed_albums and folder.exists():
+            raise FileExistsError(f"Refusing to initialize an existing album folder: {folder}")
+    for album in current.get("albums", []):
+        if digest(output / album["cover"]) != album["cover_sha256"]:
+            raise ValueError(f"{album['title']}: installed album artwork changed independently.")
     for song in songs:
         title = song["title"]
         old = previous[title]
-        folder = output / old["title"]
+        folder = output / old.get("bundle_path", old["title"])
+        target = output / bundle_path(song)
+        if folder != target and target.exists():
+            raise FileExistsError(f"Refusing to overwrite a moved song bundle: {target}")
+        if folder != target or old["title"] != title:
+            temporary = output / f".rename-{title}"
+            if temporary.exists():
+                raise FileExistsError(temporary)
+            if target.parent.exists() and not target.parent.is_dir():
+                raise NotADirectoryError(target.parent)
         if digest(folder / f"{old['title']}.strudel") != old["source_sha256"]:
             raise ValueError(f"{title}: score changed independently.")
         if digest(folder / "cover.png") != old["cover_sha256"]:
@@ -270,8 +290,9 @@ def install(songs, manifest):
     for song in songs:
         title = song["title"]
         old = previous[title]
-        folder = output / old["title"]
-        if old["title"] != title:
+        folder = output / old.get("bundle_path", old["title"])
+        target = output / bundle_path(song)
+        if folder != target or old["title"] != title:
             temporary = output / f".rename-{title}"
             if temporary.exists():
                 raise FileExistsError(temporary)
@@ -279,19 +300,19 @@ def install(songs, manifest):
             score = temporary / f"{old['title']}.strudel"
             score.rename(temporary / ".score-rename")
             (temporary / ".score-rename").rename(temporary / f"{title}.strudel")
-            temporary.rename(output / title)
-        folder = output / title
+            target.parent.mkdir(parents=True, exist_ok=True)
+            temporary.rename(target)
+        folder = target
         shutil.copyfile(ART / title / "cover.png", folder / "cover.png")
         (folder / "RIGHTS.md").write_text(
             rights_note(song, old["source_sha256"], research), encoding="utf-8", newline="\n")
-        updated.append({**old, **song, "cover_sha256": records[title]["export_sha256"],
+        updated.append({**old, **song, **location(song), "cover_sha256": records[title]["export_sha256"],
                         "cover_source": f"..\\artwork\\covers\\{title}\\{records[title]['source']}",
                         "cover_design": f"..\\artwork\\covers\\{title}\\design.json"})
     current["songs"] = updated
     current["cover_art"] = DESCRIPTION
-    save_json(output / "catalog.json", current)
-    (output / "README.md").write_text(readme(updated), encoding="utf-8", newline="\n")
-    (output / "index.html").write_text(gallery(updated), encoding="utf-8", newline="\n")
+    current["albums"] = albums
+    write_collection_pages(output, current)
     verify(output)
 
 

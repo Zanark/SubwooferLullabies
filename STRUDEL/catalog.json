@@ -25,11 +25,14 @@
       "kind": "loop",
       "duration_seconds": 83.478261,
       "source_sha256": "77f84bc58ad727322e67823fa7e7437397676ec805f27992e58b7011726d82cf",
-      "cover_sha256": "ea04ee320adf270d05f5f9fece0b0c97241e8d7ac609215a052311f5876dfb44",
+      "cover_sha256": "6c9dd9797da851240b95be9e90c5335ac556b3e97a8ecabdc44eba3dcdfdef8a",
       "source_origin": "game-project-current-source",
       "cover_source": "..\\artwork\\covers\\anticipation\\anticipation.spritecanvas.json",
       "cover_medium": "pixel",
-      "cover_design": "..\\artwork\\covers\\anticipation\\design.json"
+      "cover_design": "..\\artwork\\covers\\anticipation\\design.json",
+      "album": "YeetThatGlowStick",
+      "track_number": 1,
+      "bundle_path": "YeetThatGlowStick/anticipation"
     },
     {
       "title": "dismay",
@@ -56,7 +59,10 @@
       "source_origin": "game-project-current-source",
       "cover_source": "..\\artwork\\covers\\dismay\\dismay.spritecanvas.json",
       "cover_medium": "pixel",
-      "cover_design": "..\\artwork\\covers\\dismay\\design.json"
+      "cover_design": "..\\artwork\\covers\\dismay\\design.json",
+      "album": "YeetThatGlowStick",
+      "track_number": 2,
+      "bundle_path": "YeetThatGlowStick/dismay"
     },
     {
       "title": "vulnerability",
@@ -79,11 +85,14 @@
       "kind": "loop",
       "duration_seconds": 83.478261,
       "source_sha256": "3b3b979e0a6e45f5dd09a51fc7974df20e29f6e9b471ffd76b5ce2894e8e1006",
-      "cover_sha256": "afc2fd013879d3e544287e35b5ae8dc97191334ddb42bcf73984fa5acd163488",
+      "cover_sha256": "0ae0203f213f33470e15d3c5c24bcd116795118e9b17400f50794c2b2f707c4c",
       "source_origin": "game-project-current-source",
       "cover_source": "..\\artwork\\covers\\vulnerability\\vulnerability.spritecanvas.json",
       "cover_medium": "pixel",
-      "cover_design": "..\\artwork\\covers\\vulnerability\\design.json"
+      "cover_design": "..\\artwork\\covers\\vulnerability\\design.json",
+      "album": "YeetThatGlowStick",
+      "track_number": 3,
+      "bundle_path": "YeetThatGlowStick/vulnerability"
     },
     {
       "title": "delight",
@@ -110,7 +119,10 @@
       "source_origin": "game-project-current-source",
       "cover_source": "..\\artwork\\covers\\delight\\delight.spritecanvas.json",
       "cover_medium": "pixel",
-      "cover_design": "..\\artwork\\covers\\delight\\design.json"
+      "cover_design": "..\\artwork\\covers\\delight\\design.json",
+      "album": "YeetThatGlowStick",
+      "track_number": 4,
+      "bundle_path": "YeetThatGlowStick/delight"
     },
     {
       "title": "curiosity",
@@ -133,11 +145,14 @@
       "kind": "loop",
       "duration_seconds": 87.272727,
       "source_sha256": "8b46ddc5c693a19204852ced14d182cc7f743a2ba0c2451f8d9a2cd4d361bd97",
-      "cover_sha256": "e888e238fa4994c9c8dbcbfa242bd752d76fa944cce55ca7d657ba11f76aa714",
+      "cover_sha256": "64c0ddf493881a1d74b2632f4b72ac451d53b437457819acf9ce41cb2b347ab5",
       "source_origin": "game-project-current-source",
       "cover_source": "..\\artwork\\covers\\curiosity\\curiosity.spritecanvas.json",
       "cover_medium": "pixel",
-      "cover_design": "..\\artwork\\covers\\curiosity\\design.json"
+      "cover_design": "..\\artwork\\covers\\curiosity\\design.json",
+      "album": "YeetThatGlowStick",
+      "track_number": 5,
+      "bundle_path": "YeetThatGlowStick/curiosity"
     },
     {
       "title": "determination",
@@ -164,7 +179,10 @@
       "source_origin": "game-project-current-source",
       "cover_source": "..\\artwork\\covers\\determination\\determination.spritecanvas.json",
       "cover_medium": "pixel",
-      "cover_design": "..\\artwork\\covers\\determination\\design.json"
+      "cover_design": "..\\artwork\\covers\\determination\\design.json",
+      "album": "YeetThatGlowStick",
+      "track_number": 6,
+      "bundle_path": "YeetThatGlowStick/determination"
     },
     {
       "title": "loss",
@@ -191,7 +209,10 @@
       "source_origin": "game-project-current-source",
       "cover_source": "..\\artwork\\covers\\loss\\loss.spritecanvas.json",
       "cover_medium": "pixel",
-      "cover_design": "..\\artwork\\covers\\loss\\design.json"
+      "cover_design": "..\\artwork\\covers\\loss\\design.json",
+      "album": "YeetThatGlowStick",
+      "track_number": 7,
+      "bundle_path": "YeetThatGlowStick/loss"
     },
     {
       "title": "courage",
@@ -219,7 +240,10 @@
       "source_origin": "game-project-current-source",
       "cover_source": "..\\artwork\\covers\\courage\\courage.spritecanvas.json",
       "cover_medium": "pixel",
-      "cover_design": "..\\artwork\\covers\\courage\\design.json"
+      "cover_design": "..\\artwork\\covers\\courage\\design.json",
+      "album": "YeetThatGlowStick",
+      "track_number": 8,
+      "bundle_path": "YeetThatGlowStick/courage"
     },
     {
       "title": "resilience",
@@ -242,11 +266,14 @@
       "kind": "loop",
       "duration_seconds": 96,
       "source_sha256": "c474a55f07535d91b7a0382d16349a60b3e53a8de0deeaf8744aa308de981a89",
-      "cover_sha256": "fc9381c7d05e8ca13e7cf47bf28a253a546be6fa309b00407e7a089504878f44",
+      "cover_sha256": "8cd629f00c5c25ac298dd4074af355562340513ca16b261d8afd7b1eeafab40f",
       "source_origin": "game-project-current-source",
       "cover_source": "..\\artwork\\covers\\resilience\\resilience.spritecanvas.json",
       "cover_medium": "pixel",
-      "cover_design": "..\\artwork\\covers\\resilience\\design.json"
+      "cover_design": "..\\artwork\\covers\\resilience\\design.json",
+      "album": "YeetThatGlowStick",
+      "track_number": 9,
+      "bundle_path": "YeetThatGlowStick/resilience"
     },
     {
       "title": "hope",
@@ -273,7 +300,10 @@
       "source_origin": "game-project-current-source",
       "cover_source": "..\\artwork\\covers\\hope\\hope.spritecanvas.json",
       "cover_medium": "pixel",
-      "cover_design": "..\\artwork\\covers\\hope\\design.json"
+      "cover_design": "..\\artwork\\covers\\hope\\design.json",
+      "album": "YeetThatGlowStick",
+      "track_number": 10,
+      "bundle_path": "YeetThatGlowStick/hope"
     },
     {
       "title": "relief",
@@ -300,7 +330,10 @@
       "source_origin": "game-project-current-source",
       "cover_source": "..\\artwork\\covers\\relief\\relief.spritecanvas.json",
       "cover_medium": "pixel",
-      "cover_design": "..\\artwork\\covers\\relief\\design.json"
+      "cover_design": "..\\artwork\\covers\\relief\\design.json",
+      "album": "YeetThatGlowStick",
+      "track_number": 11,
+      "bundle_path": "YeetThatGlowStick/relief"
     },
     {
       "title": "perseverance",
@@ -327,7 +360,10 @@
       "source_origin": "game-project-current-source",
       "cover_source": "..\\artwork\\covers\\perseverance\\perseverance.spritecanvas.json",
       "cover_medium": "pixel",
-      "cover_design": "..\\artwork\\covers\\perseverance\\design.json"
+      "cover_design": "..\\artwork\\covers\\perseverance\\design.json",
+      "album": "YeetThatGlowStick",
+      "track_number": 12,
+      "bundle_path": "YeetThatGlowStick/perseverance"
     },
     {
       "title": "serenity",
@@ -350,11 +386,14 @@
       "kind": "one-shot",
       "duration_seconds": 176,
       "source_sha256": "9edbd8cfaa0051359bf24e7d7bebbf03790d2319af7f3969f62cdaeb93c9bbb8",
-      "cover_sha256": "10008da247c990c14ad9d26912e649d75b81520a265a4db378a00aba4087ecaf",
+      "cover_sha256": "14f3469ab4d97eee296456df454f5919c61ff6da46d3f5613f3e4b4b99181855",
       "source_origin": "game-project-current-source",
       "cover_source": "..\\artwork\\covers\\serenity\\scene.png",
       "cover_medium": "image",
-      "cover_design": "..\\artwork\\covers\\serenity\\design.json"
+      "cover_design": "..\\artwork\\covers\\serenity\\design.json",
+      "album": null,
+      "track_number": null,
+      "bundle_path": "serenity"
     },
     {
       "title": "euphoria",
@@ -382,7 +421,35 @@
       "source_origin": "recovered-chat-example",
       "cover_source": "..\\artwork\\covers\\euphoria\\scene.png",
       "cover_medium": "image",
-      "cover_design": "..\\artwork\\covers\\euphoria\\design.json"
+      "cover_design": "..\\artwork\\covers\\euphoria\\design.json",
+      "album": null,
+      "track_number": null,
+      "bundle_path": "euphoria"
+    }
+  ],
+  "albums": [
+    {
+      "title": "YeetThatGlowStick",
+      "description": "Twelve retro game tracks: a journey through sewer darkness, small discoveries, loss and the climb toward daylight.",
+      "tracks": [
+        "anticipation",
+        "dismay",
+        "vulnerability",
+        "delight",
+        "curiosity",
+        "determination",
+        "loss",
+        "courage",
+        "resilience",
+        "hope",
+        "relief",
+        "perseverance"
+      ],
+      "directory": "YeetThatGlowStick",
+      "cover": "YeetThatGlowStick/cover.png",
+      "cover_sha256": "812dcd2a5917af062a15a8c8da190ba76e218fcd464db3fa805ab0d2fbc4ddc1",
+      "cover_source": "../artwork/albums/YeetThatGlowStick/YeetThatGlowStick.spritecanvas.json",
+      "cover_design": "../artwork/albums/YeetThatGlowStick/design.json"
     }
   ]
 }

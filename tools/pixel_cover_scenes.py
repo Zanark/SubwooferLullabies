@@ -155,12 +155,6 @@ class Scene:
                 level = self.rng.randint(base + 1, base + 3)
             self.line([(x, y), (min(255, x + self.rng.randint(2, 10)), y)], level)
 
-    def droplet(self, x, y, size=4):
-        self.polygon([(x, y - size * 2), (x - size, y), (x - size + 1, y + 3),
-                      (x + 2, y + 3), (x + size, y)], 11)
-        self.line([(x - 1, y - size), (x - 2, y + 1)], 62)
-        self.dot(x + 1, y + 2, 8)
-
     def debris(self, floor=194):
         self.use("foreground")
         for x, r in [(8, 22), (240, 32), (23, 12), (221, 9)]:
@@ -185,7 +179,6 @@ def anticipation(s):
     s.line([(255, 203), (155, 173)], 8)
     s.use("light").rod(141, 155, -4, 17)
     s.ripples(141, 201, 12, 5, 10)
-    s.droplet(76, 102, 3)
     s.use("materials")
     for x, y in [(47, 139), (63, 89), (200, 110)]:
         s.line([(x, y), (x - 2, y + 13)], 4)
@@ -232,7 +225,6 @@ def vulnerability(s):
     s.line([(32, 142), (48, 140)], 43)
     s.line([(88, 163), (82, 166), (85, 171)], 5)
     s.use("light").rod(65, 153, 14, 3)
-    s.use("light").droplet(165, 100, 3)
     s.ripples(167, 217, 19, 3, 5)
 
 
@@ -294,8 +286,7 @@ def curiosity(s):
     s.texture((77, 169, 90, 176), [7, 5, 27], 12, True)
     s.use("foreground").line([(47, 211), (59, 218), (84, 215), (95, 222)], 24)
     s.line([(47, 212), (58, 219), (83, 216), (95, 223)], 17)
-    s.use("light").droplet(231, 71, 3)
-    s.ripples(181, 225, 15, 3, 5)
+    s.use("light").ripples(181, 225, 15, 3, 5)
 
 
 def determination(s):
@@ -414,7 +405,6 @@ def resilience(s):
         points = [(x, 173 + i * 3 + math.sin(x / 27 + i * .6) * 3) for x in range(0, 256, 2)]
         s.line(points, 6 + (i % 4))
     s.use("light").rod(177, 163, -14, 9)
-    s.droplet(60, 84, 3)
     s.debris(236)
 
 

@@ -1,0 +1,93 @@
+{
+  "title": "YeetThatGlowStick",
+  "description": "Twelve retro game tracks: a journey through sewer darkness, small discoveries, loss and the climb toward daylight.",
+  "audio_rendered": false,
+  "cover": "cover.png",
+  "cover_sha256": "812dcd2a5917af062a15a8c8da190ba76e218fcd464db3fa805ab0d2fbc4ddc1",
+  "tracks": [
+    {
+      "number": 1,
+      "title": "anticipation",
+      "source": "anticipation/anticipation.strudel",
+      "source_sha256": "77f84bc58ad727322e67823fa7e7437397676ec805f27992e58b7011726d82cf",
+      "cover_sha256": "6c9dd9797da851240b95be9e90c5335ac556b3e97a8ecabdc44eba3dcdfdef8a"
+    },
+    {
+      "number": 2,
+      "title": "dismay",
+      "source": "dismay/dismay.strudel",
+      "source_sha256": "154a0b76522a6ca06052f676dedabdba2c930bc4f6fd600585ea1b446af5e147",
+      "cover_sha256": "4bc6b0d14f70f40cb802b12cc0b14bf42ccd854e80efca842350e6a1e2dbcad8"
+    },
+    {
+      "number": 3,
+      "title": "vulnerability",
+      "source": "vulnerability/vulnerability.strudel",
+      "source_sha256": "3b3b979e0a6e45f5dd09a51fc7974df20e29f6e9b471ffd76b5ce2894e8e1006",
+      "cover_sha256": "0ae0203f213f33470e15d3c5c24bcd116795118e9b17400f50794c2b2f707c4c"
+    },
+    {
+      "number": 4,
+      "title": "delight",
+      "source": "delight/delight.strudel",
+      "source_sha256": "c5d7063578035b7682f20b8119fa2e3849d44cdb5f7c6b68f58c215a0eddca35",
+      "cover_sha256": "c0b7ed760bec7cadae64bc5d78c749d9223577efc9dad9ff77a2a30c7d3e95ee"
+    },
+    {
+      "number": 5,
+      "title": "curiosity",
+      "source": "curiosity/curiosity.strudel",
+      "source_sha256": "8b46ddc5c693a19204852ced14d182cc7f743a2ba0c2451f8d9a2cd4d361bd97",
+      "cover_sha256": "64c0ddf493881a1d74b2632f4b72ac451d53b437457819acf9ce41cb2b347ab5"
+    },
+    {
+      "number": 6,
+      "title": "determination",
+      "source": "determination/determination.strudel",
+      "source_sha256": "77b1778076e1a49fe24d9cbeb7e903fa6a39795c4d383e8464cc63ce8e0c69a9",
+      "cover_sha256": "dfdb89d47d7b70007a0dfb1cf5d54768f047431b220b6ce213a90a3e83606e6d"
+    },
+    {
+      "number": 7,
+      "title": "loss",
+      "source": "loss/loss.strudel",
+      "source_sha256": "6c0ae7f1bd3764b13fe8ab6658e345ba611da1168849c0a30349b77ebd69b7ba",
+      "cover_sha256": "5b32dcfaaf9b81afb5412bc3a577ff2764c403e1e459a9e4eb033602f03c6e2d"
+    },
+    {
+      "number": 8,
+      "title": "courage",
+      "source": "courage/courage.strudel",
+      "source_sha256": "60eef90044542be4f77a81faaa7e09c41c6c68759e7d5bae47ba7208f765ca6f",
+      "cover_sha256": "0b35c4f1e1d1e7d6454c739a3cf4d62102927f7fd33677ff5faf40043944eb24"
+    },
+    {
+      "number": 9,
+      "title": "resilience",
+      "source": "resilience/resilience.strudel",
+      "source_sha256": "c474a55f07535d91b7a0382d16349a60b3e53a8de0deeaf8744aa308de981a89",
+      "cover_sha256": "8cd629f00c5c25ac298dd4074af355562340513ca16b261d8afd7b1eeafab40f"
+    },
+    {
+      "number": 10,
+      "title": "hope",
+      "source": "hope/hope.strudel",
+      "source_sha256": "70ddfd76a858758e2280e398b252b7bf76f764c324a83d3da4f994c17359b2ea",
+      "cover_sha256": "29cdb62510a812fb0bfae1827fd41d713bcdd2c2741032b136ed7d32a72d651b"
+    },
+    {
+      "number": 11,
+      "title": "relief",
+      "source": "relief/relief.strudel",
+      "source_sha256": "9f1887dde017ff6c4fda352aec0f82f7de6e272ab072dfeebd705d49f3a7c9ac",
+      "cover_sha256": "8e77d71ce7f6172e0a5fd059813efe6ebfc72829bc23d901b8d5b9383360e461"
+    },
+    {
+      "number": 12,
+      "title": "perseverance",
+      "source": "perseverance/perseverance.strudel",
+      "source_sha256": "cbc67a89342834eb690a83c399deb0375638e000dc8f1d38de7cb0af452a8da5",
+      "cover_sha256": "885aa2462223f543d0b5bf33037f0f9d1c0f2be92ced4982769845d82aca4419"
+    }
+  ]
+}
