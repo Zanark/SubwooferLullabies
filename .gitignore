@@ -2,3 +2,8 @@ __pycache__/
 *.py[cod]
 .strudel-stage-*/
 .agent-context/
+/AUDIO/
+dist/
+node_modules/
+site/public/catalog.json
+site/public/covers/

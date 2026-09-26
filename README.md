@@ -14,6 +14,56 @@ The music files are editable sources, not rendered audio. Copyright notes explai
 known sample obligations and remaining uncertainty; they are not legal clearance or
 a promise that uploads will never receive automated claims.
 
+## Playable audio
+
+The collection can be rendered locally as **stereo 48 kHz, 16-bit PCM WAVs** using
+Strudel's browser audio engine. From the repository root, with Node.js 24 and
+Microsoft Edge installed:
+
+```powershell
+node .\tools\export_audio.mjs
+```
+
+Open `AUDIO\index.html` afterward to listen or download individual files.
+The twelve album WAVs are in `AUDIO\YeetThatGlowStick`; `serenity.wav` and
+`euphoria.wav` are at the audio root. `AUDIO\manifest.json` records source/audio
+hashes, cycle ranges, signal measurements, loaded samples and engine asset URLs.
+
+Exports use the saved score defaults and catalogue durations. Loop tracks contain
+one complete written form, not an automatically mastered seamless loop. No automatic
+normalization or extra fades are added. An explicit reduction such as
+`--gain-db euphoria=-3` prevents clipping without changing the score; it is recorded
+in the manifest and player. Sample loading requires internet access;
+the finished WAVs play offline. Rendering does not resolve the existing sample
+permissions or attribution requirements.
+
+The exporter uses isolated temporary browser profiles and closes them when finished.
+It resumes only matching, hash-checked exports; it refuses stale or unrecorded files.
+For a fresh output use `--output "C:\path\to\audio"`; use `--titles anticipation,serenity`
+to select tracks or `--browser "C:\path\to\chrome.exe"` for another Chromium browser.
+Generated `AUDIO` files are Git-ignored and are not automatically published.
+
+## Playable website
+
+The `deployment/pages` branch contains a Vite and TypeScript static site for
+GitHub Pages. It presents the collection as a PS1-inspired cassette archive:
+search or browse the album grid, click a song or drag a cassette into the
+fictional portable player, inspect both cassette sides, and play the rendered
+track in theater mode.
+
+```powershell
+npm install
+npm run dev
+npm run build
+```
+
+The checked `site/public/audio` MP3 previews are derived from the verified local
+WAV exports. Run `npm run audio:encode` only after intentionally regenerating
+the complete `AUDIO` manifest. The Pages workflow builds and deploys only from
+`deployment/pages`; the repository's Pages source must remain **GitHub Actions**.
+The player is an original design and is not affiliated with Sony or another
+hardware manufacturer.
+
 ## Songs
 
 ### [YeetThatGlowStick](STRUDEL/YeetThatGlowStick/README.md)

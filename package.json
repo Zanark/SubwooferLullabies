@@ -1,0 +1,19 @@
+{
+  "name": "subwoofer-lullabies-site",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "audio:encode": "node scripts/encode-site-audio.mjs",
+    "assets:prepare": "node scripts/prepare-site-assets.mjs",
+    "dev": "npm run assets:prepare && vite --host 127.0.0.1",
+    "build": "npm run assets:prepare && tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "lamejs": "1.2.1",
+    "typescript": "7.0.2",
+    "vite": "8.3.0"
+  }
+}

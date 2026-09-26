@@ -9,3 +9,4 @@ tools/album_cover.py text eol=lf
 tools/*_cover_scenes.py text eol=lf
 CUE_SHEET.txt -text
 MENU_LEVEL01_TRANSITION.txt -text
+site/public/audio/*.mp3 binary
