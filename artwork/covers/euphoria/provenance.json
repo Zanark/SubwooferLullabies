@@ -1,0 +1,10 @@
+{
+  "recipe": "../../../tools/image_cover_scenes.py",
+  "native_pixels": [
+    2048,
+    2048
+  ],
+  "recipe_sha256": "a255336cf9a2e0b337c33a9380752898743b0413d851a5c56b24f50658cd1b98",
+  "medium": "original smooth digital illustration",
+  "external_images": []
+}

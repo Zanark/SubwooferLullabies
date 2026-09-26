@@ -1,0 +1,146 @@
+{
+  "producer": "subwooferlullabies-genre-covers-v2",
+  "description": "Original character-free, environment-led artwork: twelve layered 256px SpriteCanvas pixel scenes and two smooth 2048px digital illustrations, with lowercase monospace type for pixel covers and Segoe UI type for smooth covers.",
+  "songs": [
+    {
+      "title": "anticipation",
+      "medium": "pixel",
+      "source": "anticipation.spritecanvas.json",
+      "source_sha256": "5d713e4c786cf460431233370d4ed2237cff69bb94a0f64689db8808dade7786",
+      "scene_sha256": "97ce4a56d0092d38efe10de012f794d3df7e218bc84fd27740931e7f256fb03a",
+      "design_sha256": "303f3e18640f33e45806fdbcdffa3d07dd08c13ef31199ec57867772fddcffdc",
+      "provenance_sha256": "c0829f6e0f3bc2a7e64f4564396fc7ae32a21bd0350b2badc977184b0b63b74b",
+      "export_sha256": "ea04ee320adf270d05f5f9fece0b0c97241e8d7ac609215a052311f5876dfb44"
+    },
+    {
+      "title": "dismay",
+      "medium": "pixel",
+      "source": "dismay.spritecanvas.json",
+      "source_sha256": "896f68f4d02ec67f1e124cb9be243e35accec4f813978f64823241d70b93fd78",
+      "scene_sha256": "ec307346f14b6863b9ebbb262515d84c0768ccc40537ecab11fd628d559737b5",
+      "design_sha256": "55a0a329c18dad17cc26bf9c80ca9af91a5db0d07ae53ca25bfe77d607a7478e",
+      "provenance_sha256": "c0829f6e0f3bc2a7e64f4564396fc7ae32a21bd0350b2badc977184b0b63b74b",
+      "export_sha256": "4bc6b0d14f70f40cb802b12cc0b14bf42ccd854e80efca842350e6a1e2dbcad8"
+    },
+    {
+      "title": "vulnerability",
+      "medium": "pixel",
+      "source": "vulnerability.spritecanvas.json",
+      "source_sha256": "26b10e8945065fd0b4957f13ffdfa65a1b2dbb447746023b71effbd0fa95cedd",
+      "scene_sha256": "f91184598f58f54d1cc64fd02ccbafb0024d0bc1d06cc04403b6adc262d2964b",
+      "design_sha256": "58dce9c19048cd17238694bbe2ec6236aa6d2911641a93edff680fafcfcbfe3d",
+      "provenance_sha256": "89a28d4542a52637fda42c3ce63c9b44c87f6694cd6ac2cd4ca4d3242ffb1d0b",
+      "export_sha256": "afc2fd013879d3e544287e35b5ae8dc97191334ddb42bcf73984fa5acd163488"
+    },
+    {
+      "title": "delight",
+      "medium": "pixel",
+      "source": "delight.spritecanvas.json",
+      "source_sha256": "6a01cfa32207c393c557e91b1832e1af7fc63234b7de575f0b316fee611be91a",
+      "scene_sha256": "16aa0beb072ff5106941af5d33916aed288d8b8345f4c52bbbb5a1a07efd9e7e",
+      "design_sha256": "819d86487a04f6da4455c01694c8c1e2e47420437b5bebd27c6f766bf0653c11",
+      "provenance_sha256": "c0829f6e0f3bc2a7e64f4564396fc7ae32a21bd0350b2badc977184b0b63b74b",
+      "export_sha256": "c0b7ed760bec7cadae64bc5d78c749d9223577efc9dad9ff77a2a30c7d3e95ee"
+    },
+    {
+      "title": "curiosity",
+      "medium": "pixel",
+      "source": "curiosity.spritecanvas.json",
+      "source_sha256": "72534288abb95a78a79a0e8926ac59d51514f52e7d8d413ddab1e968e3034c24",
+      "scene_sha256": "347871db7faf2e7f9b039a5c9369b81276297006ee7626aa6594fe4a33102bdf",
+      "design_sha256": "b8148309b4ad9a1d6a9443ac9ef5c0fa2f7ce52d4daff05b2ee251b4a0755eb8",
+      "provenance_sha256": "c0829f6e0f3bc2a7e64f4564396fc7ae32a21bd0350b2badc977184b0b63b74b",
+      "export_sha256": "e888e238fa4994c9c8dbcbfa242bd752d76fa944cce55ca7d657ba11f76aa714"
+    },
+    {
+      "title": "determination",
+      "medium": "pixel",
+      "source": "determination.spritecanvas.json",
+      "source_sha256": "60c7f9342c96389262dad46f15bef661399fb346a20e76d4b6aac12138aa3563",
+      "scene_sha256": "b404e400384c5457a8fb5ef1133fd7428f16a46a2f4669ba471016bb73d129b2",
+      "design_sha256": "b629aaa3affe9bce984c7482caa5f390ce6be932ee32a2dd6f27b39099c27f47",
+      "provenance_sha256": "89a28d4542a52637fda42c3ce63c9b44c87f6694cd6ac2cd4ca4d3242ffb1d0b",
+      "export_sha256": "dfdb89d47d7b70007a0dfb1cf5d54768f047431b220b6ce213a90a3e83606e6d"
+    },
+    {
+      "title": "loss",
+      "medium": "pixel",
+      "source": "loss.spritecanvas.json",
+      "source_sha256": "c0f71d16776a16b53431a974cd551bb002ff01ff3fd4349096db84094075c22f",
+      "scene_sha256": "af6c7ab8a71adf706fbe9cc809c68e8d44e72803f3cdcb8d7be7c61f907b2dd5",
+      "design_sha256": "37488f807f2ab4c1e4b5065ed045de74826e63cb1ff623479de17d41aca7f3ca",
+      "provenance_sha256": "c0829f6e0f3bc2a7e64f4564396fc7ae32a21bd0350b2badc977184b0b63b74b",
+      "export_sha256": "5b32dcfaaf9b81afb5412bc3a577ff2764c403e1e459a9e4eb033602f03c6e2d"
+    },
+    {
+      "title": "courage",
+      "medium": "pixel",
+      "source": "courage.spritecanvas.json",
+      "source_sha256": "8767f051b3817b53317bbe65f61571557bba04e63a31cab1bc571dbc109fed0f",
+      "scene_sha256": "7d9c244086e1484c105c9079c758fa50af80fcfbb909d84908879f1bcc5c1c93",
+      "design_sha256": "d8c9c0660cb2404ebe36215bddf00e9dcde0137f6aa9e80f8fa730a338a9421f",
+      "provenance_sha256": "c0829f6e0f3bc2a7e64f4564396fc7ae32a21bd0350b2badc977184b0b63b74b",
+      "export_sha256": "0b35c4f1e1d1e7d6454c739a3cf4d62102927f7fd33677ff5faf40043944eb24"
+    },
+    {
+      "title": "resilience",
+      "medium": "pixel",
+      "source": "resilience.spritecanvas.json",
+      "source_sha256": "8c991580aecfde1764544d586db9336a2804967237cb4c7a74719fdf4e792812",
+      "scene_sha256": "bffe588bcf6dbcc5f9ff42ab824fd47170075e182451fa51280d74495a2f0a20",
+      "design_sha256": "6375ba303f440fc5cfe27c585401128a282ac860fa8ea38f8e225739e05aa5bc",
+      "provenance_sha256": "c0829f6e0f3bc2a7e64f4564396fc7ae32a21bd0350b2badc977184b0b63b74b",
+      "export_sha256": "fc9381c7d05e8ca13e7cf47bf28a253a546be6fa309b00407e7a089504878f44"
+    },
+    {
+      "title": "hope",
+      "medium": "pixel",
+      "source": "hope.spritecanvas.json",
+      "source_sha256": "c844415dd47027fe9ad08d6fc7dfb835760484f565ad2c39842da328c92ea600",
+      "scene_sha256": "8b85057957d87d05ec32946eded07a38829c5039535798ae528ccab693d5a250",
+      "design_sha256": "b5df4c3b5cd095a09865e4f6387aed765c52a84e1583798b074698e35e4ee44d",
+      "provenance_sha256": "c0829f6e0f3bc2a7e64f4564396fc7ae32a21bd0350b2badc977184b0b63b74b",
+      "export_sha256": "29cdb62510a812fb0bfae1827fd41d713bcdd2c2741032b136ed7d32a72d651b"
+    },
+    {
+      "title": "relief",
+      "medium": "pixel",
+      "source": "relief.spritecanvas.json",
+      "source_sha256": "14c2bfc3049295eca880d9907c231fd4b38208404f3adde08384634f87e430da",
+      "scene_sha256": "1a0ff10e2dfbe099b21fc173209e419c2a79e3a9dbfd9f839f577072690eb3f9",
+      "design_sha256": "edb06fd423c7d12018766b6b6518216f176b0e16a9e384cf575dd740c5945be0",
+      "provenance_sha256": "c0829f6e0f3bc2a7e64f4564396fc7ae32a21bd0350b2badc977184b0b63b74b",
+      "export_sha256": "8e77d71ce7f6172e0a5fd059813efe6ebfc72829bc23d901b8d5b9383360e461"
+    },
+    {
+      "title": "perseverance",
+      "medium": "pixel",
+      "source": "perseverance.spritecanvas.json",
+      "source_sha256": "9cec104f052077c6a15be44cd0ba4c312e363a695c992fa555734baeee368d28",
+      "scene_sha256": "8541e785b566d25f9f51004d0a578f0648491b9c0666d902a4530290a8cfd5fb",
+      "design_sha256": "9798d6fb73947f41b8511dff9542fc2c383077ff6ffc3947b8189fa5c39d61a7",
+      "provenance_sha256": "89a28d4542a52637fda42c3ce63c9b44c87f6694cd6ac2cd4ca4d3242ffb1d0b",
+      "export_sha256": "885aa2462223f543d0b5bf33037f0f9d1c0f2be92ced4982769845d82aca4419"
+    },
+    {
+      "title": "serenity",
+      "medium": "image",
+      "source": "scene.png",
+      "source_sha256": "f91340bff773eb14566fe37402afdada627b93a7f75881bf92fed3e8cd182c47",
+      "scene_sha256": "f91340bff773eb14566fe37402afdada627b93a7f75881bf92fed3e8cd182c47",
+      "design_sha256": "23a81fa900b7f40b22ff2b6f605272399ae7d12dc48648369357e2c70151dc4d",
+      "provenance_sha256": "f67815aeca84ba97b2f2a3f40a4a38179b176c9dd2690e8a1bd220eb46d6d370",
+      "export_sha256": "10008da247c990c14ad9d26912e649d75b81520a265a4db378a00aba4087ecaf"
+    },
+    {
+      "title": "euphoria",
+      "medium": "image",
+      "source": "scene.png",
+      "source_sha256": "79e9c8877ab11c288192618602f2d22894f52927398a10bcfdc1717968cc78d9",
+      "scene_sha256": "79e9c8877ab11c288192618602f2d22894f52927398a10bcfdc1717968cc78d9",
+      "design_sha256": "908858052920052dc9425a93bbf13bbfb24b09023d4ac07c242f428f9a564c6e",
+      "provenance_sha256": "f67815aeca84ba97b2f2a3f40a4a38179b176c9dd2690e8a1bd220eb46d6d370",
+      "export_sha256": "dc1575026bec15c1b9fd40e7c0e3689cb5318ee8f858973379bd15500740bc9c"
+    }
+  ]
+}

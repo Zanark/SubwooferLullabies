@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "title": "determination",
+  "number": 6,
+  "medium": "pixel",
+  "width": 2048,
+  "height": 2048,
+  "title_font": "CascadiaMono.ttf",
+  "title_font_sha256": "0e141cb99609f6f10ad05313fd1807d5cc9e28658dcbb35ab162e52ff67dc718",
+  "label_font": "CascadiaMono.ttf",
+  "label_font_sha256": "0e141cb99609f6f10ad05313fd1807d5cc9e28658dcbb35ab162e52ff67dc718",
+  "title_size": 152,
+  "title_xy": [
+    124,
+    1690
+  ],
+  "title_color": "#f3efe2",
+  "wordmark": "subwoofer lullabies",
+  "wordmark_xy": [
+    130,
+    119
+  ],
+  "wordmark_size": 32,
+  "tracking": 5,
+  "caption": "one more reach",
+  "caption_xy": [
+    131,
+    1890
+  ],
+  "caption_size": 25,
+  "accent": "#cc9d76",
+  "image_source": "determination.spritecanvas.json",
+  "font_provenance": "Locally installed Cascadia Mono, SIL OFL 1.1; rasterized text only, no font redistribution.",
+  "font_policy": "https://github.com/microsoft/cascadia-code/blob/main/LICENSE"
+}

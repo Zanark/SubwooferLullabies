@@ -1,4 +1,8 @@
 # Preserve archived source bytes so manifest hashes survive checkout on any platform.
 *.strudel -text
+*.spritecanvas.json -text
+artwork/covers/*/design.json -text
+artwork/covers/*/provenance.json -text
+tools/*_cover_scenes.py text eol=lf
 CUE_SHEET.txt -text
 MENU_LEVEL01_TRANSITION.txt -text

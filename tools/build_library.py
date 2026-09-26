@@ -11,10 +11,9 @@ from pathlib import Path
 
 from PIL import Image
 
-from draw_covers import render_cover
-
 ROOT = Path(__file__).resolve().parent.parent
 TOOLS = ROOT / "tools"
+ARTWORK = ROOT / "artwork" / "covers"
 
 
 def sha256(path):
@@ -31,15 +30,37 @@ def display_duration(song):
 
 
 def source_for(song, source_directory):
-    if song["title"] == "Euphoria":
+    if song["title"] == "euphoria":
         return TOOLS / "sources" / "Euphoria.strudel"
     return source_directory / song["source"]
+
+
+def cover_sources(songs):
+    manifest = json.loads((ARTWORK / "manifest.json").read_text(encoding="utf-8"))
+    records = {song["title"]: song for song in manifest["songs"]}
+    if set(records) != {song["title"] for song in songs}:
+        raise ValueError("The artwork collection must match the song catalog.")
+    media = {song["title"]: song["cover_medium"] for song in songs}
+    covers = {}
+    for title, record in records.items():
+        folder = ARTWORK / title
+        source = folder / record["source"]
+        export = folder / "cover.png"
+        if (record["medium"] != media[title]
+                or sha256(source) != record["source_sha256"]
+                or sha256(folder / "scene.png") != record["scene_sha256"]
+                or sha256(folder / "design.json") != record["design_sha256"]
+                or sha256(folder / "provenance.json") != record["provenance_sha256"]
+                or sha256(export) != record["export_sha256"]):
+            raise ValueError(f"Stale artwork for {title}; run tools\\cover_pipeline.py.")
+        covers[title] = export
+    return manifest, covers
 
 
 def rights_note(song, digest, research):
     group = research["groups"][song["sample_group"]]
     title = song["title"]
-    if title == "Euphoria":
+    if title == "euphoria":
         relationship = (
             "Recovered from the original Eurodance learning example in the conversation. "
             "It was supplied as an original example, not a transcription of the requested "
@@ -50,7 +71,7 @@ def rights_note(song, digest, research):
         relationship = (
             "This is one part of the same AI-assisted game score. Recurring notes, water "
             "textures and motifs also occur in other folders in this collection. In particular, "
-            "Anticipation and Vulnerability share substantial material; Perseverance and Serenity "
+            "anticipation and vulnerability share substantial material; perseverance and serenity "
             "develop related motifs. Treat them as related arrangements when working with a "
             "distributor, rather than competing exclusive references."
         )
@@ -60,6 +81,25 @@ def rights_note(song, digest, research):
         f"{research['sources'][key]['finding']}" for key in sources
     )
     actions = "\n".join(f"- {item}" for item in group["actions"])
+    art = (
+        "Its illustration is original 256 x 256 native pixel art with seven editable SpriteCanvas "
+        "layers, enlarged 8x without smoothing before high-resolution typography is added."
+        if song["cover_medium"] == "pixel" else
+        "Its illustration is an original smooth 2048 x 2048 digital image, drawn locally from "
+        "the saved Python scene recipe; it is not pixel art or a stock photograph."
+    )
+    font_note = (
+        "Lowercase lettering uses locally installed Cascadia Mono, published under the\n"
+        "[SIL Open Font License 1.1](https://github.com/microsoft/cascadia-code/blob/main/LICENSE).\n"
+        "The font is rasterized into the artwork; no font files are embedded or redistributed.\n"
+        "The font licence does not require documents created with it to use that same licence."
+        if song["cover_medium"] == "pixel" else
+        "Lowercase lettering is rasterized from locally installed Windows\n"
+        "Segoe UI fonts. No font files are embedded or redistributed. Microsoft's\n"
+        "[font-output FAQ](https://learn.microsoft.com/en-us/typography/fonts/font-faq) distinguishes\n"
+        "permitted graphic output from redistribution of font software, subject to the applicable\n"
+        "software licence."
+    )
     return f"""# {title} - upload and copyright risk note
 
 **Reviewed:** {research['review_date']}  
@@ -124,10 +164,10 @@ from purely AI-generated material; other jurisdictions may differ. Preserve evid
 your actual human selection, arrangement and edits. This is not a jurisdiction-specific
 legal opinion or a registration determination.
 
-The adjacent cover is an original locally generated geometric illustration, not downloaded
-stock art or copied game sprites. It contains rasterized system-font lettering, not a
-redistributed font file. That provenance reduces identified third-party-art concerns but
-is not a guarantee of copyrightability or a licence for unrelated assets.
+The adjacent cover is original locally drawn artwork, not downloaded stock art or copied
+game sprites. {art} {font_note} The editable art/design sources are in `artwork/covers/{title}` at the
+repository root. This provenance is not a guarantee of copyrightability or a licence for
+unrelated assets. The image/type revision does not clear any music-sample obligations above.
 
 ## Sources and limitations
 
@@ -154,8 +194,8 @@ loop. Earlier revisions and cassette dialogue recordings are deliberately not du
 The original game sources remain untouched.
 
 **[Browse the cover gallery](index.html)**. Every title folder contains exactly:
-`Title.strudel`, an original **2048 x 2048 RGB PNG** `cover.png`, and a tailored `RIGHTS.md`.
-The one-word titles name the intended emotion; previous working titles remain in source
+`title.strudel`, an original **2048 x 2048 PNG** `cover.png`, and a tailored `RIGHTS.md`.
+Song titles and title paths are always lowercase. The one-word titles name the intended emotion; previous working titles remain in source
 comments for provenance. All game music follows **Blim**, not the Guide's off-screen life.
 
 | # | Title | Use | BPM | Export cycles | Duration | Artwork / note |
@@ -172,14 +212,14 @@ access initially. Let them load before recording/exporting the complete track.
 Use the table's export cycles, 48000 Hz, and Multi Channel Orbits **off** for a stereo
 preview. Loop durations describe one full written form, not a mastered seamless loop.
 Do not cut off echoes or assume a cold export makes a click-free repeating asset.
-Serenity is the latest sparse 60-BPM version, with water gain 0.1 and export end 44.
+serenity is the latest sparse 60-BPM version, with water gain 0.1 and export end 44.
 
-Courage is a retained legacy headlamp proposal; **Loss** is the current C-19 cinematic.
-Loss defaults to the 20-second preview with `cassetteHoldSeconds = 0`; the complete
+courage is a retained legacy headlamp proposal; **loss** is the current C-19 cinematic.
+loss defaults to the 20-second preview with `cassetteHoldSeconds = 0`; the complete
 recorded cassette requires a separately coordinated longer film/score hold.
 
-Anticipation and Vulnerability retain their selectable stem/handoff modes. Determination
-retains its story presets; Hope retains the post-final-journal preset. The collection does
+anticipation and vulnerability retain their selectable stem/handoff modes. determination
+retains its story presets; hope retains the post-final-journal preset. The collection does
 not change those defaults or fix historical source quirks.
 
 The original `CUE_SHEET.txt` and `MENU_LEVEL01_TRANSITION.txt` are archived here as reference
@@ -199,24 +239,36 @@ notes in particular before release, attribution or Content ID enrolment.
 
 ## Original cover artwork
 
-The covers are locally drawn, seeded geometric illustrations created for this collection.
-No game sprites, stock imagery, web textures or third-party illustrations are included.
-Each has its own scene, palette, emotion and one-word title. Rendered system-font lettering
-is part of the PNG; no font binaries are included.
+The twelve retro game cues have original **256 x 256 layered pixel illustrations**.
+**serenity** and **euphoria** have smooth **2048 x 2048 digital illustrations**, not pixel art.
+All retro/pixel covers use **Cascadia Mono** for titles, wordmarks, captions and numbers.
+The two smooth covers retain **Segoe UI Light / Segoe UI**. All fourteen share lowercase
+type, consistent spacing and restrained labels. Pixel scenes are enlarged 8x with nearest-neighbor scaling; lettering
+is composed separately, so the finished covers are not exclusively pixel-grid exports.
+No characters are depicted: empty spaces, worn infrastructure, objects and light carry
+the story and its emotion.
+
+[Artwork sources and export instructions](../artwork/covers/README.md) live separately
+from the three-file song bundles. Each pixel scene is a standalone seven-layer SpriteCanvas
+project, below the editor's cell limit. Image scenes retain their original drawing recipes;
+every cover has an editable typography design. No stock imagery, copied game sprites or
+font files are distributed. SpriteCanvas's shared model and renderer run locally without
+changing the live studio. No image-generation service or review proposal was used.
 
 ## Rebuilding a separate copy
 
-The packaging inputs and original cover renderer are in `..\\tools`. The builder needs
-Python with Pillow and NumPy, and the Windows Segoe UI fonts. It refuses to overwrite
+The packaging inputs are in `..\\tools`. The builder needs Python with Pillow and the
+saved artwork sources/exports in `..\\artwork\\covers`. It refuses to overwrite
 an existing output, checks that source files do not change during the copy, and stages
-the collection before publishing the completed folder.
+the collection before publishing the completed folder. It copies current checked artwork
+exports rather than regenerating earlier cover designs.
 
 ```powershell
 python .\\tools\\build_library.py --source-dir "C:\\path\\to\\game\\Assets\\Audio\\Music\\Strudel" --output "C:\\path\\to\\new-library"
 python .\\tools\\build_library.py --verify-only --output ".\\STRUDEL"
 ```
 
-Euphoria's recovered chat source is kept in `..\\tools\\sources`. Rebuild instructions
+euphoria's recovered chat source is kept in `..\\tools\\sources`. Rebuild instructions
 run from the repository root, not from inside STRUDEL.
 """
 
@@ -253,7 +305,7 @@ footer{font-size:.8rem;line-height:1.7;color:#afbfbc;border-top:1px solid #24434
 original cover per folder. Editable source music; not audio playback or a rights-cleared release.</p>
 <a href="README.md">Playback and catalogue notes</a></header><main>
 """ + "\n".join(cards) + """
-</main><footer>Original procedural cover artwork. Existing game scores are preserved;
+</main><footer>Twelve 256px pixel scenes, two smooth illustrations, one lowercase typographic identity. Existing game scores are preserved;
 the learning loop was recovered from the conversation. Read each rights note before publishing.
 No probability of automated claims or universal copyright clearance is promised.</footer></body></html>
 """
@@ -264,6 +316,8 @@ def verify(output):
     songs = manifest["songs"]
     if len(songs) != 14:
         raise ValueError("The selected collection must have 14 songs.")
+    if any(not re.fullmatch(r"[a-z]+", song["title"]) for song in songs):
+        raise ValueError("Every song title must be one lowercase ASCII word.")
     folders = {path.name for path in output.iterdir() if path.is_dir()}
     if folders != {song["title"] for song in songs}:
         raise ValueError("Unexpected or missing title folders.")
@@ -280,9 +334,12 @@ def verify(output):
             raise ValueError(f"Cover changed or duplicated: {folder}")
         covers.add(cover_hash)
         with Image.open(folder / "cover.png") as image:
-            if image.size != (2048, 2048) or image.mode != "RGB" or image.format != "PNG":
+            if image.size != (2048, 2048) or image.mode not in {"RGB", "RGBA"} or image.format != "PNG":
                 raise ValueError(f"Incorrect cover format: {folder}")
             image.verify()
+        with Image.open(folder / "cover.png") as image:
+            if image.mode == "RGBA" and image.getchannel("A").getextrema() != (255, 255):
+                raise ValueError(f"Cover background must be opaque: {folder}")
         note = (folder / "RIGHTS.md").read_text(encoding="utf-8")
         if song["source_sha256"] not in note or "Educated estimate" not in note or "https://" not in note:
             raise ValueError(f"Incomplete rights note: {folder}")
@@ -296,7 +353,7 @@ def verify(output):
             for line, prefix in zip(lines, prefixes)
         ):
             raise ValueError(f"Expected one verdict line per platform: {folder}")
-    print("14 complete bundles: preserved scores, unique 2048-square RGB covers, tailored rights notes.")
+    print("14 complete bundles: preserved scores, unique opaque 2048-square covers, tailored rights notes.")
 
 
 def main():
@@ -318,8 +375,10 @@ def main():
     research = json.loads((TOOLS / "rights_research.json").read_text(encoding="utf-8"))
     if len(songs) != 14 or len({s["title"] for s in songs}) != 14:
         raise ValueError("Expected 14 unique titles.")
-    if any(not re.fullmatch(r"[A-Z][a-z]+", s["title"]) for s in songs):
-        raise ValueError("Every title must be one ASCII word.")
+    if any(not re.fullmatch(r"[a-z]+", s["title"]) for s in songs):
+        raise ValueError("Every title must be one lowercase ASCII word.")
+    artwork, covers = cover_sources(songs)
+    art_records = {record["title"]: record for record in artwork["songs"]}
     hashes = {s["title"]: sha256(source_for(s, source_directory)) for s in songs}
     output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix=".strudel-stage-", dir=output.parent) as temporary:
@@ -332,13 +391,15 @@ def main():
             folder.mkdir()
             source = source_for(song, source_directory)
             shutil.copyfile(source, folder / f"{title}.strudel")
-            render_cover(song, number, folder / "cover.png")
+            shutil.copyfile(covers[title], folder / "cover.png")
             (folder / "RIGHTS.md").write_text(
                 rights_note(song, hashes[title], research), encoding="utf-8", newline="\n")
             records.append({
                 **song, "duration_seconds": round(duration(song), 6),
                 "source_sha256": hashes[title], "cover_sha256": sha256(folder / "cover.png"),
-                "source_origin": "recovered-chat-example" if title == "Euphoria" else "game-project-current-source",
+                "source_origin": "recovered-chat-example" if title == "euphoria" else "game-project-current-source",
+                "cover_source": f"..\\artwork\\covers\\{title}\\{art_records[title]['source']}",
+                "cover_design": f"..\\artwork\\covers\\{title}\\design.json",
             })
             print(f"{number:02d}/14 {title}", flush=True)
         for name in ["CUE_SHEET.txt", "MENU_LEVEL01_TRANSITION.txt"]:
@@ -347,7 +408,7 @@ def main():
             "created": research["review_date"],
             "scope": "Latest version of 13 game scores/cues plus the original Eurodance learning loop.",
             "audio_rendered": False,
-            "cover_art": "Original local procedural illustrations; 2048x2048 RGB PNG.",
+            "cover_art": artwork["description"],
             "songs": records,
         }, indent=2) + "\n", encoding="utf-8")
         (stage / "README.md").write_text(readme(records), encoding="utf-8", newline="\n")

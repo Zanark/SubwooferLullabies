@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "title": "serenity",
+  "number": 13,
+  "medium": "image",
+  "width": 2048,
+  "height": 2048,
+  "title_font": "segoeuil.ttf",
+  "title_font_sha256": "866557576dfc772395301b581eccef4c0daf1dbb75f9667f26784b260bce7da1",
+  "label_font": "segoeui.ttf",
+  "label_font_sha256": "8134dbcd09e7b123c9a7f229d49cffbcb01352cc72ea5e1076b65d0dca9f73cd",
+  "title_size": 152,
+  "title_xy": [
+    124,
+    1690
+  ],
+  "title_color": "#f3efe2",
+  "wordmark": "subwoofer lullabies",
+  "wordmark_xy": [
+    130,
+    119
+  ],
+  "wordmark_size": 32,
+  "tracking": 5,
+  "caption": "nothing needs to hurry",
+  "caption_xy": [
+    131,
+    1890
+  ],
+  "caption_size": 25,
+  "accent": "#98d1c8",
+  "image_source": "scene.png",
+  "font_provenance": "Installed Windows Segoe UI; rasterized text only, no font redistribution.",
+  "font_policy": "https://learn.microsoft.com/en-us/typography/fonts/font-faq"
+}

@@ -2,10 +2,10 @@
   "created": "2026-09-24",
   "scope": "Latest version of 13 game scores/cues plus the original Eurodance learning loop.",
   "audio_rendered": false,
-  "cover_art": "Original local procedural illustrations; 2048x2048 RGB PNG.",
+  "cover_art": "Original character-free, environment-led artwork: twelve layered 256px SpriteCanvas pixel scenes and two smooth 2048px digital illustrations, with lowercase monospace type for pixel covers and Segoe UI type for smooth covers.",
   "songs": [
     {
-      "title": "Anticipation",
+      "title": "anticipation",
       "source": "000_MainMenu.strudel",
       "role": "Main menu",
       "original_title": "Under the Grates: Waiting at the Door",
@@ -25,11 +25,14 @@
       "kind": "loop",
       "duration_seconds": 83.478261,
       "source_sha256": "77f84bc58ad727322e67823fa7e7437397676ec805f27992e58b7011726d82cf",
-      "cover_sha256": "551b7675ba5f4da98b0b5e4b6b176c9612370c0d3be14e116bb7399fa5f3a5b7",
-      "source_origin": "game-project-current-source"
+      "cover_sha256": "ea04ee320adf270d05f5f9fece0b0c97241e8d7ac609215a052311f5876dfb44",
+      "source_origin": "game-project-current-source",
+      "cover_source": "..\\artwork\\covers\\anticipation\\anticipation.spritecanvas.json",
+      "cover_medium": "pixel",
+      "cover_design": "..\\artwork\\covers\\anticipation\\design.json"
     },
     {
-      "title": "Dismay",
+      "title": "dismay",
       "source": "C01_CINEMATIC_Opening.strudel",
       "role": "Opening cinematic",
       "original_title": "A Very Bad Shortcut",
@@ -47,13 +50,16 @@
       "bpm": 80,
       "end_cycle": 10,
       "kind": "one-shot",
-      "duration_seconds": 30.0,
+      "duration_seconds": 30,
       "source_sha256": "154a0b76522a6ca06052f676dedabdba2c930bc4f6fd600585ea1b446af5e147",
-      "cover_sha256": "a56c57b12c650db445148135c9b3a3c37fc634d77bcdf586fb90ce9daeee7d87",
-      "source_origin": "game-project-current-source"
+      "cover_sha256": "4bc6b0d14f70f40cb802b12cc0b14bf42ccd854e80efca842350e6a1e2dbcad8",
+      "source_origin": "game-project-current-source",
+      "cover_source": "..\\artwork\\covers\\dismay\\dismay.spritecanvas.json",
+      "cover_medium": "pixel",
+      "cover_design": "..\\artwork\\covers\\dismay\\design.json"
     },
     {
-      "title": "Vulnerability",
+      "title": "vulnerability",
       "source": "L01_Level01.strudel",
       "role": "Level 1 / First Light",
       "original_title": "First Light",
@@ -73,11 +79,14 @@
       "kind": "loop",
       "duration_seconds": 83.478261,
       "source_sha256": "3b3b979e0a6e45f5dd09a51fc7974df20e29f6e9b471ffd76b5ce2894e8e1006",
-      "cover_sha256": "698d9897e07c4e1d2c2a33a99f84c126acd4f4b4a9b05f8405d39eb7812ba184",
-      "source_origin": "game-project-current-source"
+      "cover_sha256": "afc2fd013879d3e544287e35b5ae8dc97191334ddb42bcf73984fa5acd163488",
+      "source_origin": "game-project-current-source",
+      "cover_source": "..\\artwork\\covers\\vulnerability\\vulnerability.spritecanvas.json",
+      "cover_medium": "pixel",
+      "cover_design": "..\\artwork\\covers\\vulnerability\\design.json"
     },
     {
-      "title": "Delight",
+      "title": "delight",
       "source": "001_ItemFound.strudel",
       "role": "Item discovery stinger",
       "original_title": "Something Useful",
@@ -95,13 +104,16 @@
       "bpm": 120,
       "end_cycle": 1,
       "kind": "one-shot",
-      "duration_seconds": 2.0,
+      "duration_seconds": 2,
       "source_sha256": "c5d7063578035b7682f20b8119fa2e3849d44cdb5f7c6b68f58c215a0eddca35",
-      "cover_sha256": "d7b533567959b7bc7cfb9ed65cdb8d7c46d543eea9831f02a2c4110b903686cd",
-      "source_origin": "game-project-current-source"
+      "cover_sha256": "c0b7ed760bec7cadae64bc5d78c749d9223577efc9dad9ff77a2a30c7d3e95ee",
+      "source_origin": "game-project-current-source",
+      "cover_source": "..\\artwork\\covers\\delight\\delight.spritecanvas.json",
+      "cover_medium": "pixel",
+      "cover_design": "..\\artwork\\covers\\delight\\design.json"
     },
     {
-      "title": "Curiosity",
+      "title": "curiosity",
       "source": "L02_Level02.strudel",
       "role": "Level 2 / Someone Was Here",
       "original_title": "Someone Was Here",
@@ -121,11 +133,14 @@
       "kind": "loop",
       "duration_seconds": 87.272727,
       "source_sha256": "8b46ddc5c693a19204852ced14d182cc7f743a2ba0c2451f8d9a2cd4d361bd97",
-      "cover_sha256": "d2dbf520a8d02e3dd2e1188d127bc307b28a55ce4e29c289c99a56398ebd20cb",
-      "source_origin": "game-project-current-source"
+      "cover_sha256": "e888e238fa4994c9c8dbcbfa242bd752d76fa944cce55ca7d657ba11f76aa714",
+      "source_origin": "game-project-current-source",
+      "cover_source": "..\\artwork\\covers\\curiosity\\curiosity.spritecanvas.json",
+      "cover_medium": "pixel",
+      "cover_design": "..\\artwork\\covers\\curiosity\\design.json"
     },
     {
-      "title": "Determination",
+      "title": "determination",
       "source": "L03_Level03.strudel",
       "role": "Level 3 / The Long Climb",
       "original_title": "The Long Climb",
@@ -143,13 +158,16 @@
       "bpm": 96,
       "end_cycle": 32,
       "kind": "loop",
-      "duration_seconds": 80.0,
+      "duration_seconds": 80,
       "source_sha256": "77b1778076e1a49fe24d9cbeb7e903fa6a39795c4d383e8464cc63ce8e0c69a9",
-      "cover_sha256": "25420b15fdb9f2c37480a97e3dc61560fcdb7d4bf18b615e9337f8ec49483ca8",
-      "source_origin": "game-project-current-source"
+      "cover_sha256": "dfdb89d47d7b70007a0dfb1cf5d54768f047431b220b6ce213a90a3e83606e6d",
+      "source_origin": "game-project-current-source",
+      "cover_source": "..\\artwork\\covers\\determination\\determination.spritecanvas.json",
+      "cover_medium": "pixel",
+      "cover_design": "..\\artwork\\covers\\determination\\design.json"
     },
     {
-      "title": "Loss",
+      "title": "loss",
       "source": "C02_CINEMATIC_Headlamp.strudel",
       "role": "Late-Level-3 C-19 cinematic",
       "original_title": "You Were Coming Back",
@@ -167,13 +185,16 @@
       "bpm": 96,
       "end_cycle": 8,
       "kind": "one-shot",
-      "duration_seconds": 20.0,
+      "duration_seconds": 20,
       "source_sha256": "6c0ae7f1bd3764b13fe8ab6658e345ba611da1168849c0a30349b77ebd69b7ba",
-      "cover_sha256": "82102d22bfdcebf4f66532fc83c46524c2de14d353543daa0e6717bd55c57672",
-      "source_origin": "game-project-current-source"
+      "cover_sha256": "5b32dcfaaf9b81afb5412bc3a577ff2764c403e1e459a9e4eb033602f03c6e2d",
+      "source_origin": "game-project-current-source",
+      "cover_source": "..\\artwork\\covers\\loss\\loss.spritecanvas.json",
+      "cover_medium": "pixel",
+      "cover_design": "..\\artwork\\covers\\loss\\design.json"
     },
     {
-      "title": "Courage",
+      "title": "courage",
       "source": "003_HeadlampFound.strudel",
       "role": "Legacy headlamp discovery proposal",
       "original_title": "A Little More Courage",
@@ -191,14 +212,17 @@
       "bpm": 96,
       "end_cycle": 3,
       "kind": "one-shot",
-      "usage_note": "Legacy proposal retained as its own cue; Loss is the current C-19 cinematic score.",
+      "usage_note": "Legacy proposal retained as its own cue; loss is the current C-19 cinematic score.",
       "duration_seconds": 7.5,
       "source_sha256": "60eef90044542be4f77a81faaa7e09c41c6c68759e7d5bae47ba7208f765ca6f",
-      "cover_sha256": "fa075484c49014c4f0caad6882a9ba8a583b209ca2731484b1bb2ad2ed7afa4e",
-      "source_origin": "game-project-current-source"
+      "cover_sha256": "0b35c4f1e1d1e7d6454c739a3cf4d62102927f7fd33677ff5faf40043944eb24",
+      "source_origin": "game-project-current-source",
+      "cover_source": "..\\artwork\\covers\\courage\\courage.spritecanvas.json",
+      "cover_medium": "pixel",
+      "cover_design": "..\\artwork\\covers\\courage\\design.json"
     },
     {
-      "title": "Resilience",
+      "title": "resilience",
       "source": "L04_Level04.strudel",
       "role": "Level 4 / Flood Levels",
       "original_title": "Flood Levels",
@@ -216,13 +240,16 @@
       "bpm": 80,
       "end_cycle": 32,
       "kind": "loop",
-      "duration_seconds": 96.0,
+      "duration_seconds": 96,
       "source_sha256": "c474a55f07535d91b7a0382d16349a60b3e53a8de0deeaf8744aa308de981a89",
-      "cover_sha256": "78f773bb798a7f1e63fd46d714b0ed4d8d3943c06388256f165a7d951dcbed36",
-      "source_origin": "game-project-current-source"
+      "cover_sha256": "fc9381c7d05e8ca13e7cf47bf28a253a546be6fa309b00407e7a089504878f44",
+      "source_origin": "game-project-current-source",
+      "cover_source": "..\\artwork\\covers\\resilience\\resilience.spritecanvas.json",
+      "cover_medium": "pixel",
+      "cover_design": "..\\artwork\\covers\\resilience\\design.json"
     },
     {
-      "title": "Hope",
+      "title": "hope",
       "source": "L05_Level05.strudel",
       "role": "Level 5 / Near the Surface",
       "original_title": "Near the Surface",
@@ -242,11 +269,14 @@
       "kind": "loop",
       "duration_seconds": 87.272727,
       "source_sha256": "70ddfd76a858758e2280e398b252b7bf76f764c324a83d3da4f994c17359b2ea",
-      "cover_sha256": "d8ed141ea8d7f694757e1d0310f262c6bff8e062406da953d5046e2505390915",
-      "source_origin": "game-project-current-source"
+      "cover_sha256": "29cdb62510a812fb0bfae1827fd41d713bcdd2c2741032b136ed7d32a72d651b",
+      "source_origin": "game-project-current-source",
+      "cover_source": "..\\artwork\\covers\\hope\\hope.spritecanvas.json",
+      "cover_medium": "pixel",
+      "cover_design": "..\\artwork\\covers\\hope\\design.json"
     },
     {
-      "title": "Relief",
+      "title": "relief",
       "source": "C03_CINEMATIC_Surface.strudel",
       "role": "Surface ending",
       "original_title": "Sky, At Last",
@@ -264,13 +294,16 @@
       "bpm": 80,
       "end_cycle": 9,
       "kind": "one-shot",
-      "duration_seconds": 27.0,
+      "duration_seconds": 27,
       "source_sha256": "9f1887dde017ff6c4fda352aec0f82f7de6e272ab072dfeebd705d49f3a7c9ac",
-      "cover_sha256": "145f4141860467433d9fbde28f246826f37c7d75b337cb5c66b8b4cf9dc06534",
-      "source_origin": "game-project-current-source"
+      "cover_sha256": "8e77d71ce7f6172e0a5fd059813efe6ebfc72829bc23d901b8d5b9383360e461",
+      "source_origin": "game-project-current-source",
+      "cover_source": "..\\artwork\\covers\\relief\\relief.spritecanvas.json",
+      "cover_medium": "pixel",
+      "cover_design": "..\\artwork\\covers\\relief\\design.json"
     },
     {
-      "title": "Perseverance",
+      "title": "perseverance",
       "source": "T01_THEME_KeepClimbing.strudel",
       "role": "Complete game theme",
       "original_title": "Keep Climbing",
@@ -290,11 +323,14 @@
       "kind": "one-shot",
       "duration_seconds": 166.956522,
       "source_sha256": "cbc67a89342834eb690a83c399deb0375638e000dc8f1d38de7cb0af452a8da5",
-      "cover_sha256": "ae790ba2ce3cf560d84a5d0b1aa84b535639fcce09073ba740468c756217839c",
-      "source_origin": "game-project-current-source"
+      "cover_sha256": "885aa2462223f543d0b5bf33037f0f9d1c0f2be92ced4982769845d82aca4419",
+      "source_origin": "game-project-current-source",
+      "cover_source": "..\\artwork\\covers\\perseverance\\perseverance.spritecanvas.json",
+      "cover_medium": "pixel",
+      "cover_design": "..\\artwork\\covers\\perseverance\\design.json"
     },
     {
-      "title": "Serenity",
+      "title": "serenity",
       "source": "T02_THEME_KeepClimbing_UnderwaterJazz.strudel",
       "role": "Deep-calm underwater jazz theme",
       "original_title": "Keep Climbing: Still Water",
@@ -312,13 +348,16 @@
       "bpm": 60,
       "end_cycle": 44,
       "kind": "one-shot",
-      "duration_seconds": 176.0,
+      "duration_seconds": 176,
       "source_sha256": "9edbd8cfaa0051359bf24e7d7bebbf03790d2319af7f3969f62cdaeb93c9bbb8",
-      "cover_sha256": "05023dbe8c70710a4ac242e0346e651127e7bc281c60b2a2bf8562897a8fa792",
-      "source_origin": "game-project-current-source"
+      "cover_sha256": "10008da247c990c14ad9d26912e649d75b81520a265a4db378a00aba4087ecaf",
+      "source_origin": "game-project-current-source",
+      "cover_source": "..\\artwork\\covers\\serenity\\scene.png",
+      "cover_medium": "image",
+      "cover_design": "..\\artwork\\covers\\serenity\\design.json"
     },
     {
-      "title": "Euphoria",
+      "title": "euphoria",
       "source": "Euphoria.strudel",
       "role": "Original Eurodance learning loop",
       "original_title": "Original Eurodance-style learning loop",
@@ -339,8 +378,11 @@
       "usage_note": "Recovered from the original chat example. This is an original learning loop, not a transcription of Better Off Alone.",
       "duration_seconds": 7.5,
       "source_sha256": "a5a1e310e61395f3ead8dece8e01edc827cb02775880881960303f196ac07d1a",
-      "cover_sha256": "bb67876ffcb0203fad40a24eecda17c3fe5e15e23597be640f93036234904d23",
-      "source_origin": "recovered-chat-example"
+      "cover_sha256": "dc1575026bec15c1b9fd40e7c0e3689cb5318ee8f858973379bd15500740bc9c",
+      "source_origin": "recovered-chat-example",
+      "cover_source": "..\\artwork\\covers\\euphoria\\scene.png",
+      "cover_medium": "image",
+      "cover_design": "..\\artwork\\covers\\euphoria\\design.json"
     }
   ]
 }

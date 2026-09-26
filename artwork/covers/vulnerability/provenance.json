@@ -1,0 +1,13 @@
+{
+  "baseline_project_id": "7f7aa004-e631-4910-9e58-92f6e2702594",
+  "baseline_revision": 3,
+  "handoff_sha256": "5cb5aab8cfea938caed4423945c97dbc56aadf4b3797baeac340b4a4f227d3d2",
+  "recipe": "../../../tools/pixel_cover_scenes.py",
+  "recipe_sha256": "f7e3a5785ab4bba07c6c6ecf85e80c837bd562b1ca171112a1a2c21aac75b1ea",
+  "native_pixels": [
+    256,
+    256
+  ],
+  "editable_cells": 458752,
+  "live_studio_mutated": false
+}
