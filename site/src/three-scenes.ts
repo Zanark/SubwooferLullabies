@@ -13,9 +13,17 @@ type SceneController = {
 
 export type HandCursorController = SceneController & {
   hover(x: number, y: number, active: boolean): void;
-  grab(title: string, x: number, y: number): void;
+  grab(title: string, cover: string, x: number, y: number): void;
   move(x: number, y: number, overPlayer: boolean): void;
   release(dropped: boolean): void;
+};
+
+export type VisualizerMode = 'scope' | 'bars' | 'radar';
+
+export type BoxSceneController = SceneController & {
+  setTrack(song: VisualSong): Promise<void>;
+  setPlaying(active: boolean): void;
+  setVisualizer(mode: VisualizerMode): void;
 };
 
 type CassetteParts = {
@@ -112,6 +120,41 @@ function textureMaterial(texture: THREE.Texture, transparent = false) {
   });
 }
 
+function maskingTapeTexture(title: string) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 112;
+  const context = canvas.getContext('2d');
+  if (!context) throw new Error('Masking tape texture context unavailable.');
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.fillStyle = '#d6bd7b';
+  context.beginPath();
+  context.moveTo(8, 13);
+  context.lineTo(500, 5);
+  context.lineTo(507, 101);
+  context.lineTo(16, 108);
+  context.closePath();
+  context.fill();
+  context.fillStyle = 'rgba(107, 76, 38, .16)';
+  for (let x = 18; x < 500; x += 19) context.fillRect(x, 11, 2, 88);
+  context.fillStyle = '#2c2520';
+  context.font = '700 48px "Segoe Print", "Comic Sans MS", cursive';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  const fitted = title.length > 20 ? `${title.slice(0, 19)}…` : title;
+  context.save();
+  context.translate(canvas.width / 2, canvas.height / 2 + 2);
+  context.rotate(-0.018);
+  context.fillText(fitted, 0, 0);
+  context.restore();
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.magFilter = THREE.NearestFilter;
+  texture.minFilter = THREE.LinearFilter;
+  texture.userData.owned = true;
+  return texture;
+}
+
 const coverTextures = new Map<string, Promise<THREE.Texture>>();
 
 function loadCoverTexture(path: string) {
@@ -149,7 +192,7 @@ function disposeObject(root: THREE.Object3D) {
   });
 }
 
-function createCassette(title: string, genre = '', cover?: THREE.Texture): CassetteParts {
+function createCassette(title: string, cover?: THREE.Texture): CassetteParts {
   const group = new THREE.Group();
   const body = box(3.4, 2.18, 0.34, COLORS.tape, [0, 0, 0]);
   group.add(body);
@@ -157,14 +200,14 @@ function createCassette(title: string, genre = '', cover?: THREE.Texture): Casse
   const edge = box(3.12, 1.9, 0.38, COLORS.tapeEdge, [0, 0, 0]);
   group.add(edge);
 
-  const frontTexture = cover ?? canvasTexture('subwave', 'cassette archive', '#15272c', '#edf0d7');
+  const frontTexture = canvasTexture('', '', '#1b292a', '#1b292a');
   const front = new THREE.Mesh(new THREE.PlaneGeometry(3.02, 1.78), textureMaterial(frontTexture));
   front.position.set(0, 0, 0.201);
   group.add(front);
 
-  const labelTexture = canvasTexture(title, genre);
-  const label = new THREE.Mesh(new THREE.PlaneGeometry(2.72, 0.38), textureMaterial(labelTexture));
-  label.position.set(0, 0.68, 0.211);
+  const labelTexture = maskingTapeTexture(title);
+  const label = new THREE.Mesh(new THREE.PlaneGeometry(2.68, 0.56), textureMaterial(labelTexture, true));
+  label.position.set(0, 0.58, 0.218);
   group.add(label);
 
   const backTexture = cover ?? canvasTexture('side b', 'subwoofer lullabies', '#192525', '#d3c99d');
@@ -328,37 +371,13 @@ export function createHandCursorScene(canvas: HTMLCanvasElement): HandCursorCont
   let targetGrip = 0;
   let overPlayer = false;
   let hideTimer = 0;
-  let pointerVisible = false;
 
   function position(x: number, y: number) {
     canvas.style.left = `${x - canvas.clientWidth * 0.5}px`;
     canvas.style.top = `${y - canvas.clientHeight * 0.42}px`;
   }
 
-  function trackPointer(event: PointerEvent) {
-    if (event.pointerType === 'touch' && event.buttons === 0) return;
-    pointerVisible = true;
-    position(event.clientX, event.clientY);
-    canvas.classList.add('is-visible');
-  }
-
-  function hidePointer(event: MouseEvent) {
-    if (event.relatedTarget) return;
-    pointerVisible = false;
-    if (targetGrip === 0) canvas.classList.remove('is-visible');
-  }
-
-  function hideOnBlur() {
-    pointerVisible = false;
-    if (targetGrip === 0) canvas.classList.remove('is-visible');
-  }
-
-  document.documentElement.classList.add('ps1-hand-cursor');
-  window.addEventListener('pointermove', trackPointer, { passive: true });
-  document.addEventListener('mouseout', hidePointer);
-  window.addEventListener('blur', hideOnBlur);
-
-  function setCassette(title: string) {
+  function setCassette(title: string, coverPath: string) {
     if (heldCassette) {
       hand.remove(heldCassette.group);
       disposeObject(heldCassette.group);
@@ -368,6 +387,12 @@ export function createHandCursorScene(canvas: HTMLCanvasElement): HandCursorCont
     heldCassette.group.position.set(0.05, 0.52, 0.72);
     heldCassette.group.rotation.set(-0.08, 0.04, -0.05);
     hand.add(heldCassette.group);
+    const activeCassette = heldCassette;
+    void loadCoverTexture(coverPath).then((cover) => {
+      if (heldCassette !== activeCassette) return;
+      disposeMaterial(activeCassette.back.material);
+      activeCassette.back.material = textureMaterial(cover);
+    });
   }
 
   const disposeAnimation = animateScene(renderer, scene, camera, resize, (_time, delta) => {
@@ -391,13 +416,12 @@ export function createHandCursorScene(canvas: HTMLCanvasElement): HandCursorCont
     hover(x, y, active) {
       if (targetGrip > 0) return;
       position(x, y);
-      canvas.classList.toggle('is-hovering-tape', active);
-      if (pointerVisible) canvas.classList.add('is-visible');
+      canvas.classList.toggle('is-visible', active);
     },
-    grab(title, x, y) {
+    grab(title, cover, x, y) {
       window.clearTimeout(hideTimer);
       position(x, y);
-      setCassette(title);
+      setCassette(title, cover);
       targetGrip = 1;
       canvas.classList.remove('is-dropping');
       canvas.classList.add('is-visible', 'is-grabbing');
@@ -412,8 +436,7 @@ export function createHandCursorScene(canvas: HTMLCanvasElement): HandCursorCont
       canvas.classList.remove('is-grabbing', 'is-over-player');
       if (dropped) canvas.classList.add('is-dropping');
       hideTimer = window.setTimeout(() => {
-        canvas.classList.remove('is-dropping');
-        canvas.classList.toggle('is-visible', pointerVisible);
+        canvas.classList.remove('is-visible', 'is-dropping');
         if (heldCassette) {
           hand.remove(heldCassette.group);
           disposeObject(heldCassette.group);
@@ -423,10 +446,6 @@ export function createHandCursorScene(canvas: HTMLCanvasElement): HandCursorCont
     },
     dispose() {
       window.clearTimeout(hideTimer);
-      document.documentElement.classList.remove('ps1-hand-cursor');
-      window.removeEventListener('pointermove', trackPointer);
-      document.removeEventListener('mouseout', hidePointer);
-      window.removeEventListener('blur', hideOnBlur);
       disposeObject(hand);
       disposeAnimation();
     },
@@ -439,123 +458,196 @@ export function createBoxScene(
   onSelect: (title: string) => void,
   dropTarget: HTMLElement,
   handCursor: HandCursorController,
-): SceneController {
+): BoxSceneController {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(31, 1, 0.1, 100);
-  camera.position.set(8.8, 6.6, 13.8);
-  camera.lookAt(0, -0.7, 0);
+  camera.position.set(0, 2.2, 17.5);
+  camera.lookAt(0, -0.55, 0);
   const { renderer, resize } = setupRenderer(canvas);
   addLighting(scene);
 
-  const wall = new THREE.Mesh(new THREE.PlaneGeometry(32, 15), material(0x4b2924, { roughness: 1 }));
-  wall.position.set(0, 2.5, -5.2);
+  const wall = new THREE.Mesh(new THREE.PlaneGeometry(24, 11), material(0x4b2924, { roughness: 1 }));
+  wall.position.set(0, 1.6, -4.8);
   wall.receiveShadow = true;
   scene.add(wall);
 
-  const poster = new THREE.Mesh(
-    new THREE.PlaneGeometry(4.8, 2.4),
-    textureMaterial(canvasTexture('SATURDAY MIX', 'BOMBAY / 1996', '#d8a34b', '#3b1b20')),
-  );
-  poster.position.set(-7.2, 2.35, -5.05);
-  poster.rotation.z = -0.045;
-  scene.add(poster);
-
-  const chart = new THREE.Mesh(
-    new THREE.PlaneGeometry(3.5, 2.1),
-    textureMaterial(canvasTexture('TOP 10', 'RADIO REQUESTS', '#426d66', '#f1d7a8')),
-  );
-  chart.position.set(6.8, 2.55, -5.02);
-  chart.rotation.z = 0.055;
-  scene.add(chart);
+  const posterLayouts: Array<[string, string, string, string, number, number, number, number, number]> = [
+    ['SATURDAY MIX', 'BOMBAY / 1996', '#d8a34b', '#3b1b20', -7.3, 2.5, 3.7, 2.1, -0.05],
+    ['TOP 10', 'RADIO REQUESTS', '#426d66', '#f1d7a8', 0.1, 3.0, 3.1, 1.8, 0.035],
+    ['MIDNIGHT FM', '90.4 / STEREO', '#31556c', '#ead59d', 6.7, 2.4, 3.8, 2.2, -0.025],
+  ];
+  posterLayouts.forEach(([title, subtitle, background, foreground, x, y, width, height, rotation]) => {
+    const poster = new THREE.Mesh(
+      new THREE.PlaneGeometry(width, height),
+      textureMaterial(canvasTexture(title, subtitle, background, foreground)),
+    );
+    poster.position.set(x, y, -4.65);
+    poster.rotation.z = rotation;
+    scene.add(poster);
+  });
 
   const boxGroup = new THREE.Group();
-  boxGroup.rotation.y = -0.12;
-  boxGroup.position.set(0.75, -0.42, 0.15);
+  boxGroup.position.set(2.65, -0.12, 0.1);
   scene.add(boxGroup);
 
-  boxGroup.add(box(8, 0.3, 5, COLORS.cardboardDark, [0, -2.05, 0]));
-  boxGroup.add(box(8, 2.6, 0.28, COLORS.cardboard, [0, -0.85, 2.36]));
-  boxGroup.add(box(0.3, 2.65, 5, COLORS.cardboard, [-3.87, -0.85, 0]));
-  boxGroup.add(box(0.3, 2.65, 5, COLORS.cardboard, [3.87, -0.85, 0]));
-  boxGroup.add(box(8, 2.15, 0.28, COLORS.cardboardLight, [0, -0.97, -2.36]));
-  boxGroup.add(box(7.6, 0.18, 3.1, COLORS.cardboardLight, [0, 0.4, -3.75], [-0.92, 0, 0]));
-  boxGroup.add(box(3.6, 0.18, 4.4, COLORS.cardboardLight, [-5.25, 0.05, 0], [0, 0, 0.72]));
-  boxGroup.add(box(3.6, 0.18, 4.4, COLORS.cardboardLight, [5.25, 0.05, 0], [0, 0, -0.72]));
+  boxGroup.add(box(9.6, 0.3, 3.5, COLORS.cardboardDark, [0, -1.62, 0]));
+  boxGroup.add(box(9.6, 2.75, 0.24, COLORS.cardboardLight, [0, -0.18, -1.63]));
+  boxGroup.add(box(0.25, 2.75, 3.5, COLORS.cardboard, [-4.68, -0.18, 0]));
+  boxGroup.add(box(0.25, 2.75, 3.5, COLORS.cardboard, [4.68, -0.18, 0]));
+  boxGroup.add(box(9.6, 0.5, 0.25, COLORS.cardboard, [0, -1.35, 1.58]));
+  for (let slot = -3; slot <= 3; slot++) {
+    boxGroup.add(box(0.06, 2.4, 0.16, COLORS.cardboardDark, [slot * 1.24, -0.15, -1.48]));
+  }
 
   const tapeRoots: THREE.Group[] = [];
   songs.forEach((song, index) => {
-    const cassette = createCassette(song.title, song.genre);
-    if (index < 8) {
-      const column = index % 4;
-      const row = Math.floor(index / 4);
-      cassette.group.scale.setScalar(0.56);
-      cassette.group.position.set(-2.45 + column * 1.65, -0.48 + row * 0.62, 0.62 - row * 1.22);
-      cassette.group.rotation.set(-0.15 + row * 0.07, (column - 1.5) * 0.07, ((index % 3) - 1) * 0.07);
-      boxGroup.add(cassette.group);
-    } else {
-      const floorLayouts: Array<[[number, number, number], [number, number, number], number]> = [
-        [[-6.6, -2.02, 1.5], [-1.4, 0.2, -0.34], 0.72],
-        [[-4.9, -2.08, -1.9], [-1.5, -0.2, 0.42], 0.68],
-        [[-2.7, -2.04, 3.15], [-1.34, 0.08, 0.18], 0.7],
-        [[5.25, -2.05, 2.2], [-1.46, -0.08, -0.42], 0.72],
-        [[6.8, -2.03, -0.8], [-1.35, 0.2, 0.3], 0.65],
-        [[3.6, -2.07, -3.25], [-1.48, -0.1, -0.16], 0.7],
-      ];
-      const [position, rotation, scale] = floorLayouts[index - 8];
-      cassette.group.scale.setScalar(scale);
-      cassette.group.position.set(...position);
-      cassette.group.rotation.set(...rotation);
-      scene.add(cassette.group);
-    }
+    const cassette = createCassette(song.title);
+    const column = index % 7;
+    const row = Math.floor(index / 7);
+    cassette.group.scale.setScalar(0.35);
+    cassette.group.position.set(-3.72 + column * 1.24, -0.78 + row * 1.08, 1.72);
+    cassette.group.rotation.set(0, (column - 3) * 0.012, ((index % 3) - 1) * 0.015);
+    boxGroup.add(cassette.group);
+    void loadCoverTexture(song.cover).then((cover) => {
+      disposeMaterial(cassette.back.material);
+      cassette.back.material = textureMaterial(cover);
+    });
     cassette.group.userData.home = cassette.group.position.clone();
     cassette.group.userData.rotationHome = cassette.group.rotation.clone();
+    cassette.group.userData.cover = song.cover;
     tapeRoots.push(cassette.group);
   });
 
-  const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(30, 18, 6, 4),
-    material(0x4a2c24, { roughness: 1 }),
-  );
-  floor.rotation.x = -Math.PI / 2;
-  floor.position.y = -2.24;
-  floor.receiveShadow = true;
-  scene.add(floor);
-
-  const rug = new THREE.Mesh(
-    new THREE.PlaneGeometry(15, 7),
-    material(0x9a4d31, { roughness: 1 }),
-  );
-  rug.rotation.x = -Math.PI / 2;
-  rug.rotation.z = -0.03;
-  rug.position.set(0.4, -2.2, 0.7);
-  scene.add(rug);
-  for (let stripe = -3; stripe <= 3; stripe++) {
-    const line = box(13.5, 0.03, 0.13, stripe % 2 ? 0xd59a47 : 0x4b6f68, [0.4, -2.18, stripe * 0.78]);
-    scene.add(line);
-  }
+  scene.add(box(19.5, 0.65, 7.5, 0x70442e, [0, -2.28, 0]));
+  scene.add(box(19.5, 0.12, 7.5, 0xa56a3d, [0, -1.91, 0]));
 
   const television = new THREE.Group();
-  television.position.set(-7.3, -0.85, -2.7);
-  television.rotation.y = 0.12;
-  television.add(box(3.2, 2.5, 1.8, 0x34302d, [0, 0, 0]));
-  television.add(box(2.35, 1.55, 0.08, 0x19272b, [-0.18, 0.2, 0.94]));
-  television.add(box(0.35, 0.35, 0.16, 0xd1963e, [1.18, -0.52, 0.98]));
+  television.position.set(-6.45, -0.45, -0.05);
+  television.rotation.y = 0.08;
+  television.add(box(3.7, 3.05, 2.35, 0x34302d, [0, 0, 0]));
+  television.add(box(2.75, 2.05, 0.12, 0x11191b, [-0.25, 0.2, 1.22]));
+  television.add(box(0.42, 0.42, 0.2, 0xd1963e, [1.35, 0.36, 1.25]));
+  television.add(box(0.42, 0.42, 0.2, 0x718b75, [1.35, -0.38, 1.25]));
+  television.add(box(0.7, 0.22, 0.5, 0x27201f, [-1.05, -1.68, 0]));
+  television.add(box(0.7, 0.22, 0.5, 0x27201f, [1.05, -1.68, 0]));
+  const antennaLeft = box(0.08, 2.2, 0.08, 0x8f8c7d, [-0.45, 2.25, -0.2], [0, 0, -0.28]);
+  const antennaRight = box(0.08, 2.2, 0.08, 0x8f8c7d, [0.45, 2.25, -0.2], [0, 0, 0.28]);
+  television.add(antennaLeft, antennaRight);
+
+  const crtCanvas = document.createElement('canvas');
+  crtCanvas.width = 320;
+  crtCanvas.height = 240;
+  const crtContextResult = crtCanvas.getContext('2d');
+  if (!crtContextResult) throw new Error('CRT screen context unavailable.');
+  const crtContext: CanvasRenderingContext2D = crtContextResult;
+  const crtTexture = new THREE.CanvasTexture(crtCanvas);
+  crtTexture.colorSpace = THREE.SRGBColorSpace;
+  crtTexture.magFilter = THREE.NearestFilter;
+  crtTexture.minFilter = THREE.NearestFilter;
+  const crtScreen = new THREE.Mesh(
+    new THREE.PlaneGeometry(2.55, 1.84),
+    textureMaterial(crtTexture),
+  );
+  crtScreen.position.set(-0.25, 0.2, 1.3);
+  television.add(crtScreen);
   scene.add(television);
 
-  const notebooks = new THREE.Group();
-  notebooks.position.set(6.7, -1.82, -2.25);
-  notebooks.rotation.y = -0.28;
-  [0x315b74, 0xb76b3c, 0xd4bd72].forEach((color, index) => {
-    notebooks.add(box(2.7, 0.18, 1.7, color, [0, index * 0.21, 0]));
+  const books = new THREE.Group();
+  books.position.set(-3.55, -1.46, 1.45);
+  books.rotation.y = -0.18;
+  [0x315b74, 0xb76b3c, 0xd4bd72, 0x52704d].forEach((color, index) => {
+    books.add(box(1.75, 0.18, 1.05, color, [0, index * 0.2, 0]));
   });
-  scene.add(notebooks);
+  scene.add(books);
 
-  const bat = new THREE.Group();
-  bat.position.set(7.6, -0.5, 1.3);
-  bat.rotation.set(0.06, 0, -0.52);
-  bat.add(box(0.62, 3.6, 0.22, 0xb9874f, [0, 0, 0]));
-  bat.add(box(0.25, 1.55, 0.2, 0x55312a, [0, 2.45, 0]));
-  scene.add(bat);
+  const pencilCup = new THREE.Group();
+  pencilCup.position.set(-3.9, -1.15, -1.4);
+  pencilCup.add(new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.48, 1.05, 7), material(0x416f78)));
+  for (let index = 0; index < 4; index++) {
+    pencilCup.add(box(0.08, 1.55, 0.08, index % 2 ? 0xd8a34b : 0xc7592f, [-0.2 + index * 0.14, 0.92, 0], [0, 0, (index - 1.5) * 0.08]));
+  }
+  scene.add(pencilCup);
+
+  let crtCover: CanvasImageSource | null = null;
+  let crtPlaying = false;
+  let visualizerMode: VisualizerMode = 'scope';
+
+  function drawCrt(time: number) {
+    const width = crtCanvas.width;
+    const height = crtCanvas.height;
+    crtContext.fillStyle = '#071214';
+    crtContext.fillRect(0, 0, width, height);
+    if (crtCover) {
+      const sourceWidth = Number((crtCover as { width?: number }).width) || width;
+      const sourceHeight = Number((crtCover as { height?: number }).height) || height;
+      const sourceRatio = sourceWidth / sourceHeight;
+      const targetRatio = width / height;
+      const drawWidth = sourceRatio > targetRatio ? height * sourceRatio : width;
+      const drawHeight = sourceRatio > targetRatio ? height : width / sourceRatio;
+      crtContext.globalAlpha = crtPlaying ? 0.28 : 0.82;
+      crtContext.drawImage(crtCover, (width - drawWidth) / 2, (height - drawHeight) / 2, drawWidth, drawHeight);
+      crtContext.globalAlpha = 1;
+    } else {
+      crtContext.fillStyle = '#6c9288';
+      crtContext.font = '700 18px monospace';
+      crtContext.textAlign = 'center';
+      crtContext.fillText('NO SIGNAL / PICK A TAPE', width / 2, height / 2);
+    }
+
+    if (crtPlaying) {
+      crtContext.strokeStyle = '#f4d789';
+      crtContext.fillStyle = '#e66a32';
+      crtContext.lineWidth = 5;
+      if (visualizerMode === 'scope') {
+        crtContext.beginPath();
+        for (let x = 0; x <= width; x += 5) {
+          const wave = Math.sin(x * 0.055 + time * 5.5) * 28
+            + Math.sin(x * 0.14 - time * 3.2) * 12;
+          const y = height / 2 + wave;
+          if (x === 0) crtContext.moveTo(x, y);
+          else crtContext.lineTo(x, y);
+        }
+        crtContext.stroke();
+      } else if (visualizerMode === 'bars') {
+        for (let index = 0; index < 16; index++) {
+          const energy = 0.25 + Math.abs(Math.sin(time * 2.8 + index * 0.71)) * 0.72;
+          const barHeight = energy * 155;
+          crtContext.fillRect(10 + index * 19, height - 28 - barHeight, 11, barHeight);
+        }
+      } else {
+        crtContext.save();
+        crtContext.translate(width / 2, height / 2);
+        for (let ring = 0; ring < 4; ring++) {
+          const radius = 24 + ring * 22 + Math.sin(time * 3 + ring) * 7;
+          crtContext.beginPath();
+          for (let point = 0; point <= 32; point++) {
+            const angle = point / 32 * Math.PI * 2;
+            const pulse = Math.sin(angle * 5 + time * 4.2) * 8;
+            const x = Math.cos(angle) * (radius + pulse);
+            const y = Math.sin(angle) * (radius + pulse);
+            if (point === 0) crtContext.moveTo(x, y);
+            else crtContext.lineTo(x, y);
+          }
+          crtContext.closePath();
+          crtContext.stroke();
+        }
+        crtContext.restore();
+      }
+    }
+
+    const vignette = crtContext.createRadialGradient(width / 2, height / 2, 45, width / 2, height / 2, 205);
+    vignette.addColorStop(0, 'rgba(0,0,0,0)');
+    vignette.addColorStop(1, 'rgba(0,0,0,.72)');
+    crtContext.fillStyle = vignette;
+    crtContext.fillRect(0, 0, width, height);
+    crtContext.fillStyle = 'rgba(0,0,0,.22)';
+    for (let y = 0; y < height; y += 5) crtContext.fillRect(0, y, width, 2);
+    for (let index = 0; index < 55; index++) {
+      crtContext.fillStyle = `rgba(220,235,205,${Math.random() * 0.16})`;
+      crtContext.fillRect(Math.random() * width, Math.random() * height, 2, 2);
+    }
+    crtTexture.needsUpdate = true;
+  }
 
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -613,7 +705,7 @@ export function createBoxScene(
     if (scrollFrame) cancelAnimationFrame(scrollFrame);
     scrollFrame = 0;
     canvas.classList.remove('is-dragging');
-    canvas.style.cursor = 'grab';
+    canvas.style.cursor = 'none';
     dropTarget.classList.remove('awaiting-drop', 'is-over');
     handCursor.release(false);
   }
@@ -632,7 +724,12 @@ export function createBoxScene(
     canvas.style.cursor = 'none';
     latestClientX = event.clientX;
     latestClientY = event.clientY;
-    handCursor.grab(String(pressed.userData.title), event.clientX, event.clientY);
+    handCursor.grab(
+      String(pressed.userData.title),
+      String(pressed.userData.cover),
+      event.clientX,
+      event.clientY,
+    );
     if (!scrollFrame) scrollFrame = requestAnimationFrame(autoScroll);
   });
   canvas.addEventListener('pointermove', (event) => {
@@ -645,8 +742,8 @@ export function createBoxScene(
       hover = nextHover;
     }
     if (hover && hover !== pressed) hover.position.y = hover.userData.home.y + 0.22;
-    canvas.style.cursor = hover || pressed ? 'none' : 'grab';
-    handCursor.hover(event.clientX, event.clientY, Boolean(hover));
+    canvas.style.cursor = 'none';
+    handCursor.hover(event.clientX, event.clientY, true);
     if (pressed) {
       moved ||= Math.hypot(event.clientX - startX, event.clientY - startY) > 7;
       pressed.position.y = pressed.userData.home.y + 0.72;
@@ -668,7 +765,7 @@ export function createBoxScene(
     canvas.releasePointerCapture(event.pointerId);
     canvas.classList.remove('is-dragging');
     dropTarget.classList.remove('awaiting-drop', 'is-over');
-    canvas.style.cursor = 'grab';
+    canvas.style.cursor = 'none';
     handCursor.release(dropped);
     if (dropped) {
       window.setTimeout(() => onSelect(String(chosen.userData.title)), 260);
@@ -694,16 +791,27 @@ export function createBoxScene(
 
   const disposeAnimation = animateScene(renderer, scene, camera, resize, (time) => {
     const aspect = canvas.clientWidth / Math.max(canvas.clientHeight, 1);
-    const cameraScale = Math.max(1, 1.45 / aspect);
-    camera.position.set(8.8 * cameraScale, 6.6 * cameraScale, 13.8 * cameraScale);
-    camera.lookAt(0, -0.7, 0);
-    boxGroup.rotation.y += (pointerX * 0.18 - 0.12 - boxGroup.rotation.y) * 0.06;
-    boxGroup.rotation.x += (-pointerY * 0.08 - boxGroup.rotation.x) * 0.06;
-    boxGroup.position.y = -0.45 + Math.sin(time * 0.8) * 0.025;
+    const cameraScale = Math.max(1, 1.72 / aspect);
+    camera.position.set(pointerX * 0.4, 2.2 * cameraScale - pointerY * 0.16, 17.5 * cameraScale);
+    camera.lookAt(0, -0.55, 0);
+    boxGroup.position.y = -0.12 + Math.sin(time * 0.8) * 0.012;
+    drawCrt(time);
   });
   return {
+    async setTrack(song: VisualSong) {
+      const cover = await loadCoverTexture(song.cover);
+      crtCover = cover.image as CanvasImageSource;
+      drawCrt(performance.now() / 1000);
+    },
+    setPlaying(active: boolean) {
+      crtPlaying = active;
+    },
+    setVisualizer(mode: VisualizerMode) {
+      visualizerMode = mode;
+    },
     dispose() {
       if (scrollFrame) cancelAnimationFrame(scrollFrame);
+      crtTexture.dispose();
       disposeAnimation();
     },
   };
@@ -810,9 +918,9 @@ export function createPlayerScene(canvas: HTMLCanvasElement) {
       disposeMaterial(cassette.front.material);
       disposeMaterial(cassette.back.material);
       disposeMaterial(cassette.label.material);
-      cassette.front.material = textureMaterial(cover);
+      cassette.front.material = textureMaterial(canvasTexture('', '', '#1b292a', '#1b292a'));
       cassette.back.material = textureMaterial(cover);
-      cassette.label.material = textureMaterial(canvasTexture(song.title, `${song.bpm} bpm`));
+      cassette.label.material = textureMaterial(maskingTapeTexture(song.title), true);
       cassette.group.visible = true;
     },
     setPlaying(value: boolean) {
@@ -861,7 +969,7 @@ export function createShowcaseScene(canvas: HTMLCanvasElement) {
         disposeObject(cassette.group);
       }
       const cover = await loadCoverTexture(song.cover);
-      cassette = createCassette(song.title, `${song.genre} / ${song.bpm} bpm`, cover);
+      cassette = createCassette(song.title, cover);
       cassette.group.scale.setScalar(0.72);
       scene.add(cassette.group);
       await new Promise<void>((resolve) => {

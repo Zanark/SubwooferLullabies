@@ -1,5 +1,11 @@
 import './styles.css';
-import { createBoxScene, createHandCursorScene, createPlayerScene, createShowcaseScene } from './three-scenes';
+import {
+  createBoxScene,
+  createHandCursorScene,
+  createPlayerScene,
+  createShowcaseScene,
+  type VisualizerMode,
+} from './three-scenes';
 
 type Song = {
   title: string;
@@ -100,7 +106,13 @@ app.innerHTML = `
         <strong>pick up or drag a 3d tape</strong>
       </div>
       <canvas id="box-3d" class="scene-canvas box-canvas" aria-label="Interactive 3D room with a box and loose cassettes"></canvas>
-      <p class="canvas-help">click any cassette or drag it across to the player above</p>
+      <div class="crt-controls" role="group" aria-label="CRT visualizer">
+        <span>crt signal</span>
+        <button type="button" data-visualizer="scope" disabled>scope</button>
+        <button type="button" data-visualizer="bars" disabled>bars</button>
+        <button type="button" data-visualizer="radar" disabled>radar</button>
+      </div>
+      <p class="canvas-help">all tapes stay visible / click or drag one to the player</p>
     </section>
   </main>
 
@@ -116,12 +128,6 @@ app.innerHTML = `
       <strong id="showcase-title"></strong>
     </div>
   </div>
-
-  <div id="theater" class="theater" hidden aria-hidden="true">
-    <div id="theater-art" class="theater-art"></div>
-    <div class="theater-shade"></div>
-  </div>
-  <button id="exit-theater" class="pixel-button exit-theater" type="button" hidden>return to archive</button>
 
   <audio id="audio" preload="metadata"></audio>
 `;
@@ -144,13 +150,7 @@ const status = required<HTMLDivElement>('status');
 const announcement = required<HTMLDivElement>('announcement');
 const showcase = required<HTMLDivElement>('showcase');
 const showcaseTitle = required<HTMLElement>('showcase-title');
-const theater = required<HTMLDivElement>('theater');
-const theaterArt = required<HTMLDivElement>('theater-art');
-const exitTheater = required<HTMLButtonElement>('exit-theater');
-const masthead = document.querySelector<HTMLElement>('.masthead');
-const libraryPanel = document.querySelector<HTMLElement>('.library-panel');
-const roomPanel = document.querySelector<HTMLElement>('.room-panel');
-const footer = document.querySelector<HTMLElement>('footer');
+const visualizerButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-visualizer]'));
 
 let catalog: Catalog;
 let currentAlbum: string | null = null;
@@ -272,14 +272,13 @@ async function loadCassette(song: Song, autoplay = false) {
 
     selected = song;
     await playerScene.setCassette({ ...song, cover: asset(song.cover) });
-    theaterArt.style.backgroundImage = `url("${asset(song.cover)}")`;
+    await boxScene.setTrack({ ...song, cover: asset(song.cover) });
     setTransportEnabled(true);
     announcement.textContent = `${song.title} cassette loaded`;
     if (autoplay && await activation) {
       audio.currentTime = 0;
       audio.muted = false;
       setPlayingState(true);
-      setTheaterMode(true);
       status.textContent = `playing / ${song.title}`;
     } else {
       audio.muted = false;
@@ -308,6 +307,7 @@ function setPlayingState(active: boolean) {
   playButton.setAttribute('aria-label', active ? 'Pause selected cassette' : 'Play selected cassette');
   playLabel.textContent = active ? 'pause' : 'play';
   playerScene.setPlaying(active);
+  boxScene.setPlaying(active);
   document.body.classList.toggle('playing', active);
 }
 
@@ -323,7 +323,6 @@ async function togglePlayback() {
     try {
       await audio.play();
       setPlayingState(true);
-      setTheaterMode(true);
       status.textContent = `playing / ${selected.title}`;
       announcement.textContent = `${selected.title} playing`;
     } catch {
@@ -338,21 +337,11 @@ async function togglePlayback() {
   }
 }
 
-function leaveTheater() {
-  audio.pause();
-  setPlayingState(false);
-  setTheaterMode(false);
-  status.textContent = selected ? `paused / ${selected.title}` : 'choose a cassette';
-  announcement.textContent = selected ? `${selected.title} paused` : '';
-  playButton.focus({ preventScroll: true });
-}
-
 function stopPlayback() {
   if (!selected) return;
   audio.pause();
   audio.currentTime = 0;
   setPlayingState(false);
-  setTheaterMode(false);
   status.textContent = `stopped / ${selected.title}`;
   announcement.textContent = `${selected.title} stopped and rewound`;
 }
@@ -370,17 +359,6 @@ async function playRandomTape() {
   const pool = choices.length ? choices : catalog.songs;
   const song = pool[Math.floor(Math.random() * pool.length)];
   await loadCassette(song, true);
-}
-
-function setTheaterMode(active: boolean) {
-  document.body.classList.toggle('theater-mode', active);
-  theater.hidden = !active;
-  theater.setAttribute('aria-hidden', String(!active));
-  exitTheater.hidden = !active;
-  for (const element of [masthead, libraryPanel, roomPanel, footer]) {
-    if (element) element.inert = active;
-  }
-  if (active) exitTheater.focus({ preventScroll: true });
 }
 
 playButton.addEventListener('click', togglePlayback);
@@ -401,7 +379,16 @@ audio.addEventListener('timeupdate', () => {
     status.textContent = `${formatDuration(audio.currentTime)} / ${formatDuration(audio.duration || selected.duration_seconds)}`;
   }
 });
-exitTheater.addEventListener('click', leaveTheater);
+visualizerButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    const mode = button.dataset.visualizer as VisualizerMode;
+    boxScene.setVisualizer(mode);
+    visualizerButtons.forEach((candidate) => {
+      candidate.classList.toggle('is-active', candidate === button);
+      candidate.setAttribute('aria-pressed', String(candidate === button));
+    });
+  });
+});
 search.addEventListener('input', renderShelf);
 back.addEventListener('click', () => {
   currentAlbum = null;
@@ -444,6 +431,15 @@ async function start() {
     dropZone,
     handCursorScene,
   );
+  const visualizerModes: VisualizerMode[] = ['scope', 'bars', 'radar'];
+  const dailyVisualizer = visualizerModes[Math.floor(Date.now() / 86_400_000) % visualizerModes.length];
+  boxScene.setVisualizer(dailyVisualizer);
+  visualizerButtons.forEach((button) => {
+    const active = button.dataset.visualizer === dailyVisualizer;
+    button.disabled = false;
+    button.classList.toggle('is-active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
   randomPlayButton.disabled = false;
   initGrain();
 }
