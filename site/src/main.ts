@@ -109,6 +109,7 @@ app.innerHTML = `
 
     <section id="room-panel" class="room-panel box-scene" aria-label="Messy 2010 teenager room">
       <canvas id="box-3d" class="scene-canvas box-canvas" aria-label="Interactive 3D room with loose cassettes on a desk"></canvas>
+      <button id="toggle-crt-isolation" class="crt-isolation-button" type="button" aria-pressed="false" hidden>dim surroundings</button>
       <button id="exit-crt-focus" class="crt-back-button" type="button" hidden>back to room</button>
       <div class="crt-controls" role="group" aria-label="CRT visualizer">
         <span>crt signal</span>
@@ -163,6 +164,7 @@ const announcement = required<HTMLDivElement>('announcement');
 const showcase = required<HTMLDivElement>('showcase');
 const showcaseTitle = required<HTMLElement>('showcase-title');
 const roomPanel = required<HTMLElement>('room-panel');
+const toggleCrtIsolationButton = required<HTMLButtonElement>('toggle-crt-isolation');
 const exitCrtFocusButton = required<HTMLButtonElement>('exit-crt-focus');
 const visualizerButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-visualizer]'));
 
@@ -491,6 +493,11 @@ visualizerButtons.forEach((button) => {
 exitCrtFocusButton.addEventListener('click', () => {
   boxScene.setCrtFocus(false);
 });
+toggleCrtIsolationButton.addEventListener('click', () => {
+  const active = document.body.classList.toggle('crt-isolation-mode');
+  toggleCrtIsolationButton.setAttribute('aria-pressed', String(active));
+  toggleCrtIsolationButton.textContent = active ? 'restore surroundings' : 'dim surroundings';
+});
 search.addEventListener('input', () => {
   deskPreviewTitle = null;
   renderShelf();
@@ -544,6 +551,12 @@ async function start() {
     },
     (active) => {
       roomPanel.classList.toggle('is-crt-focused', active);
+      if (!active) {
+        document.body.classList.remove('crt-isolation-mode');
+        toggleCrtIsolationButton.setAttribute('aria-pressed', 'false');
+        toggleCrtIsolationButton.textContent = 'dim surroundings';
+      }
+      toggleCrtIsolationButton.hidden = !active;
       exitCrtFocusButton.hidden = !active;
     },
     dropZone,

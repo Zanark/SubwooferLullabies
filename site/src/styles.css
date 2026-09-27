@@ -2147,10 +2147,10 @@ body.theater-mode .transport-controls > .play-button {
   bottom: auto;
 }
 
-.crt-back-button {
+.crt-back-button,
+.crt-isolation-button {
   position: absolute;
   top: 14px;
-  right: 18px;
   z-index: 10;
   border: 2px solid #815340;
   padding: 7px 9px;
@@ -2162,11 +2162,42 @@ body.theater-mode .transport-controls > .play-button {
   text-transform: uppercase;
 }
 
+.crt-back-button {
+  right: 18px;
+}
+
+.crt-isolation-button {
+  left: 18px;
+}
+
 .crt-back-button:hover,
-.crt-back-button:focus-visible {
+.crt-back-button:focus-visible,
+.crt-isolation-button:hover,
+.crt-isolation-button:focus-visible,
+.crt-isolation-button[aria-pressed="true"] {
   outline: 2px solid #f0d38c;
   outline-offset: 2px;
   background: #f0d38c;
+}
+
+.masthead,
+.library-panel,
+.player-panel,
+footer {
+  transition: filter .28s steps(5), opacity .28s steps(5);
+}
+
+body.crt-isolation-mode {
+  background: #010203;
+}
+
+body.crt-isolation-mode .masthead,
+body.crt-isolation-mode .library-panel,
+body.crt-isolation-mode .player-panel,
+body.crt-isolation-mode footer {
+  filter: brightness(.08) saturate(.35);
+  opacity: .16;
+  pointer-events: none;
 }
 
 .room-panel.is-crt-focused .canvas-help {
