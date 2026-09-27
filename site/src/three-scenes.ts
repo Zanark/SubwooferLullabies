@@ -479,8 +479,8 @@ export function createBoxScene(
 ): BoxSceneController {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(31, 1, 0.1, 100);
-  camera.position.set(0, 2.2, 17.5);
-  camera.lookAt(0, -0.55, 0);
+  camera.position.set(0, 8, 17);
+  camera.lookAt(0, -0.85, 0);
   const { renderer, resize } = setupRenderer(canvas);
   addLighting(scene);
 
@@ -504,32 +504,25 @@ export function createBoxScene(
     scene.add(poster);
   });
 
-  const boxGroup = new THREE.Group();
-  boxGroup.position.set(3.55, -0.18, 0.15);
-  scene.add(boxGroup);
-
-  boxGroup.add(box(8.7, 0.3, 3.5, COLORS.cardboardDark, [0, -1.62, 0]));
-  boxGroup.add(box(8.7, 2.75, 0.24, COLORS.cardboardLight, [0, -0.18, -1.63]));
-  boxGroup.add(box(0.25, 2.75, 3.5, COLORS.cardboard, [-4.23, -0.18, 0]));
-  boxGroup.add(box(0.25, 2.75, 3.5, COLORS.cardboard, [4.23, -0.18, 0]));
-  boxGroup.add(box(8.7, 0.5, 0.25, COLORS.cardboard, [0, -1.35, 1.58]));
+  const tapeGroup = new THREE.Group();
+  scene.add(tapeGroup);
 
   const tapeRoots: THREE.Group[] = [];
   const cassetteLayouts: Array<[[number, number, number], [number, number, number], number]> = [
-    [[-3.45, 0.35, 1.72], [0, -0.05, -0.13], 0.34],
-    [[-2.05, 0.28, 1.74], [0, 0.04, 0.09], 0.34],
-    [[-0.62, 0.4, 1.71], [0, -0.02, -0.07], 0.34],
-    [[0.85, 0.29, 1.73], [0, 0.05, 0.14], 0.34],
-    [[2.28, 0.38, 1.72], [0, -0.04, -0.1], 0.34],
-    [[3.5, 0.25, 1.76], [0, 0.02, 0.08], 0.31],
-    [[-3.38, -0.78, 1.75], [0, 0.03, 0.1], 0.33],
-    [[-1.94, -0.85, 1.73], [0, -0.05, -0.15], 0.33],
-    [[-0.48, -0.73, 1.76], [0, 0.02, 0.07], 0.33],
-    [[1.0, -0.86, 1.72], [0, -0.03, -0.08], 0.33],
-    [[2.48, -0.75, 1.74], [0, 0.05, 0.13], 0.33],
-    [[3.58, -0.88, 1.77], [0, -0.02, -0.05], 0.29],
-    [[-2.75, 1.25, 1.68], [0, 0.06, 0.23], 0.29],
-    [[2.9, 1.27, 1.69], [0, -0.05, -0.22], 0.29],
+    [[0.05, -1.775, -1.2], [-Math.PI / 2, 0, -0.32], 0.44],
+    [[1.62, -1.77, -0.72], [-Math.PI / 2, 0, 0.21], 0.44],
+    [[2.88, -1.765, -1.25], [-Math.PI / 2, 0, -0.14], 0.44],
+    [[4.55, -1.77, -0.7], [-Math.PI / 2, 0, 0.31], 0.44],
+    [[6.38, -1.775, -1.18], [-Math.PI / 2, 0, -0.25], 0.44],
+    [[0.48, -1.765, 0.28], [-Math.PI / 2, 0, 0.16], 0.44],
+    [[2.12, -1.76, 0.48], [-Math.PI / 2, 0, -0.28], 0.44],
+    [[3.5, -1.755, -0.05], [-Math.PI / 2, 0, 0.24], 0.44],
+    [[5.2, -1.765, 0.45], [-Math.PI / 2, 0, -0.12], 0.44],
+    [[7.02, -1.76, 0.12], [-Math.PI / 2, 0, 0.29], 0.42],
+    [[1.12, -1.755, 1.38], [-Math.PI / 2, 0, -0.22], 0.43],
+    [[2.76, -1.75, 1.18], [-Math.PI / 2, 0, 0.33], 0.43],
+    [[4.32, -1.745, 1.48], [-Math.PI / 2, 0, -0.3], 0.43],
+    [[6.08, -1.75, 1.27], [-Math.PI / 2, 0, 0.17], 0.43],
   ];
   songs.forEach((song, index) => {
     const cassette = createCassette(song.title);
@@ -537,7 +530,7 @@ export function createBoxScene(
     cassette.group.scale.setScalar(scale);
     cassette.group.position.set(...position);
     cassette.group.rotation.set(...rotation);
-    boxGroup.add(cassette.group);
+    tapeGroup.add(cassette.group);
     void loadCoverTexture(song.cover).then((cover) => {
       disposeMaterial(cassette.back.material);
       cassette.back.material = textureMaterial(cover);
@@ -601,7 +594,7 @@ export function createBoxScene(
   scene.add(television);
 
   const books = new THREE.Group();
-  books.position.set(-3.55, -1.46, 1.45);
+  books.position.set(-3.55, -1.84, 1.45);
   books.rotation.y = -0.18;
   [0x315b74, 0xb76b3c, 0xd4bd72, 0x52704d].forEach((color, index) => {
     books.add(box(1.75, 0.18, 1.05, color, [0, index * 0.2, 0]));
@@ -609,7 +602,7 @@ export function createBoxScene(
   scene.add(books);
 
   const cdStack = new THREE.Group();
-  cdStack.position.set(-2.85, -1.15, -0.65);
+  cdStack.position.set(-2.85, -1.83, -0.65);
   cdStack.rotation.set(0.08, -0.22, -0.12);
   [0x6aa3af, 0xd06b52, 0x9897b9].forEach((color, index) => {
     const caseMesh = box(1.2, 0.08, 1.2, color, [index * 0.16, index * 0.1, index * 0.07]);
@@ -620,7 +613,7 @@ export function createBoxScene(
   scene.add(cdStack);
 
   const phone = new THREE.Group();
-  phone.position.set(-2.1, -1.45, 1.2);
+  phone.position.set(-2.1, -1.82, 1.2);
   phone.rotation.set(-0.08, 0.25, 0.16);
   phone.add(box(0.7, 0.14, 1.35, 0x24282b, [0, 0, 0]));
   phone.add(box(0.48, 0.04, 0.62, 0x6b938e, [0, 0.1, -0.18]));
@@ -628,7 +621,7 @@ export function createBoxScene(
   scene.add(phone);
 
   const pencilCup = new THREE.Group();
-  pencilCup.position.set(-3.9, -1.15, -1.4);
+  pencilCup.position.set(-3.9, -1.41, -1.4);
   pencilCup.add(new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.48, 1.05, 7), material(0x416f78)));
   for (let index = 0; index < 4; index++) {
     pencilCup.add(box(0.08, 1.55, 0.08, index % 2 ? 0xd8a34b : 0xc7592f, [-0.2 + index * 0.14, 0.92, 0], [0, 0, (index - 1.5) * 0.08]));
@@ -649,8 +642,8 @@ export function createBoxScene(
       const sourceHeight = Number((crtCover as { height?: number }).height) || height;
       const sourceRatio = sourceWidth / sourceHeight;
       const targetRatio = width / height;
-      const drawWidth = sourceRatio > targetRatio ? height * sourceRatio : width;
-      const drawHeight = sourceRatio > targetRatio ? height : width / sourceRatio;
+      const drawWidth = sourceRatio > targetRatio ? width : height * sourceRatio;
+      const drawHeight = sourceRatio > targetRatio ? width / sourceRatio : height;
       crtContext.globalAlpha = crtPlaying ? 0.28 : 0.82;
       crtContext.drawImage(crtCover, (width - drawWidth) / 2, (height - drawHeight) / 2, drawWidth, drawHeight);
       crtContext.globalAlpha = 1;
@@ -809,7 +802,7 @@ export function createBoxScene(
     if (scrollFrame) cancelAnimationFrame(scrollFrame);
     scrollFrame = 0;
     canvas.classList.remove('is-dragging');
-    canvas.style.cursor = 'none';
+    canvas.style.cursor = 'default';
     dropTarget.classList.remove('awaiting-drop', 'is-over');
     handCursor.release(false);
   }
@@ -842,16 +835,17 @@ export function createBoxScene(
     latestClientY = event.clientY;
     const nextHover = hit(event);
     if (hover !== nextHover) {
-      if (hover && hover !== pressed) hover.position.y = hover.userData.home.y;
       hover = nextHover;
     }
-    if (hover && hover !== pressed) hover.position.y = hover.userData.home.y + 0.22;
-    canvas.style.cursor = 'none';
-    handCursor.hover(event.clientX, event.clientY, true);
+    canvas.style.cursor = hover || pressed ? 'none' : 'default';
+    handCursor.hover(event.clientX, event.clientY, Boolean(hover || pressed));
     if (pressed) {
       moved ||= Math.hypot(event.clientX - startX, event.clientY - startY) > 7;
-      pressed.position.y = pressed.userData.home.y + 0.72;
-      pressed.rotation.y += 0.04;
+      const home = pressed.userData.home as THREE.Vector3;
+      pressed.position.x = THREE.MathUtils.clamp(home.x + (event.clientX - startX) * 0.018, -0.1, 8.05);
+      pressed.position.z = THREE.MathUtils.clamp(home.z + (event.clientY - startY) * 0.014, -1.55, 1.55);
+      pressed.position.y = home.y + 0.36;
+      pressed.rotation.z = (pressed.userData.rotationHome as THREE.Euler).z + (event.clientX - startX) * 0.0018;
       updateDropTarget();
     }
   });
@@ -860,8 +854,6 @@ export function createBoxScene(
     const chosen = pressed;
     const target = document.elementFromPoint(event.clientX, event.clientY);
     const dropped = Boolean(target && dropTarget.contains(target));
-    chosen.position.copy(chosen.userData.home);
-    chosen.rotation.copy(chosen.userData.rotationHome);
     pressed = null;
     activePointerId = null;
     if (scrollFrame) cancelAnimationFrame(scrollFrame);
@@ -869,12 +861,20 @@ export function createBoxScene(
     canvas.releasePointerCapture(event.pointerId);
     canvas.classList.remove('is-dragging');
     dropTarget.classList.remove('awaiting-drop', 'is-over');
-    canvas.style.cursor = 'none';
+    canvas.style.cursor = 'default';
     handCursor.release(dropped);
     if (dropped) {
+      chosen.position.copy(chosen.userData.home);
+      chosen.rotation.copy(chosen.userData.rotationHome);
       window.setTimeout(() => onSelect(String(chosen.userData.title)), 260);
     } else if (!moved) {
+      chosen.position.copy(chosen.userData.home);
+      chosen.rotation.copy(chosen.userData.rotationHome);
       onSelect(String(chosen.userData.title));
+    } else {
+      chosen.position.y = (chosen.userData.home as THREE.Vector3).y;
+      chosen.userData.home = chosen.position.clone();
+      chosen.userData.rotationHome = chosen.rotation.clone();
     }
   });
   canvas.addEventListener('pointercancel', cancelDrag);
@@ -896,9 +896,8 @@ export function createBoxScene(
   const disposeAnimation = animateScene(renderer, scene, camera, resize, (time) => {
     const aspect = canvas.clientWidth / Math.max(canvas.clientHeight, 1);
     const cameraScale = Math.max(1, 1.72 / aspect);
-    camera.position.set(pointerX * 0.4, 2.2 * cameraScale - pointerY * 0.16, 17.5 * cameraScale);
-    camera.lookAt(0, -0.55, 0);
-    boxGroup.position.y = -0.12 + Math.sin(time * 0.8) * 0.012;
+    camera.position.set(pointerX * 0.4, 8 * cameraScale - pointerY * 0.16, 17 * cameraScale);
+    camera.lookAt(0, -0.85, 0);
     drawCrt(time);
   });
   return {

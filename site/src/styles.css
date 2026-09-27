@@ -2137,10 +2137,12 @@ body.theater-mode .transport-controls > .play-button {
 }
 
 .box-scene,
-.box-canvas,
-.box-scene:active,
+.box-canvas {
+  cursor: default;
+}
+
 .box-canvas.is-dragging {
-  cursor: none !important;
+  cursor: none;
 }
 
 .crt-controls {

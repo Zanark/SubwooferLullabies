@@ -108,7 +108,7 @@ app.innerHTML = `
     </section>
 
     <section class="room-panel box-scene" aria-label="Messy 2010 teenager room">
-      <canvas id="box-3d" class="scene-canvas box-canvas" aria-label="Interactive 3D room with a box and loose cassettes"></canvas>
+      <canvas id="box-3d" class="scene-canvas box-canvas" aria-label="Interactive 3D room with loose cassettes on a desk"></canvas>
       <div class="crt-controls" role="group" aria-label="CRT visualizer">
         <span>crt signal</span>
         <button type="button" data-visualizer="scope" disabled>scope</button>
@@ -118,7 +118,7 @@ app.innerHTML = `
         <button type="button" data-visualizer="tunnel" disabled>tunnel</button>
         <button type="button" data-visualizer="rain" disabled>rain</button>
       </div>
-      <p class="canvas-help">all tapes stay visible / click or drag one to the player</p>
+      <p class="canvas-help">move tapes around to search / drag one to the player</p>
     </section>
   </main>
 
