@@ -13,7 +13,7 @@ type SceneController = {
 
 type CassetteParts = {
   group: THREE.Group;
-  reels: THREE.Mesh[];
+  reels: THREE.Group[];
   label: THREE.Mesh;
   front: THREE.Mesh;
   back: THREE.Mesh;
@@ -166,24 +166,30 @@ function createCassette(title: string, genre = '', cover?: THREE.Texture): Casse
   back.rotation.y = Math.PI;
   group.add(back);
 
-  const reels: THREE.Mesh[] = [];
+  const reels: THREE.Group[] = [];
   for (const x of [-0.92, 0.92]) {
+    const reel = new THREE.Group();
+    reel.position.set(x, -0.22, 0.24);
     const outer = new THREE.Mesh(
       new THREE.CylinderGeometry(0.42, 0.42, 0.15, 12),
       material(COLORS.reel, { roughness: 0.65 }),
     );
-    outer.position.set(x, -0.22, 0.24);
-    outer.rotation.x = Math.PI / 2;
-    group.add(outer);
+    outer.geometry.rotateX(Math.PI / 2);
+    reel.add(outer);
 
     const inner = new THREE.Mesh(
       new THREE.CylinderGeometry(0.21, 0.21, 0.17, 8),
       material(COLORS.dark),
     );
-    inner.position.set(x, -0.22, 0.33);
-    inner.rotation.x = Math.PI / 2;
-    group.add(inner);
-    reels.push(inner);
+    inner.geometry.rotateX(Math.PI / 2);
+    inner.position.z = 0.09;
+    reel.add(inner);
+    for (let spoke = 0; spoke < 3; spoke++) {
+      const bar = box(0.34, 0.055, 0.055, COLORS.label, [0, 0, 0.19], [0, 0, spoke * Math.PI / 3]);
+      reel.add(bar);
+    }
+    group.add(reel);
+    reels.push(reel);
   }
 
   group.add(box(1.2, 0.13, 0.08, 0x281b17, [0, -0.22, 0.3]));
@@ -265,15 +271,36 @@ export function createBoxScene(
   dropTarget: HTMLElement,
 ): SceneController {
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
-  camera.position.set(8.4, 6.2, 10.5);
-  camera.lookAt(0, -0.45, 0);
+  const camera = new THREE.PerspectiveCamera(31, 1, 0.1, 100);
+  camera.position.set(8.8, 6.6, 13.8);
+  camera.lookAt(0, -0.7, 0);
   const { renderer, resize } = setupRenderer(canvas);
   addLighting(scene);
 
+  const wall = new THREE.Mesh(new THREE.PlaneGeometry(32, 15), material(0x4b2924, { roughness: 1 }));
+  wall.position.set(0, 2.5, -5.2);
+  wall.receiveShadow = true;
+  scene.add(wall);
+
+  const poster = new THREE.Mesh(
+    new THREE.PlaneGeometry(4.8, 2.4),
+    textureMaterial(canvasTexture('SATURDAY MIX', 'BOMBAY / 1996', '#d8a34b', '#3b1b20')),
+  );
+  poster.position.set(-7.2, 2.35, -5.05);
+  poster.rotation.z = -0.045;
+  scene.add(poster);
+
+  const chart = new THREE.Mesh(
+    new THREE.PlaneGeometry(3.5, 2.1),
+    textureMaterial(canvasTexture('TOP 10', 'RADIO REQUESTS', '#426d66', '#f1d7a8')),
+  );
+  chart.position.set(6.8, 2.55, -5.02);
+  chart.rotation.z = 0.055;
+  scene.add(chart);
+
   const boxGroup = new THREE.Group();
   boxGroup.rotation.y = -0.12;
-  boxGroup.position.y = -0.45;
+  boxGroup.position.set(0.75, -0.42, 0.15);
   scene.add(boxGroup);
 
   boxGroup.add(box(8, 0.3, 5, COLORS.cardboardDark, [0, -2.05, 0]));
@@ -288,25 +315,77 @@ export function createBoxScene(
   const tapeRoots: THREE.Group[] = [];
   songs.forEach((song, index) => {
     const cassette = createCassette(song.title, song.genre);
-    const column = index % 7;
-    const row = Math.floor(index / 7);
-    cassette.group.scale.setScalar(0.58);
-    cassette.group.position.set(-2.8 + column * 0.92, -0.5 + row * 0.55, 0.6 - row * 1.05);
-    cassette.group.rotation.set(-0.18 + row * 0.08, (column - 3) * 0.045, ((index % 3) - 1) * 0.08);
+    if (index < 8) {
+      const column = index % 4;
+      const row = Math.floor(index / 4);
+      cassette.group.scale.setScalar(0.56);
+      cassette.group.position.set(-2.45 + column * 1.65, -0.48 + row * 0.62, 0.62 - row * 1.22);
+      cassette.group.rotation.set(-0.15 + row * 0.07, (column - 1.5) * 0.07, ((index % 3) - 1) * 0.07);
+      boxGroup.add(cassette.group);
+    } else {
+      const floorLayouts: Array<[[number, number, number], [number, number, number], number]> = [
+        [[-6.6, -2.02, 1.5], [-1.4, 0.2, -0.34], 0.72],
+        [[-4.9, -2.08, -1.9], [-1.5, -0.2, 0.42], 0.68],
+        [[-2.7, -2.04, 3.15], [-1.34, 0.08, 0.18], 0.7],
+        [[5.25, -2.05, 2.2], [-1.46, -0.08, -0.42], 0.72],
+        [[6.8, -2.03, -0.8], [-1.35, 0.2, 0.3], 0.65],
+        [[3.6, -2.07, -3.25], [-1.48, -0.1, -0.16], 0.7],
+      ];
+      const [position, rotation, scale] = floorLayouts[index - 8];
+      cassette.group.scale.setScalar(scale);
+      cassette.group.position.set(...position);
+      cassette.group.rotation.set(...rotation);
+      scene.add(cassette.group);
+    }
     cassette.group.userData.home = cassette.group.position.clone();
     cassette.group.userData.rotationHome = cassette.group.rotation.clone();
-    boxGroup.add(cassette.group);
     tapeRoots.push(cassette.group);
   });
 
   const floor = new THREE.Mesh(
     new THREE.PlaneGeometry(30, 18, 6, 4),
-    material(0x0a2026, { roughness: 1 }),
+    material(0x4a2c24, { roughness: 1 }),
   );
   floor.rotation.x = -Math.PI / 2;
   floor.position.y = -2.24;
   floor.receiveShadow = true;
   scene.add(floor);
+
+  const rug = new THREE.Mesh(
+    new THREE.PlaneGeometry(15, 7),
+    material(0x9a4d31, { roughness: 1 }),
+  );
+  rug.rotation.x = -Math.PI / 2;
+  rug.rotation.z = -0.03;
+  rug.position.set(0.4, -2.2, 0.7);
+  scene.add(rug);
+  for (let stripe = -3; stripe <= 3; stripe++) {
+    const line = box(13.5, 0.03, 0.13, stripe % 2 ? 0xd59a47 : 0x4b6f68, [0.4, -2.18, stripe * 0.78]);
+    scene.add(line);
+  }
+
+  const television = new THREE.Group();
+  television.position.set(-7.3, -0.85, -2.7);
+  television.rotation.y = 0.12;
+  television.add(box(3.2, 2.5, 1.8, 0x34302d, [0, 0, 0]));
+  television.add(box(2.35, 1.55, 0.08, 0x19272b, [-0.18, 0.2, 0.94]));
+  television.add(box(0.35, 0.35, 0.16, 0xd1963e, [1.18, -0.52, 0.98]));
+  scene.add(television);
+
+  const notebooks = new THREE.Group();
+  notebooks.position.set(6.7, -1.82, -2.25);
+  notebooks.rotation.y = -0.28;
+  [0x315b74, 0xb76b3c, 0xd4bd72].forEach((color, index) => {
+    notebooks.add(box(2.7, 0.18, 1.7, color, [0, index * 0.21, 0]));
+  });
+  scene.add(notebooks);
+
+  const bat = new THREE.Group();
+  bat.position.set(7.6, -0.5, 1.3);
+  bat.rotation.set(0.06, 0, -0.52);
+  bat.add(box(0.62, 3.6, 0.22, 0xb9874f, [0, 0, 0]));
+  bat.add(box(0.25, 1.55, 0.2, 0x55312a, [0, 2.45, 0]));
+  scene.add(bat);
 
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -379,6 +458,10 @@ export function createBoxScene(
   });
 
   const dispose = animateScene(renderer, scene, camera, resize, (time) => {
+    const aspect = canvas.clientWidth / Math.max(canvas.clientHeight, 1);
+    const cameraScale = Math.max(1, 1.45 / aspect);
+    camera.position.set(8.8 * cameraScale, 6.6 * cameraScale, 13.8 * cameraScale);
+    camera.lookAt(0, -0.7, 0);
     boxGroup.rotation.y += (pointerX * 0.18 - 0.12 - boxGroup.rotation.y) * 0.06;
     boxGroup.rotation.x += (-pointerY * 0.08 - boxGroup.rotation.x) * 0.06;
     boxGroup.position.y = -0.45 + Math.sin(time * 0.8) * 0.025;
@@ -388,95 +471,97 @@ export function createBoxScene(
 
 export function createPlayerScene(canvas: HTMLCanvasElement) {
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(31, 1, 0.1, 100);
-  camera.position.set(6.4, 2.5, 19);
-  camera.lookAt(0, 0.35, 0);
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+  camera.position.set(4.8, 2.2, 19.5);
+  camera.lookAt(0, 0.15, 0);
   const { renderer, resize } = setupRenderer(canvas);
   addLighting(scene);
 
   const rig = new THREE.Group();
   rig.rotation.set(-0.025, -0.08, -0.015);
-  rig.position.set(-0.15, -0.35, 0);
+  rig.position.set(-0.12, -0.25, 0);
   scene.add(rig);
 
-  const body = box(6.25, 8.1, 1.24, COLORS.blue, [0, 0, 0]);
+  const body = box(7.15, 7.45, 1.28, COLORS.blue, [0, 0, 0]);
   rig.add(body);
-  rig.add(box(5.95, 7.8, 1.3, COLORS.blueDark, [0.12, -0.08, -0.05]));
-  rig.add(box(5.78, 7.55, 1.38, COLORS.blue, [-0.08, 0.08, 0.02]));
-  rig.add(box(5.55, 0.12, 1.45, COLORS.orange, [0, 2.42, 0.08]));
+  rig.add(box(6.86, 7.15, 1.34, COLORS.blueDark, [0.12, -0.08, -0.05]));
+  rig.add(box(6.68, 6.9, 1.42, COLORS.blue, [-0.08, 0.08, 0.02]));
+  rig.add(box(6.4, 0.12, 1.48, COLORS.orange, [0, 2.15, 0.08]));
 
   for (let index = 0; index < 4; index++) {
-    rig.add(box(index === 0 ? 1.12 : 0.72, 0.32, 0.9, index === 0 ? COLORS.orange : COLORS.metal, [-2.1 + index * 1.2, 4.18, 0]));
+    rig.add(box(1.15, 0.36, 0.95, index === 1 ? COLORS.orange : COLORS.metal, [-2.35 + index * 1.55, 3.9, 0]));
   }
-  rig.add(box(0.24, 5.6, 1.45, COLORS.metal, [3.18, 0.18, 0]));
+  rig.add(box(0.26, 5.1, 1.48, COLORS.metal, [3.63, 0.05, 0]));
 
   const brand = new THREE.Mesh(
     new THREE.PlaneGeometry(2.3, 0.72),
     textureMaterial(canvasTexture('SUBWAVE', 'TPS-14', '#416d88', '#edf0d7'), true),
   );
-  brand.position.set(-1.35, 3.13, 0.73);
+  brand.position.set(-1.65, 2.85, 0.76);
   rig.add(brand);
 
-  const windowFrame = box(4.25, 3.45, 0.28, COLORS.dark, [0, 0.2, 0.72]);
+  const windowFrame = box(4.9, 3.65, 0.28, COLORS.dark, [0, 0.05, 0.75]);
   rig.add(windowFrame);
-  const windowGlass = box(3.72, 2.9, 0.12, COLORS.glass, [0, 0.2, 0.9]);
+  const windowGlass = box(4.35, 3.08, 0.12, COLORS.glass, [0, 0.05, 0.92]);
   (windowGlass.material as THREE.MeshStandardMaterial).transparent = true;
   (windowGlass.material as THREE.MeshStandardMaterial).opacity = 0.72;
   rig.add(windowGlass);
 
   const cassette = createCassette('no tape');
-  cassette.group.scale.setScalar(0.94);
-  cassette.group.position.set(0, 0.1, 1.05);
+  cassette.group.scale.setScalar(1.04);
+  cassette.group.position.set(0, -0.02, 1.08);
   cassette.group.visible = false;
   rig.add(cassette.group);
 
   const controls = new THREE.Group();
-  controls.position.set(0, -3.06, 0.78);
-  controls.add(box(1.75, 0.1, 0.12, 0xb8c8c1, [-1.15, 0, 0]));
-  controls.add(box(0.5, 0.18, 0.16, COLORS.orange, [0.42, 0, 0]));
-  controls.add(box(1.55, 0.1, 0.12, 0xb8c8c1, [1.48, 0, 0]));
+  controls.position.set(0, -2.92, 0.8);
+  controls.add(box(2.15, 0.1, 0.12, 0xb8c8c1, [-1.35, 0, 0]));
+  controls.add(box(0.62, 0.18, 0.16, COLORS.orange, [0.35, 0, 0]));
+  controls.add(box(1.85, 0.1, 0.12, 0xb8c8c1, [1.6, 0, 0]));
   rig.add(controls);
 
   const headphoneGroup = new THREE.Group();
   const curve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-3.75, -1.15, -0.45),
-    new THREE.Vector3(-3.7, 3.4, -0.5),
-    new THREE.Vector3(0, 5.75, -0.65),
-    new THREE.Vector3(3.7, 3.4, -0.5),
-    new THREE.Vector3(3.75, -1.15, -0.45),
+    new THREE.Vector3(-4.2, -1.0, -0.45),
+    new THREE.Vector3(-4.1, 3.35, -0.5),
+    new THREE.Vector3(0, 5.5, -0.65),
+    new THREE.Vector3(4.1, 3.35, -0.5),
+    new THREE.Vector3(4.2, -1.0, -0.45),
   ]);
   const band = new THREE.Mesh(
     new THREE.TubeGeometry(curve, 14, 0.18, 6, false),
     material(COLORS.metal, { metalness: 0.2 }),
   );
   headphoneGroup.add(band);
-  for (const x of [-3.72, 3.72]) {
+  for (const x of [-4.18, 4.18]) {
     const ear = new THREE.Mesh(
       new THREE.CapsuleGeometry(0.5, 1.35, 2, 6),
       material(COLORS.orange),
     );
-    ear.position.set(x, -1.15, 0);
+    ear.position.set(x, -1.0, 0);
     ear.rotation.z = x < 0 ? 0.12 : -0.12;
     headphoneGroup.add(ear);
   }
   rig.add(headphoneGroup);
 
   const cableCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(3.78, -1.8, -0.15),
-    new THREE.Vector3(4.25, -3.8, -0.3),
-    new THREE.Vector3(4.1, -5.8, -0.6),
-    new THREE.Vector3(3.3, -7.2, -0.8),
+    new THREE.Vector3(4.2, -1.65, -0.15),
+    new THREE.Vector3(4.7, -3.4, -0.3),
+    new THREE.Vector3(4.35, -5.3, -0.6),
+    new THREE.Vector3(3.5, -6.7, -0.8),
   ]);
   rig.add(new THREE.Mesh(new THREE.TubeGeometry(cableCurve, 8, 0.08, 5, false), material(COLORS.dark)));
 
   let playing = false;
   const dispose = animateScene(renderer, scene, camera, resize, (time, delta) => {
     const aspect = canvas.clientWidth / Math.max(canvas.clientHeight, 1);
-    const cameraScale = Math.max(1, 0.8 / aspect);
-    camera.position.set(6.4 * cameraScale, 2.5 * cameraScale, 19 * cameraScale);
-    camera.lookAt(0, 0.35, 0);
+    const cameraScale = Math.max(1, 0.86 / aspect);
+    camera.position.set(4.8 * cameraScale, 2.2 * cameraScale, 19.5 * cameraScale);
+    camera.lookAt(0, 0.15, 0);
     rig.position.y = Math.sin(time * 0.7) * 0.04;
-    if (playing) cassette.reels.forEach((reel) => { reel.rotation.y += delta * 9; });
+    if (playing) {
+      cassette.reels.forEach((reel) => { reel.rotation.z -= delta * 9; });
+    }
   });
 
   return {
