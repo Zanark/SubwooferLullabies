@@ -113,6 +113,169 @@ function canvasTexture(
   return texture;
 }
 
+type MoviePosterKind = 'web' | 'masala' | 'campus' | 'rogue' | 'three';
+
+function moviePosterTexture(kind: MoviePosterKind, title: string, subtitle: string) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 160;
+  canvas.height = 240;
+  const context = canvas.getContext('2d');
+  if (!context) throw new Error('Movie poster context unavailable.');
+  context.imageSmoothingEnabled = false;
+
+  const palette = {
+    web: ['#182833', '#7a8d94', '#a9362d', '#d3d6c7'],
+    masala: ['#d94f24', '#f0ad31', '#26342c', '#f4e5ad'],
+    campus: ['#d8dfd2', '#725b4c', '#315e55', '#f6f0d7'],
+    rogue: ['#8c672f', '#d1a552', '#211b1a', '#b32625'],
+    three: ['#ddaa37', '#f0d56b', '#2b3a37', '#ce493b'],
+  }[kind];
+  context.fillStyle = palette[0];
+  context.fillRect(0, 0, 160, 240);
+  for (let index = 0; index < 90; index++) {
+    context.fillStyle = index % 3 ? `${palette[1]}22` : `${palette[3]}18`;
+    context.fillRect((index * 37) % 160, (index * 61) % 205, 2 + index % 5, 1 + index % 3);
+  }
+
+  if (kind === 'web') {
+    context.fillStyle = '#263944';
+    for (let x = 0; x < 160; x += 18) context.fillRect(x, 116 - x % 28, 14, 89 + x % 28);
+    context.strokeStyle = '#a7b8bb';
+    context.lineWidth = 2;
+    for (let x = 8; x < 160; x += 19) {
+      context.beginPath();
+      context.moveTo(x, 0);
+      context.lineTo(x - 18, 185);
+      context.stroke();
+    }
+    const drawCrawler = (x: number, color: string, mirrored: boolean) => {
+      context.save();
+      context.translate(x, 88);
+      context.scale(mirrored ? -1 : 1, 1);
+      context.fillStyle = color;
+      context.fillRect(-8, -17, 16, 21);
+      context.fillRect(-6, -27, 12, 12);
+      context.fillRect(-20, -12, 14, 6);
+      context.fillRect(7, -8, 24, 6);
+      context.fillRect(-17, 2, 14, 7);
+      context.fillRect(5, 3, 18, 7);
+      context.strokeStyle = '#d8ddd4';
+      context.lineWidth = 1;
+      for (let line = -5; line <= 5; line += 5) {
+        context.beginPath();
+        context.moveTo(line, -26);
+        context.lineTo(line * 2, 4);
+        context.stroke();
+      }
+      context.restore();
+    };
+    drawCrawler(96, palette[2], false);
+    drawCrawler(47, '#171c20', true);
+  } else if (kind === 'masala') {
+    context.fillStyle = palette[1];
+    for (let ring = 0; ring < 7; ring++) {
+      context.beginPath();
+      context.arc(80, 78, 16 + ring * 15, 0, Math.PI * 2);
+      context.globalAlpha = 0.12;
+      context.fill();
+    }
+    context.globalAlpha = 1;
+    context.fillStyle = palette[2];
+    context.fillRect(31, 56, 28, 72);
+    context.fillRect(99, 48, 28, 80);
+    context.fillRect(35, 37, 20, 22);
+    context.fillRect(103, 29, 20, 22);
+    context.fillStyle = '#eee3bf';
+    context.fillRect(103, 52, 20, 60);
+    context.fillStyle = '#6d271d';
+    for (let dancer = 0; dancer < 5; dancer++) {
+      context.fillRect(30 + dancer * 23, 139 + dancer % 2 * 8, 11, 37);
+      context.fillRect(27 + dancer * 23, 132 + dancer % 2 * 8, 17, 9);
+    }
+  } else if (kind === 'campus') {
+    context.fillStyle = '#eef0e5';
+    context.fillRect(0, 0, 160, 184);
+    context.fillStyle = '#a68268';
+    context.fillRect(52, 27, 56, 82);
+    context.fillStyle = '#332822';
+    context.fillRect(58, 18, 44, 23);
+    context.fillStyle = '#1b2523';
+    context.fillRect(67, 55, 7, 7);
+    context.fillRect(87, 55, 7, 7);
+    context.fillRect(73, 80, 19, 4);
+    context.fillStyle = palette[2];
+    context.fillRect(17, 107, 23, 55);
+    context.fillRect(120, 101, 23, 61);
+    context.fillStyle = '#d8d4c1';
+    context.fillRect(20, 89, 17, 20);
+    context.fillRect(123, 83, 17, 20);
+    for (let line = 0; line < 6; line++) {
+      context.fillStyle = line % 2 ? '#b7c1b7' : '#d8dcd4';
+      context.fillRect(0, 12 + line * 27, 46, 5);
+      context.fillRect(114, 8 + line * 29, 46, 5);
+    }
+  } else if (kind === 'rogue') {
+    context.fillStyle = '#b98b43';
+    for (let line = 0; line < 13; line++) {
+      context.fillStyle = line % 2 ? '#71452155' : '#d8b65b44';
+      context.fillRect(6, 8 + line * 14, 148, 3);
+    }
+    context.fillStyle = '#181718';
+    context.fillRect(30, 47, 48, 115);
+    context.fillRect(84, 61, 43, 101);
+    context.fillRect(38, 28, 31, 28);
+    context.fillRect(91, 37, 29, 28);
+    context.fillStyle = '#d8b56b';
+    context.fillRect(39, 42, 29, 8);
+    context.fillStyle = '#050505';
+    context.fillRect(40, 37, 12, 7);
+    context.fillRect(55, 37, 12, 7);
+    context.fillStyle = '#8f2522';
+    context.fillRect(84, 148, 62, 10);
+  } else {
+    context.fillStyle = '#edcf64';
+    for (let line = 0; line < 12; line++) context.fillRect(0, 13 + line * 16, 160, 2);
+    context.strokeStyle = '#96702c';
+    context.lineWidth = 2;
+    for (let scribble = 0; scribble < 12; scribble++) {
+      context.beginPath();
+      context.moveTo((scribble * 31) % 150, 12 + (scribble * 47) % 150);
+      context.lineTo((scribble * 53) % 150, 18 + (scribble * 29) % 150);
+      context.stroke();
+    }
+    ['#c93f37', '#2d71a8', '#4f9b48'].forEach((color, index) => {
+      const x = 24 + index * 49;
+      context.fillStyle = color;
+      context.fillRect(x, 123, 29, 43);
+      context.fillRect(x - 5, 115, 39, 15);
+      context.fillStyle = palette[2];
+      context.fillRect(x + 7, 76, 15, 40);
+      context.fillRect(x + 3, 66, 23, 17);
+      context.fillRect(x - 3, 87, 35, 8);
+    });
+  }
+
+  context.fillStyle = 'rgba(7,10,11,.9)';
+  context.fillRect(0, 184, 160, 56);
+  context.fillStyle = palette[3];
+  context.font = title.length > 13 ? '700 13px monospace' : '700 16px monospace';
+  context.textAlign = 'center';
+  context.fillText(title.toUpperCase(), 80, 207);
+  context.fillStyle = palette[1];
+  context.font = '700 7px monospace';
+  context.fillText(subtitle.toUpperCase(), 80, 221);
+  context.strokeStyle = palette[2];
+  context.lineWidth = 4;
+  context.strokeRect(2, 2, 156, 236);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.magFilter = THREE.NearestFilter;
+  texture.minFilter = THREE.NearestFilter;
+  texture.userData.owned = true;
+  return texture;
+}
+
 function textureMaterial(texture: THREE.Texture, transparent = false) {
   return new THREE.MeshBasicMaterial({
     map: texture,
@@ -485,6 +648,19 @@ export function createBoxScene(
   camera.position.set(0, 8, 17);
   camera.lookAt(0, -0.85, 0);
   const { renderer, resize } = setupRenderer(canvas);
+  const darknessMaterial = new THREE.MeshBasicMaterial({
+    color: 0x010204,
+    transparent: true,
+    opacity: 0.42,
+    depthTest: false,
+    depthWrite: false,
+  });
+  const darknessVeil = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), darknessMaterial);
+  darknessVeil.position.z = -0.2;
+  darknessVeil.renderOrder = 900;
+  darknessVeil.frustumCulled = false;
+  camera.add(darknessVeil);
+  scene.add(camera);
   const nightAmbient = new THREE.HemisphereLight(0x637b86, 0x1b1014, 0.88);
   scene.add(nightAmbient);
   const moonlight = new THREE.DirectionalLight(0x557a8c, 0.95);
@@ -500,15 +676,17 @@ export function createBoxScene(
   wall.receiveShadow = true;
   scene.add(wall);
 
-  const posterLayouts: Array<[string, string, string, string, number, number, number, number, number]> = [
-    ['INDIE NIGHT', 'BANGALORE / 2010', '#d8a34b', '#3b1b20', -7.1, 2.5, 3.9, 2.2, -0.065],
-    ['LAN PARTY', 'FRIDAY / 10 PM', '#426d66', '#f1d7a8', 0.1, 3.0, 3.2, 1.9, 0.045],
-    ['MIXTAPE BLOG', 'NEW POST DAILY', '#31556c', '#ead59d', 6.7, 2.4, 3.9, 2.25, -0.035],
+  const posterLayouts: Array<[MoviePosterKind, string, string, number, number, number, number, number]> = [
+    ['web', 'web of two', 'rain city double feature', -8.3, 1.7, 1.75, 2.3, -0.045],
+    ['masala', 'double fire', '70s masala re-run', -4.55, 1.78, 1.72, 2.25, 0.04],
+    ['campus', 'campus return', 'comedy night', -0.85, 1.76, 1.72, 2.25, -0.025],
+    ['rogue', 'city rogue', 'sepia action matinee', 5.55, 1.76, 1.72, 2.25, 0.035],
+    ['three', 'three backlogs', 'hostel comedy', 8.5, 1.7, 1.75, 2.3, -0.04],
   ];
-  posterLayouts.forEach(([title, subtitle, background, foreground, x, y, width, height, rotation]) => {
+  posterLayouts.forEach(([kind, title, subtitle, x, y, width, height, rotation]) => {
     const poster = new THREE.Mesh(
       new THREE.PlaneGeometry(width, height),
-      textureMaterial(canvasTexture(title, subtitle, background, foreground)),
+      textureMaterial(moviePosterTexture(kind, title, subtitle)),
     );
     poster.position.set(x, y, -4.65);
     poster.rotation.z = rotation;
@@ -525,7 +703,7 @@ export function createBoxScene(
 
   function createWallSwitch(label: string, kind: WallSwitch['kind'], x: number, initialState: boolean) {
     const group = new THREE.Group();
-    group.position.set(x, 1.15, -4.55);
+    group.position.set(x, -0.25, -4.55);
     group.add(box(0.92, 1.35, 0.16, 0xd5c6a2, [0, 0, 0]));
     group.add(box(0.72, 1.12, 0.09, 0x8f826b, [0, 0, 0.12]));
     const rocker = box(0.42, 0.62, 0.2, 0x2f3535, [0, -0.05, 0.23]);
@@ -534,9 +712,11 @@ export function createBoxScene(
       emissive: initialState ? 0xff6d24 : 0x000000,
       emissiveIntensity: initialState ? 1.8 : 0,
       roughness: 0.45,
+      transparent: true,
     });
     const indicatorMesh = new THREE.Mesh(new THREE.SphereGeometry(0.09, 6, 4), indicator);
     indicatorMesh.position.set(0, 0.43, 0.23);
+    indicatorMesh.renderOrder = 1000;
     group.add(indicatorMesh);
     const labelMesh = new THREE.Mesh(
       new THREE.PlaneGeometry(0.72, 0.24),
@@ -674,11 +854,9 @@ export function createBoxScene(
   crtTexture.colorSpace = THREE.SRGBColorSpace;
   crtTexture.magFilter = THREE.NearestFilter;
   crtTexture.minFilter = THREE.NearestFilter;
-  const crtScreen = new THREE.Mesh(
-    crtGlassGeometry(4.12, 2.94),
-    textureMaterial(crtTexture),
-  );
+  const crtScreen = new THREE.Mesh(crtGlassGeometry(4.12, 2.94), textureMaterial(crtTexture, true));
   crtScreen.position.set(-0.38, 0.25, 1.72);
+  crtScreen.renderOrder = 1000;
   television.add(crtScreen);
   const glassHighlight = new THREE.Mesh(
     crtGlassGeometry(4.14, 2.96),
@@ -693,6 +871,7 @@ export function createBoxScene(
     }),
   );
   glassHighlight.position.set(-0.38, 0.25, 1.745);
+  glassHighlight.renderOrder = 1001;
   television.add(glassHighlight);
   scene.add(television);
 
@@ -728,15 +907,18 @@ export function createBoxScene(
   });
   const crtWallGlow = new THREE.Mesh(new THREE.PlaneGeometry(6.8, 5.1), crtWallGlowMaterial);
   crtWallGlow.position.set(-5.5, 0.35, -4.62);
+  crtWallGlow.renderOrder = 950;
   scene.add(crtWallGlow);
   const crtDeskGlowMaterial = crtWallGlowMaterial.clone();
   const crtDeskGlow = new THREE.Mesh(new THREE.PlaneGeometry(6.2, 4.0), crtDeskGlowMaterial);
   crtDeskGlow.position.set(-3.55, -1.82, 0.72);
   crtDeskGlow.rotation.x = -Math.PI / 2;
+  crtDeskGlow.renderOrder = 951;
   scene.add(crtDeskGlow);
   const crtScreenGlowMaterial = crtWallGlowMaterial.clone();
   const crtScreenGlow = new THREE.Mesh(new THREE.PlaneGeometry(5.05, 3.72), crtScreenGlowMaterial);
   crtScreenGlow.position.set(-0.38, 0.25, 1.695);
+  crtScreenGlow.renderOrder = 952;
   television.add(crtScreenGlow);
 
   const books = new THREE.Group();
@@ -789,17 +971,17 @@ export function createBoxScene(
   );
   lampShade.position.set(1.03, 2.63, 0);
   lampShade.rotation.z = -0.62;
-  const bulb = new THREE.Mesh(
-    new THREE.SphereGeometry(0.28, 7, 5),
-    new THREE.MeshStandardMaterial({
-      color: 0xffd991,
-      emissive: 0xff9b42,
-      emissiveIntensity: 2.6,
-      roughness: 0.3,
-      flatShading: true,
-    }),
-  );
+  const bulbMaterial = new THREE.MeshStandardMaterial({
+    color: 0xffd991,
+    emissive: 0xff9b42,
+    emissiveIntensity: 2.6,
+    roughness: 0.3,
+    flatShading: true,
+    transparent: true,
+  });
+  const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.28, 7, 5), bulbMaterial);
   bulb.position.set(1.25, 2.31, 0);
+  bulb.renderOrder = 1000;
   lamp.add(lampBase, lampStem, lampArm, lampShade, bulb);
   scene.add(lamp);
 
@@ -1207,11 +1389,17 @@ export function createBoxScene(
     const cameraScale = Math.max(1, 1.72 / aspect);
     camera.position.set(pointerX * 0.4, 8 * cameraScale - pointerY * 0.16, 17 * cameraScale);
     camera.lookAt(0, -0.85, 0);
+    const veilDistance = Math.abs(darknessVeil.position.z);
+    const veilHeight = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5)) * veilDistance;
+    darknessVeil.scale.set(veilHeight * camera.aspect, veilHeight, 1);
+    const darknessTarget = roomLightOn ? 0 : lampOn ? 0.48 : 0.7;
+    darknessMaterial.opacity += (darknessTarget - darknessMaterial.opacity) * 0.14;
+    nightAmbient.intensity += ((roomLightOn ? 0.88 : 0.13) - nightAmbient.intensity) * 0.12;
+    moonlight.intensity += ((roomLightOn ? 0.95 : 0.08) - moonlight.intensity) * 0.12;
     roomLight.intensity += ((roomLightOn ? 13 : 0) - roomLight.intensity) * 0.12;
     lampLight.intensity += ((lampOn ? 34 : 0) - lampLight.intensity) * 0.16;
     lampGlow.intensity += ((lampOn ? 5.5 : 0) - lampGlow.intensity) * 0.16;
     lampShadeMaterial.emissiveIntensity += ((lampOn ? 0.7 : 0.03) - lampShadeMaterial.emissiveIntensity) * 0.18;
-    const bulbMaterial = bulb.material as THREE.MeshStandardMaterial;
     bulbMaterial.emissiveIntensity += ((lampOn ? 2.6 : 0.04) - bulbMaterial.emissiveIntensity) * 0.18;
     const crtPulse = crtPlaying ? 0.96 + Math.sin(time * 47) * 0.018 + smoothedEnergy * 0.12 : 1;
     crtSpill.intensity = (crtCover ? (crtPlaying ? 22 + smoothedEnergy * 12 : 16) : 5.5) * crtPulse;
@@ -1269,6 +1457,7 @@ export function createBoxScene(
       crtWallGlowMaterial.dispose();
       crtDeskGlowMaterial.dispose();
       crtScreenGlowMaterial.dispose();
+      darknessMaterial.dispose();
       disposeAnimation();
     },
   };
