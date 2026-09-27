@@ -781,7 +781,22 @@ export function createBoxScene(
   scene.add(tapeGroup);
 
   const tapeRoots: THREE.Group[] = [];
+  const tapeByTitle = new Map<string, THREE.Group>();
   const searchSpotlights = new Map<THREE.Group, THREE.Group>();
+  const activeTapeGlowCanvas = document.createElement('canvas');
+  activeTapeGlowCanvas.width = 96;
+  activeTapeGlowCanvas.height = 96;
+  const activeTapeGlowContext = activeTapeGlowCanvas.getContext('2d');
+  if (!activeTapeGlowContext) throw new Error('Cassette glow context unavailable.');
+  const activeTapeGlowGradient = activeTapeGlowContext.createRadialGradient(48, 48, 4, 48, 48, 48);
+  activeTapeGlowGradient.addColorStop(0, 'rgba(255,255,255,.95)');
+  activeTapeGlowGradient.addColorStop(0.32, 'rgba(255,255,255,.58)');
+  activeTapeGlowGradient.addColorStop(1, 'rgba(255,255,255,0)');
+  activeTapeGlowContext.fillStyle = activeTapeGlowGradient;
+  activeTapeGlowContext.fillRect(0, 0, 96, 96);
+  const activeTapeGlowTexture = new THREE.CanvasTexture(activeTapeGlowCanvas);
+  let activeTape: THREE.Group | null = null;
+  let activeTapePlaying = false;
   const cassetteLayouts: Array<[[number, number, number], [number, number, number], number]> = [
     [[0.05, -1.775, -1.2], [-Math.PI / 2, 0, -0.32], 0.44],
     [[1.62, -1.77, -0.72], [-Math.PI / 2, 0, 0.21], 0.44],
@@ -812,7 +827,36 @@ export function createBoxScene(
     cassette.group.userData.home = cassette.group.position.clone();
     cassette.group.userData.rotationHome = cassette.group.rotation.clone();
     cassette.group.userData.cover = song.cover;
+    const glowMaterial = new THREE.MeshBasicMaterial({
+      map: activeTapeGlowTexture,
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide,
+    });
+    const glow = new THREE.Mesh(new THREE.PlaneGeometry(2.9, 2.35), glowMaterial);
+    glow.rotation.x = -Math.PI / 2;
+    glow.position.set(cassette.group.position.x, -1.86, cassette.group.position.z);
+    glow.renderOrder = 954;
+    scene.add(glow);
+    const shellMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide,
+    });
+    const shell = new THREE.Mesh(new THREE.BoxGeometry(3.58, 2.34, 0.44), shellMaterial);
+    shell.renderOrder = 955;
+    cassette.group.add(shell);
+    cassette.group.userData.activeGlow = glow;
+    cassette.group.userData.activeGlowMaterial = glowMaterial;
+    cassette.group.userData.activeGlowShellMaterial = shellMaterial;
     tapeRoots.push(cassette.group);
+    tapeByTitle.set(song.title, cassette.group);
   });
 
   function clearSearchSpotlights() {
@@ -1131,6 +1175,35 @@ export function createBoxScene(
     crtGlow.color.copy(crtLightColor);
     crtDeskGlowMaterial.color.copy(crtLightColor);
     crtScreenGlowMaterial.color.copy(crtLightColor);
+  }
+
+  function updateActiveTapeColor(image: CanvasImageSource) {
+    if (!activeTape) return;
+    const sample = document.createElement('canvas');
+    sample.width = 10;
+    sample.height = 10;
+    const context = sample.getContext('2d', { willReadFrequently: true });
+    if (!context) return;
+    context.drawImage(image, 0, 0, sample.width, sample.height);
+    const pixels = context.getImageData(0, 0, sample.width, sample.height).data;
+    const color = new THREE.Color();
+    const hsl = { h: 0, s: 0, l: 0 };
+    let bestWeight = 0;
+    let bestColor = new THREE.Color(0xf0a95c);
+    for (let index = 0; index < pixels.length; index += 4) {
+      const alpha = pixels[index + 3] / 255;
+      color.setRGB(pixels[index] / 255, pixels[index + 1] / 255, pixels[index + 2] / 255);
+      color.getHSL(hsl);
+      const weight = alpha * hsl.s * (0.35 + hsl.l);
+      if (weight > bestWeight) {
+        bestWeight = weight;
+        bestColor = color.clone();
+      }
+    }
+    bestColor.getHSL(hsl);
+    bestColor.setHSL(hsl.h, Math.max(0.72, hsl.s), THREE.MathUtils.clamp(hsl.l * 1.35, 0.52, 0.7));
+    (activeTape.userData.activeGlowMaterial as THREE.MeshBasicMaterial).color.copy(bestColor);
+    (activeTape.userData.activeGlowShellMaterial as THREE.MeshBasicMaterial).color.copy(bestColor);
   }
 
   function averageBand(start: number, end: number) {
@@ -1686,6 +1759,16 @@ export function createBoxScene(
       1,
       (crtCover ? (crtPlaying ? 0.72 + smoothedEnergy * 0.12 : 0.48) : 0.12) * crtPulse,
     );
+    tapeRoots.forEach((tape) => {
+      const glow = tape.userData.activeGlow as THREE.Mesh;
+      const glowMaterial = tape.userData.activeGlowMaterial as THREE.MeshBasicMaterial;
+      const shellMaterial = tape.userData.activeGlowShellMaterial as THREE.MeshBasicMaterial;
+      glow.position.x = tape.position.x;
+      glow.position.z = tape.position.z;
+      const targetOpacity = tape === activeTape && activeTapePlaying ? 0.92 : 0;
+      glowMaterial.opacity += (targetOpacity - glowMaterial.opacity) * 0.18;
+      shellMaterial.opacity += ((targetOpacity > 0 ? 0.3 : 0) - shellMaterial.opacity) * 0.18;
+    });
     tapeRoots.forEach((tape, index) => {
       if (!tape.userData.searchMatch || tape === pressed) return;
       const home = tape.userData.home as THREE.Vector3;
@@ -1707,11 +1790,14 @@ export function createBoxScene(
     async setTrack(song: VisualSong) {
       const cover = await loadCoverTexture(song.cover);
       crtCover = cover.image as CanvasImageSource;
+      activeTape = tapeByTitle.get(song.title) ?? null;
+      updateActiveTapeColor(crtCover);
       updateCrtLightColor(crtCover);
       drawCrt(performance.now() / 1000);
     },
     setPlaying(active: boolean) {
       crtPlaying = active;
+      activeTapePlaying = active;
     },
     setAnalyser(analyser: AnalyserNode) {
       audioAnalyser = analyser;
@@ -1734,6 +1820,14 @@ export function createBoxScene(
       clearSearchSpotlights();
       crtTexture.dispose();
       crtGlowTexture.dispose();
+      activeTapeGlowTexture.dispose();
+      tapeRoots.forEach((tape) => {
+        const glow = tape.userData.activeGlow as THREE.Mesh | undefined;
+        if (glow) {
+          scene.remove(glow);
+          disposeObject(glow);
+        }
+      });
       crtDeskGlowMaterial.dispose();
       crtScreenGlowMaterial.dispose();
       darknessMaterial.dispose();
