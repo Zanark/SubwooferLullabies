@@ -132,6 +132,36 @@ function canvasTexture(
   return texture;
 }
 
+function roomPlaqueTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 384;
+  canvas.height = 128;
+  const context = canvas.getContext('2d');
+  if (!context) throw new Error('Room plaque context unavailable.');
+  context.imageSmoothingEnabled = false;
+  context.fillStyle = '#8b5535';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  for (let y = 0; y < canvas.height; y += 16) {
+    context.fillStyle = y % 32 === 0 ? '#a56b43' : '#77452f';
+    context.fillRect(0, y, canvas.width, 5);
+  }
+  context.strokeStyle = '#3c241e';
+  context.lineWidth = 9;
+  context.strokeRect(8, 8, canvas.width - 16, canvas.height - 16);
+  context.fillStyle = '#ead7a4';
+  context.font = '700 47px "Segoe Print", "Comic Sans MS", cursive';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.rotate(-0.018);
+  context.fillText("Zanark's room", canvas.width / 2 - 1, canvas.height / 2 + 3);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.magFilter = THREE.NearestFilter;
+  texture.minFilter = THREE.NearestFilter;
+  texture.userData.owned = true;
+  return texture;
+}
+
 type MoviePosterKind = 'web' | 'masala' | 'campus' | 'rogue' | 'three';
 
 function moviePosterTexture(kind: MoviePosterKind, title: string, subtitle: string) {
@@ -698,42 +728,38 @@ export function createBoxScene(
   wall.receiveShadow = true;
   scene.add(wall);
 
-  const posterLayouts: Array<[MoviePosterKind, string, string, number, number, number, number, number]> = [
-    ['web', 'web of two', 'rain city double feature', -8.8, 1.4, 2.2, 3.3, -0.045],
-    ['masala', 'double fire', '70s masala re-run', -4.45, 1.47, 2.2, 3.3, 0.04],
-    ['campus', 'campus return', 'comedy night', 0, 1.45, 2.2, 3.3, -0.025],
-    ['rogue', 'city rogue', 'sepia action matinee', 4.45, 1.47, 2.2, 3.3, 0.035],
-    ['three', 'three backlogs', 'hostel comedy', 8.8, 1.4, 2.2, 3.3, -0.04],
-  ];
-  const posterTapeMaterial = new THREE.MeshBasicMaterial({
-    color: 0xd7bd78,
-    transparent: true,
-    opacity: 0.78,
-    side: THREE.DoubleSide,
-  });
-  posterLayouts.forEach(([kind, title, subtitle, x, y, width, height, rotation]) => {
-    const mountedPoster = new THREE.Group();
-    mountedPoster.position.set(x, y, -4.65);
-    mountedPoster.rotation.z = rotation;
-    const poster = new THREE.Mesh(
-      new THREE.PlaneGeometry(width, height),
-      textureMaterial(moviePosterTexture(kind, title, subtitle)),
-    );
-    mountedPoster.add(poster);
-    const tapeLayouts: Array<[number, number, number]> = [
-      [-width * 0.43, height * 0.46, -0.52],
-      [width * 0.43, height * 0.46, 0.48],
-      [-width * 0.43, -height * 0.46, 0.44],
-      [width * 0.43, -height * 0.46, -0.5],
-    ];
-    tapeLayouts.forEach(([tapeX, tapeY, tapeRotation]) => {
-      const tape = new THREE.Mesh(new THREE.PlaneGeometry(0.52, 0.17), posterTapeMaterial);
-      tape.position.set(tapeX, tapeY, 0.025);
-      tape.rotation.z = tapeRotation;
-      mountedPoster.add(tape);
-    });
-    scene.add(mountedPoster);
-  });
+  const roomPlaque = new THREE.Group();
+  roomPlaque.position.set(0, 2.15, -4.54);
+  roomPlaque.rotation.z = -0.025;
+  roomPlaque.add(box(5.25, 1.55, 0.2, 0x563426, [0, 0, 0]));
+  const plaqueFace = new THREE.Mesh(
+    new THREE.PlaneGeometry(4.95, 1.28),
+    textureMaterial(roomPlaqueTexture()),
+  );
+  plaqueFace.position.z = 0.115;
+  roomPlaque.add(plaqueFace);
+  for (const x of [-2.25, 2.25]) {
+    const nail = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.08, 6), material(0x7f7769));
+    nail.position.set(x, 0.58, 0.17);
+    nail.rotation.x = Math.PI / 2;
+    roomPlaque.add(nail);
+  }
+  const cord = new THREE.Mesh(
+    new THREE.TubeGeometry(
+      new THREE.CatmullRomCurve3([
+        new THREE.Vector3(-2.18, 0.63, 0.02),
+        new THREE.Vector3(0, 1.65, 0.02),
+        new THREE.Vector3(2.18, 0.63, 0.02),
+      ]),
+      10,
+      0.035,
+      5,
+      false,
+    ),
+    material(0x5b3928),
+  );
+  roomPlaque.add(cord);
+  scene.add(roomPlaque);
 
   type WallSwitch = {
     group: THREE.Group;
