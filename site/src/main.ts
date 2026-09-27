@@ -42,11 +42,18 @@ app.innerHTML = `
   <header class="masthead">
     <div>
       <p class="eyebrow">playable archive / no. 0014</p>
-      <h1>subwoofer<br><span>lullabies</span></h1>
+      <h1>subwoofer <span>lullabies</span></h1>
     </div>
     <div class="mast-actions">
       <p class="mast-copy">fourteen original code-composed tapes.<br>choose one, load it, press play.</p>
       <button id="random-play" class="random-play" type="button" disabled>
+        <svg class="shuffle-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 7h3.7c2.1 0 3.4 1 4.8 3.3l1 1.7c1.3 2.2 2.5 3 4.7 3H21"></path>
+          <path d="m18 12 3 3-3 3"></path>
+          <path d="M3 17h3.7c1.6 0 2.7-.6 3.7-2"></path>
+          <path d="M14 7h3.9H21"></path>
+          <path d="m18 4 3 3-3 3"></path>
+        </svg>
         <span>feeling lucky?</span>
         <strong>play a random tape</strong>
       </button>
@@ -101,16 +108,15 @@ app.innerHTML = `
     </section>
 
     <section class="room-panel box-scene" aria-label="Messy 2010 teenager room">
-      <div class="box-label">
-        <span>teenage room / india / 2010</span>
-        <strong>pick up or drag a 3d tape</strong>
-      </div>
       <canvas id="box-3d" class="scene-canvas box-canvas" aria-label="Interactive 3D room with a box and loose cassettes"></canvas>
       <div class="crt-controls" role="group" aria-label="CRT visualizer">
         <span>crt signal</span>
         <button type="button" data-visualizer="scope" disabled>scope</button>
         <button type="button" data-visualizer="bars" disabled>bars</button>
         <button type="button" data-visualizer="radar" disabled>radar</button>
+        <button type="button" data-visualizer="orbit" disabled>orbit</button>
+        <button type="button" data-visualizer="tunnel" disabled>tunnel</button>
+        <button type="button" data-visualizer="rain" disabled>rain</button>
       </div>
       <p class="canvas-help">all tapes stay visible / click or drag one to the player</p>
     </section>
@@ -434,7 +440,7 @@ async function start() {
     dropZone,
     handCursorScene,
   );
-  const visualizerModes: VisualizerMode[] = ['scope', 'bars', 'radar'];
+  const visualizerModes: VisualizerMode[] = ['scope', 'bars', 'radar', 'orbit', 'tunnel', 'rain'];
   const dailyVisualizer = visualizerModes[Math.floor(Date.now() / 86_400_000) % visualizerModes.length];
   boxScene.setVisualizer(dailyVisualizer);
   visualizerButtons.forEach((button) => {

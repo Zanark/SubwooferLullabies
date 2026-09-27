@@ -18,7 +18,7 @@ export type HandCursorController = SceneController & {
   release(dropped: boolean): void;
 };
 
-export type VisualizerMode = 'scope' | 'bars' | 'radar';
+export type VisualizerMode = 'scope' | 'bars' | 'radar' | 'orbit' | 'tunnel' | 'rain';
 
 export type BoxSceneController = SceneController & {
   setTrack(song: VisualSong): Promise<void>;
@@ -681,7 +681,7 @@ export function createBoxScene(
           const barHeight = energy * 155;
           crtContext.fillRect(10 + index * 19, height - 28 - barHeight, 11, barHeight);
         }
-      } else {
+      } else if (visualizerMode === 'radar') {
         crtContext.save();
         crtContext.translate(width / 2, height / 2);
         for (let ring = 0; ring < 4; ring++) {
@@ -699,6 +699,43 @@ export function createBoxScene(
           crtContext.stroke();
         }
         crtContext.restore();
+      } else if (visualizerMode === 'orbit') {
+        crtContext.save();
+        crtContext.translate(width / 2, height / 2);
+        crtContext.beginPath();
+        for (let point = 0; point <= 160; point++) {
+          const phase = point / 160 * Math.PI * 2;
+          const x = Math.sin(phase * 3 + time * 1.7) * 118;
+          const y = Math.sin(phase * 4 - time * 2.1) * 72;
+          if (point === 0) crtContext.moveTo(x, y);
+          else crtContext.lineTo(x, y);
+        }
+        crtContext.stroke();
+        crtContext.restore();
+      } else if (visualizerMode === 'tunnel') {
+        crtContext.save();
+        crtContext.translate(width / 2, height / 2);
+        for (let frame = 0; frame < 9; frame++) {
+          const phase = (frame / 9 + time * 0.55) % 1;
+          const frameWidth = 28 + phase * 260;
+          const frameHeight = 18 + phase * 180;
+          crtContext.globalAlpha = 1 - phase * 0.72;
+          crtContext.strokeRect(-frameWidth / 2, -frameHeight / 2, frameWidth, frameHeight);
+        }
+        crtContext.globalAlpha = 1;
+        crtContext.restore();
+      } else {
+        for (let column = 0; column < 18; column++) {
+          const x = 7 + column * 18;
+          const offset = (time * (42 + column % 4 * 9) + column * 31) % (height + 80);
+          for (let drop = 0; drop < 5; drop++) {
+            const y = offset - drop * 18 - 40;
+            if (y < 0 || y > height) continue;
+            crtContext.globalAlpha = 1 - drop * 0.17;
+            crtContext.fillRect(x, y, 8, 11);
+          }
+        }
+        crtContext.globalAlpha = 1;
       }
     }
 
