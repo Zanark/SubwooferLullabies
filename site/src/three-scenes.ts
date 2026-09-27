@@ -690,20 +690,40 @@ export function createBoxScene(
   scene.add(wall);
 
   const posterLayouts: Array<[MoviePosterKind, string, string, number, number, number, number, number]> = [
-    ['web', 'web of two', 'rain city double feature', -8.3, 1.7, 1.75, 2.3, -0.045],
-    ['masala', 'double fire', '70s masala re-run', -4.55, 1.78, 1.72, 2.25, 0.04],
-    ['campus', 'campus return', 'comedy night', -0.85, 1.76, 1.72, 2.25, -0.025],
-    ['rogue', 'city rogue', 'sepia action matinee', 5.55, 1.76, 1.72, 2.25, 0.035],
-    ['three', 'three backlogs', 'hostel comedy', 8.5, 1.7, 1.75, 2.3, -0.04],
+    ['web', 'web of two', 'rain city double feature', -8.8, 1.4, 2.2, 3.3, -0.045],
+    ['masala', 'double fire', '70s masala re-run', -4.45, 1.47, 2.2, 3.3, 0.04],
+    ['campus', 'campus return', 'comedy night', 0, 1.45, 2.2, 3.3, -0.025],
+    ['rogue', 'city rogue', 'sepia action matinee', 4.45, 1.47, 2.2, 3.3, 0.035],
+    ['three', 'three backlogs', 'hostel comedy', 8.8, 1.4, 2.2, 3.3, -0.04],
   ];
+  const posterTapeMaterial = new THREE.MeshBasicMaterial({
+    color: 0xd7bd78,
+    transparent: true,
+    opacity: 0.78,
+    side: THREE.DoubleSide,
+  });
   posterLayouts.forEach(([kind, title, subtitle, x, y, width, height, rotation]) => {
+    const mountedPoster = new THREE.Group();
+    mountedPoster.position.set(x, y, -4.65);
+    mountedPoster.rotation.z = rotation;
     const poster = new THREE.Mesh(
       new THREE.PlaneGeometry(width, height),
       textureMaterial(moviePosterTexture(kind, title, subtitle)),
     );
-    poster.position.set(x, y, -4.65);
-    poster.rotation.z = rotation;
-    scene.add(poster);
+    mountedPoster.add(poster);
+    const tapeLayouts: Array<[number, number, number]> = [
+      [-width * 0.43, height * 0.46, -0.52],
+      [width * 0.43, height * 0.46, 0.48],
+      [-width * 0.43, -height * 0.46, 0.44],
+      [width * 0.43, -height * 0.46, -0.5],
+    ];
+    tapeLayouts.forEach(([tapeX, tapeY, tapeRotation]) => {
+      const tape = new THREE.Mesh(new THREE.PlaneGeometry(0.52, 0.17), posterTapeMaterial);
+      tape.position.set(tapeX, tapeY, 0.025);
+      tape.rotation.z = tapeRotation;
+      mountedPoster.add(tape);
+    });
+    scene.add(mountedPoster);
   });
 
   type WallSwitch = {
