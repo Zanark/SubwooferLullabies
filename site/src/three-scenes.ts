@@ -23,6 +23,7 @@ export type VisualizerMode = 'scope' | 'bars' | 'radar' | 'orbit' | 'tunnel' | '
 export type BoxSceneController = SceneController & {
   setTrack(song: VisualSong): Promise<void>;
   setPlaying(active: boolean): void;
+  setAnalyser(analyser: AnalyserNode): void;
   setVisualizer(mode: VisualizerMode): void;
 };
 
@@ -631,10 +632,38 @@ export function createBoxScene(
   let crtCover: CanvasImageSource | null = null;
   let crtPlaying = false;
   let visualizerMode: VisualizerMode = 'scope';
+  let audioAnalyser: AnalyserNode | null = null;
+  let frequencyData = new Uint8Array(0);
+  let waveformData = new Uint8Array(0);
+  let smoothedEnergy = 0;
+  let smoothedBass = 0;
+
+  function averageBand(start: number, end: number) {
+    if (!frequencyData.length) return 0;
+    const first = Math.max(0, Math.floor(start * frequencyData.length));
+    const last = Math.min(frequencyData.length, Math.max(first + 1, Math.ceil(end * frequencyData.length)));
+    let total = 0;
+    for (let index = first; index < last; index++) total += frequencyData[index];
+    return total / (last - first) / 255;
+  }
 
   function drawCrt(time: number) {
     const width = crtCanvas.width;
     const height = crtCanvas.height;
+    if (crtPlaying && audioAnalyser) {
+      audioAnalyser.getByteFrequencyData(frequencyData);
+      audioAnalyser.getByteTimeDomainData(waveformData);
+    } else {
+      frequencyData.fill(0);
+      waveformData.fill(128);
+    }
+    const bass = averageBand(0, 0.12);
+    const mid = averageBand(0.12, 0.48);
+    const treble = averageBand(0.48, 1);
+    const energy = bass * 0.45 + mid * 0.38 + treble * 0.17;
+    smoothedEnergy += (energy - smoothedEnergy) * (energy > smoothedEnergy ? 0.48 : 0.12);
+    smoothedBass += (bass - smoothedBass) * (bass > smoothedBass ? 0.62 : 0.1);
+    const beat = Math.max(0, bass - smoothedEnergy * 0.82);
     crtContext.fillStyle = '#071214';
     crtContext.fillRect(0, 0, width, height);
     if (crtCover) {
@@ -661,28 +690,36 @@ export function createBoxScene(
       if (visualizerMode === 'scope') {
         crtContext.beginPath();
         for (let x = 0; x <= width; x += 5) {
-          const wave = Math.sin(x * 0.055 + time * 5.5) * 28
-            + Math.sin(x * 0.14 - time * 3.2) * 12;
-          const y = height / 2 + wave;
+          const sampleIndex = Math.min(
+            waveformData.length - 1,
+            Math.floor(x / width * waveformData.length),
+          );
+          const sample = waveformData.length ? (waveformData[sampleIndex] - 128) / 128 : 0;
+          const y = height / 2 + sample * (64 + smoothedEnergy * 78);
           if (x === 0) crtContext.moveTo(x, y);
           else crtContext.lineTo(x, y);
         }
         crtContext.stroke();
       } else if (visualizerMode === 'bars') {
         for (let index = 0; index < 16; index++) {
-          const energy = 0.25 + Math.abs(Math.sin(time * 2.8 + index * 0.71)) * 0.72;
-          const barHeight = energy * 155;
+          const start = index / 16;
+          const bandEnergy = averageBand(start * start, ((index + 1) / 16) ** 2);
+          const barHeight = Math.max(3, bandEnergy * 178);
           crtContext.fillRect(10 + index * 19, height - 28 - barHeight, 11, barHeight);
         }
       } else if (visualizerMode === 'radar') {
         crtContext.save();
         crtContext.translate(width / 2, height / 2);
         for (let ring = 0; ring < 4; ring++) {
-          const radius = 24 + ring * 22 + Math.sin(time * 3 + ring) * 7;
+          const ringEnergy = averageBand(ring * 0.18, 0.28 + ring * 0.18);
+          const radius = 20 + ring * 21 + ringEnergy * 24 + beat * 20;
           crtContext.beginPath();
           for (let point = 0; point <= 32; point++) {
             const angle = point / 32 * Math.PI * 2;
-            const pulse = Math.sin(angle * 5 + time * 4.2) * 8;
+            const bin = frequencyData.length
+              ? frequencyData[Math.min(frequencyData.length - 1, point * 3)] / 255
+              : 0;
+            const pulse = Math.sin(angle * 5 + time * (1.5 + mid * 5)) * (3 + bin * 16);
             const x = Math.cos(angle) * (radius + pulse);
             const y = Math.sin(angle) * (radius + pulse);
             if (point === 0) crtContext.moveTo(x, y);
@@ -698,8 +735,13 @@ export function createBoxScene(
         crtContext.beginPath();
         for (let point = 0; point <= 160; point++) {
           const phase = point / 160 * Math.PI * 2;
-          const x = Math.sin(phase * 3 + time * 1.7) * 118;
-          const y = Math.sin(phase * 4 - time * 2.1) * 72;
+          const sampleIndex = waveformData.length
+            ? Math.min(waveformData.length - 1, Math.floor(point / 160 * waveformData.length))
+            : 0;
+          const sample = waveformData.length ? (waveformData[sampleIndex] - 128) / 128 : 0;
+          const x = Math.sin(phase * 3 + time * (0.8 + treble * 3.5)) * (82 + smoothedEnergy * 58);
+          const y = Math.sin(phase * 4 - time * (0.9 + mid * 3.8)) * (48 + bass * 54)
+            + sample * 28;
           if (point === 0) crtContext.moveTo(x, y);
           else crtContext.lineTo(x, y);
         }
@@ -709,9 +751,9 @@ export function createBoxScene(
         crtContext.save();
         crtContext.translate(width / 2, height / 2);
         for (let frame = 0; frame < 9; frame++) {
-          const phase = (frame / 9 + time * 0.55) % 1;
-          const frameWidth = 28 + phase * 260;
-          const frameHeight = 18 + phase * 180;
+          const phase = (frame / 9 + time * (0.18 + smoothedEnergy * 1.35)) % 1;
+          const frameWidth = 22 + phase * (230 + bass * 52);
+          const frameHeight = 14 + phase * (150 + mid * 54);
           crtContext.globalAlpha = 1 - phase * 0.72;
           crtContext.strokeRect(-frameWidth / 2, -frameHeight / 2, frameWidth, frameHeight);
         }
@@ -720,12 +762,15 @@ export function createBoxScene(
       } else {
         for (let column = 0; column < 18; column++) {
           const x = 7 + column * 18;
-          const offset = (time * (42 + column % 4 * 9) + column * 31) % (height + 80);
-          for (let drop = 0; drop < 5; drop++) {
+          const columnEnergy = averageBand(column / 18, (column + 1) / 18);
+          const speed = 18 + columnEnergy * 145;
+          const offset = (time * speed + column * 31) % (height + 80);
+          const drops = 2 + Math.round(columnEnergy * 5);
+          for (let drop = 0; drop < drops; drop++) {
             const y = offset - drop * 18 - 40;
             if (y < 0 || y > height) continue;
-            crtContext.globalAlpha = 1 - drop * 0.17;
-            crtContext.fillRect(x, y, 8, 11);
+            crtContext.globalAlpha = Math.max(0.2, 0.45 + columnEnergy - drop * 0.13);
+            crtContext.fillRect(x, y, 8, 7 + columnEnergy * 13);
           }
         }
         crtContext.globalAlpha = 1;
@@ -908,6 +953,11 @@ export function createBoxScene(
     },
     setPlaying(active: boolean) {
       crtPlaying = active;
+    },
+    setAnalyser(analyser: AnalyserNode) {
+      audioAnalyser = analyser;
+      frequencyData = new Uint8Array(analyser.frequencyBinCount);
+      waveformData = new Uint8Array(analyser.fftSize);
     },
     setVisualizer(mode: VisualizerMode) {
       visualizerMode = mode;

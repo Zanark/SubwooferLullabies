@@ -166,6 +166,9 @@ let boxScene: ReturnType<typeof createBoxScene>;
 let handCursorScene: ReturnType<typeof createHandCursorScene>;
 let playerScene: ReturnType<typeof createPlayerScene>;
 let showcaseScene: ReturnType<typeof createShowcaseScene>;
+let audioContext: AudioContext | null = null;
+let audioSource: MediaElementAudioSourceNode | null = null;
+let audioAnalyser: AnalyserNode | null = null;
 
 function required<T extends HTMLElement>(id: string): T {
   const element = document.getElementById(id);
@@ -176,6 +179,27 @@ function required<T extends HTMLElement>(id: string): T {
 function formatDuration(seconds: number) {
   const minutes = Math.floor(seconds / 60);
   return `${minutes}:${String(Math.round(seconds % 60)).padStart(2, '0')}`;
+}
+
+function enableAudioAnalysis() {
+  if (!audioContext) {
+    audioContext = new AudioContext();
+    audioSource = audioContext.createMediaElementSource(audio);
+    audioAnalyser = audioContext.createAnalyser();
+    audioAnalyser.fftSize = 256;
+    audioAnalyser.smoothingTimeConstant = 0.68;
+    audioAnalyser.minDecibels = -82;
+    audioAnalyser.maxDecibels = -12;
+    audioSource.connect(audioAnalyser);
+    audioAnalyser.connect(audioContext.destination);
+    boxScene.setAnalyser(audioAnalyser);
+  }
+  if (audioContext.state === 'suspended') {
+    void audioContext.resume().catch((error: unknown) => {
+      console.error('Unable to start audio analysis.', error);
+      status.textContent = 'audio visualizer unavailable';
+    });
+  }
 }
 
 function trackByTitle(title: string) {
@@ -330,6 +354,7 @@ async function togglePlayback() {
   if (!selected) return;
   if (audio.paused) {
     try {
+      enableAudioAnalysis();
       await audio.play();
       setPlayingState(true);
       status.textContent = `playing / ${selected.title}`;
@@ -364,6 +389,7 @@ function seekBy(seconds: number) {
 
 async function playRandomTape() {
   if (loading || !catalog.songs.length) return;
+  enableAudioAnalysis();
   const choices = catalog.songs.filter((song) => song.title !== selected?.title);
   const pool = choices.length ? choices : catalog.songs;
   const song = pool[Math.floor(Math.random() * pool.length)];
