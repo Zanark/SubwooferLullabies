@@ -60,6 +60,8 @@ Generated `AUDIO` files are Git-ignored and are not automatically published.
 Browse or search by song title, move tapes around the desk, then drag one into
 the fictional player. Each tape has a two-second 3D inspection, mechanical
 controls, volume, animated reels and a convex CRT with selectable signals.
+On desktop, the library spans the top while the Walkman and room share the
+bottom row in a one-third/two-thirds split.
 
 ```powershell
 npm install
