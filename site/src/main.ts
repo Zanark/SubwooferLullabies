@@ -179,9 +179,7 @@ function renderShelf() {
   const query = search.value.trim().toLowerCase();
   shelf.replaceChildren();
   if (query) {
-    const matches = catalog.songs.filter((song) =>
-      [song.title, song.genre, song.role, song.emotion].some((value) => value.toLowerCase().includes(query)),
-    );
+    const matches = catalog.songs.filter((song) => song.title.toLowerCase().includes(query));
     shelfLabel.textContent = 'search results';
     resultCount.textContent = `${matches.length} found`;
     back.hidden = false;
