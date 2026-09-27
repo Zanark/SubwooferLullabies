@@ -1178,15 +1178,21 @@ export function createBoxScene(
     );
     crtContext.fillStyle = '#071214';
     crtContext.fillRect(0, 0, width, height);
+    let coverX = 0;
+    let coverY = 0;
+    let coverWidth = width;
+    let coverHeight = height;
     if (crtCover) {
       const sourceWidth = Number((crtCover as { width?: number }).width) || width;
       const sourceHeight = Number((crtCover as { height?: number }).height) || height;
       const sourceRatio = sourceWidth / sourceHeight;
       const targetRatio = width / height;
-      const drawWidth = sourceRatio > targetRatio ? width : height * sourceRatio;
-      const drawHeight = sourceRatio > targetRatio ? width / sourceRatio : height;
-      crtContext.globalAlpha = crtPlaying ? 0.5 : 0.9;
-      crtContext.drawImage(crtCover, (width - drawWidth) / 2, (height - drawHeight) / 2, drawWidth, drawHeight);
+      coverWidth = sourceRatio > targetRatio ? width : height * sourceRatio;
+      coverHeight = sourceRatio > targetRatio ? width / sourceRatio : height;
+      coverX = (width - coverWidth) / 2;
+      coverY = (height - coverHeight) / 2;
+      crtContext.globalAlpha = crtPlaying ? 0.72 : 0.9;
+      crtContext.drawImage(crtCover, coverX, coverY, coverWidth, coverHeight);
       crtContext.globalAlpha = 1;
     } else {
       crtContext.fillStyle = '#6c9288';
@@ -1196,13 +1202,17 @@ export function createBoxScene(
     }
 
     if (crtPlaying) {
-      const phosphorRed = Math.round(THREE.MathUtils.clamp(crtLightColor.r, 0, 1) * 255);
-      const phosphorGreen = Math.round(THREE.MathUtils.clamp(crtLightColor.g, 0, 1) * 255);
-      const phosphorBlue = Math.round(THREE.MathUtils.clamp(crtLightColor.b, 0, 1) * 255);
-      crtContext.globalCompositeOperation = 'screen';
-      crtContext.fillStyle = `rgba(${phosphorRed},${phosphorGreen},${phosphorBlue},.5)`;
-      crtContext.fillRect(0, 0, width, height);
-      crtContext.globalCompositeOperation = 'source-over';
+      if (crtCover) {
+        crtContext.save();
+        crtContext.globalCompositeOperation = 'screen';
+        crtContext.filter = 'blur(5px) brightness(1.8) saturate(1.35)';
+        crtContext.globalAlpha = 0.42;
+        crtContext.drawImage(crtCover, coverX, coverY, coverWidth, coverHeight);
+        crtContext.filter = 'brightness(1.65) saturate(1.22) contrast(1.08)';
+        crtContext.globalAlpha = 0.58;
+        crtContext.drawImage(crtCover, coverX, coverY, coverWidth, coverHeight);
+        crtContext.restore();
+      }
       crtContext.strokeStyle = '#f4d789';
       crtContext.fillStyle = '#e66a32';
       crtContext.lineWidth = 5;
