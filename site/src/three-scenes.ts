@@ -483,7 +483,10 @@ export function createBoxScene(
   camera.position.set(0, 8, 17);
   camera.lookAt(0, -0.85, 0);
   const { renderer, resize } = setupRenderer(canvas);
-  addLighting(scene);
+  scene.add(new THREE.HemisphereLight(0x637b86, 0x1b1014, 0.88));
+  const moonlight = new THREE.DirectionalLight(0x557a8c, 0.95);
+  moonlight.position.set(7, 5, -4);
+  scene.add(moonlight);
 
   const wall = new THREE.Mesh(new THREE.PlaneGeometry(24, 11), material(0x4b2924, { roughness: 1 }));
   wall.position.set(0, 1.6, -4.8);
@@ -595,8 +598,8 @@ export function createBoxScene(
   scene.add(television);
 
   const books = new THREE.Group();
-  books.position.set(-3.55, -1.84, 1.45);
-  books.rotation.y = -0.18;
+  books.position.set(-1.05, -1.84, 1.55);
+  books.rotation.y = 0.16;
   [0x315b74, 0xb76b3c, 0xd4bd72, 0x52704d].forEach((color, index) => {
     books.add(box(1.75, 0.18, 1.05, color, [0, index * 0.2, 0]));
   });
@@ -614,12 +617,61 @@ export function createBoxScene(
   scene.add(cdStack);
 
   const phone = new THREE.Group();
-  phone.position.set(-2.1, -1.82, 1.2);
+  phone.position.set(-0.35, -1.82, 1.55);
   phone.rotation.set(-0.08, 0.25, 0.16);
   phone.add(box(0.7, 0.14, 1.35, 0x24282b, [0, 0, 0]));
   phone.add(box(0.48, 0.04, 0.62, 0x6b938e, [0, 0.1, -0.18]));
   phone.add(box(0.42, 0.04, 0.28, 0xb8a67c, [0, 0.1, 0.38]));
   scene.add(phone);
+
+  const lamp = new THREE.Group();
+  lamp.position.set(-1.3, -1.82, -1.25);
+  lamp.scale.setScalar(1.12);
+  const lampMetal = material(0x587079, { roughness: 0.58, metalness: 0.24 });
+  const lampShadeMaterial = new THREE.MeshStandardMaterial({
+    color: 0xc76a3d,
+    emissive: 0x5c2412,
+    emissiveIntensity: 0.7,
+    roughness: 0.72,
+    flatShading: true,
+    side: THREE.DoubleSide,
+  });
+  const lampBase = new THREE.Mesh(new THREE.CylinderGeometry(0.72, 0.82, 0.18, 8), lampMetal);
+  lampBase.position.y = 0.08;
+  const lampStem = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.11, 1.75, 6), lampMetal);
+  lampStem.position.set(0, 0.94, 0);
+  const lampArm = box(0.15, 1.75, 0.15, 0x38515a, [0.5, 2.05, 0], [0, 0, -0.62]);
+  const lampShade = new THREE.Mesh(
+    new THREE.ConeGeometry(0.78, 1.0, 7, 1, true),
+    lampShadeMaterial,
+  );
+  lampShade.position.set(1.03, 2.63, 0);
+  lampShade.rotation.z = -0.62;
+  const bulb = new THREE.Mesh(
+    new THREE.SphereGeometry(0.28, 7, 5),
+    new THREE.MeshStandardMaterial({
+      color: 0xffd991,
+      emissive: 0xff9b42,
+      emissiveIntensity: 2.6,
+      roughness: 0.3,
+      flatShading: true,
+    }),
+  );
+  bulb.position.set(1.25, 2.31, 0);
+  lamp.add(lampBase, lampStem, lampArm, lampShade, bulb);
+  scene.add(lamp);
+
+  const lampTarget = new THREE.Object3D();
+  lampTarget.position.set(2.4, -1.82, 0.35);
+  scene.add(lampTarget);
+  const lampLight = new THREE.SpotLight(0xffaa55, 34, 14, 0.78, 0.76, 1.35);
+  lampLight.position.set(0.08, 0.78, -1.25);
+  lampLight.target = lampTarget;
+  lampLight.castShadow = true;
+  scene.add(lampLight);
+  const lampGlow = new THREE.PointLight(0xffb060, 5.5, 6.5, 1.5);
+  lampGlow.position.set(0.08, 0.78, -1.25);
+  scene.add(lampGlow);
 
   const pencilCup = new THREE.Group();
   pencilCup.position.set(-3.9, -1.41, -1.4);
