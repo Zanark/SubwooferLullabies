@@ -1028,8 +1028,8 @@ export function createBoxScene(
   scene.add(cdStack);
 
   const phone = new THREE.Group();
-  phone.position.set(-0.35, -1.82, 1.55);
-  phone.rotation.set(-0.08, 0.25, 0.16);
+  phone.position.set(-1.05, -1.07, 1.55);
+  phone.rotation.set(-0.04, 0.16, -0.08);
   phone.add(box(0.7, 0.14, 1.35, 0x24282b, [0, 0, 0]));
   phone.add(box(0.48, 0.04, 0.62, 0x6b938e, [0, 0.1, -0.18]));
   phone.add(box(0.42, 0.04, 0.28, 0xb8a67c, [0, 0.1, 0.38]));
