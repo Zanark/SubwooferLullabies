@@ -991,7 +991,7 @@ export function createBoxScene(
   const crtLightTarget = new THREE.Object3D();
   crtLightTarget.position.set(-4.25, -1.82, 6.4);
   scene.add(crtLightTarget);
-  const crtSpill = new THREE.SpotLight(0x8fcbd1, 52, 18, 0.78, 0.72, 1.05);
+  const crtSpill = new THREE.SpotLight(0x8fcbd1, 52, 18, 0.96, 0.78, 1.05);
   crtSpill.position.set(-5.45, 0.28, 2.12);
   crtSpill.target = crtLightTarget;
   crtSpill.castShadow = true;
@@ -1021,8 +1021,8 @@ export function createBoxScene(
     depthWrite: false,
     blending: THREE.AdditiveBlending,
   });
-  const crtDeskGlow = new THREE.Mesh(new THREE.PlaneGeometry(9.4, 6.4), crtDeskGlowMaterial);
-  crtDeskGlow.position.set(-3.7, -1.82, 1.8);
+  const crtDeskGlow = new THREE.Mesh(new THREE.PlaneGeometry(15.5, 7.2), crtDeskGlowMaterial);
+  crtDeskGlow.position.set(-5.2, -1.82, 1.8);
   crtDeskGlow.rotation.x = -Math.PI / 2;
   crtDeskGlow.renderOrder = 951;
   scene.add(crtDeskGlow);
