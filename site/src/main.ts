@@ -253,6 +253,7 @@ async function loadCassette(song: Song, autoplay = false) {
   setTransportEnabled(false);
   randomPlayButton.disabled = true;
   audio.src = asset(song.audio);
+  audio.loop = song.kind === 'loop';
   audio.muted = autoplay;
   const activation = autoplay
     ? audio.play().then(() => true).catch(() => false)
@@ -282,7 +283,9 @@ async function loadCassette(song: Song, autoplay = false) {
       status.textContent = `playing / ${song.title}`;
     } else {
       audio.muted = false;
-      status.textContent = `ready / ${formatDuration(song.duration_seconds)}`;
+      status.textContent = song.kind === 'loop'
+        ? `ready / ${formatDuration(song.duration_seconds)} loop`
+        : `ready / ${formatDuration(song.duration_seconds)}`;
       playButton.focus({ preventScroll: true });
     }
     loaded = true;
