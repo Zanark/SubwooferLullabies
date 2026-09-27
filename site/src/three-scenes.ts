@@ -770,7 +770,7 @@ export function createPlayerScene(canvas: HTMLCanvasElement) {
     camera.lookAt(0, 0.15, 0);
     rig.position.y = Math.sin(time * 0.7) * 0.04;
     if (playing) {
-      cassette.reels.forEach((reel) => { reel.rotation.z -= delta * 9; });
+      cassette.reels.forEach((reel) => { reel.rotation.z -= delta * 3.2; });
     }
   });
 
