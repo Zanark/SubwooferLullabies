@@ -798,8 +798,9 @@ export function createBoxScene(
       blending: THREE.AdditiveBlending,
       side: THREE.DoubleSide,
     });
-    const cone = new THREE.Mesh(new THREE.ConeGeometry(1.05, 4.2, 12, 1, true), coneMaterial);
-    cone.position.y = 0.28;
+    const coneHeight = 9.6;
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(1.05, coneHeight, 12, 1, true), coneMaterial);
+    cone.position.y = -1.7 + coneHeight / 2;
     spotlight.add(cone);
 
     const pool = new THREE.Mesh(
@@ -1471,7 +1472,7 @@ export function createBoxScene(
       if (!tape.userData.searchMatch || tape === pressed) return;
       const home = tape.userData.home as THREE.Vector3;
       const rotationHome = tape.userData.rotationHome as THREE.Euler;
-      tape.position.y = home.y + 0.58 + Math.sin(time * 2.2 + index * 0.7) * 0.08;
+      tape.position.y = home.y + 0.92 + Math.sin(time * 2.2 + index * 0.7) * 0.08;
       tape.rotation.x = rotationHome.x + Math.sin(time * 1.8 + index) * 0.07;
       tape.rotation.y = rotationHome.y;
       tape.rotation.z = rotationHome.z + time * 1.25;
