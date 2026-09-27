@@ -824,8 +824,8 @@ export function createBoxScene(
     tape.userData.searchMatch = true;
   }
 
-  scene.add(box(19.5, 0.65, 7.5, 0x70442e, [0, -2.28, 0]));
-  scene.add(box(19.5, 0.12, 7.5, 0xa56a3d, [0, -1.91, 0]));
+  scene.add(box(25, 0.65, 7.5, 0x70442e, [0, -2.28, 0]));
+  scene.add(box(25, 0.12, 7.5, 0xa56a3d, [0, -1.91, 0]));
 
   const television = new THREE.Group();
   television.position.set(-5.5, -0.02, -0.05);
