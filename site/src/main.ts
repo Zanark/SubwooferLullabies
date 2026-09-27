@@ -31,6 +31,7 @@ type Album = {
 };
 
 type Catalog = { songs: Song[]; albums: Album[] };
+type QueueEntry = { id: string; title: string };
 
 const base = import.meta.env.BASE_URL;
 const asset = (path: string) => `${base}${path}`;
@@ -77,6 +78,24 @@ app.innerHTML = `
       </div>
 
     </section>
+
+    <aside id="queue-panel" class="queue-panel" aria-label="Playback queue">
+      <div class="queue-head">
+        <div>
+          <span>continuous play</span>
+          <strong>tape queue</strong>
+        </div>
+        <output id="queue-count">0</output>
+      </div>
+      <div class="queue-actions" role="group" aria-label="Queue controls">
+        <button id="queue-add" type="button" disabled>add selected</button>
+        <button id="queue-shuffle" type="button" disabled>shuffle</button>
+        <button id="queue-next" type="button" disabled>next</button>
+        <button id="queue-clear" type="button" disabled>clear</button>
+      </div>
+      <ol id="queue-list" class="queue-list"></ol>
+      <p id="queue-empty" class="queue-empty">drag a cassette here<br>or select songs above</p>
+    </aside>
 
     <section class="player-panel" aria-label="Cassette player">
       <div id="walkman-drop" class="walkman-drop">
@@ -151,6 +170,14 @@ const resultCount = required<HTMLSpanElement>('result-count');
 const search = required<HTMLInputElement>('search');
 const back = required<HTMLButtonElement>('back');
 const dropZone = required<HTMLDivElement>('walkman-drop');
+const queuePanel = required<HTMLElement>('queue-panel');
+const queueList = required<HTMLOListElement>('queue-list');
+const queueCount = required<HTMLOutputElement>('queue-count');
+const queueEmpty = required<HTMLParagraphElement>('queue-empty');
+const queueAddButton = required<HTMLButtonElement>('queue-add');
+const queueShuffleButton = required<HTMLButtonElement>('queue-shuffle');
+const queueNextButton = required<HTMLButtonElement>('queue-next');
+const queueClearButton = required<HTMLButtonElement>('queue-clear');
 const playButton = required<HTMLButtonElement>('play');
 const playLabel = required<HTMLElement>('play-label');
 const rewindButton = required<HTMLButtonElement>('rewind');
@@ -172,6 +199,10 @@ let catalog: Catalog;
 let currentAlbum: string | null = null;
 let deskPreviewTitle: string | null = null;
 let selected: Song | null = null;
+let queue: QueueEntry[] = [];
+let activeQueueId: string | null = null;
+let currentSource: 'direct' | 'queue' | null = null;
+const selectedTitles = new Set<string>();
 let loading = false;
 let boxScene: ReturnType<typeof createBoxScene>;
 let handCursorScene: ReturnType<typeof createHandCursorScene>;
@@ -219,19 +250,167 @@ function trackByTitle(title: string) {
   return song;
 }
 
+function createQueueEntry(title: string): QueueEntry {
+  return { id: crypto.randomUUID(), title };
+}
+
+function persistQueue() {
+  localStorage.setItem('subwoofer-lullabies-queue', JSON.stringify(queue));
+}
+
+function updateQueueAddButton() {
+  if (selectedTitles.size) {
+    queueAddButton.disabled = false;
+    queueAddButton.textContent = `add selected (${selectedTitles.size})`;
+    return;
+  }
+  const album = currentAlbum
+    ? catalog.albums.find((candidate) => candidate.title === currentAlbum)
+    : null;
+  queueAddButton.disabled = !album;
+  queueAddButton.textContent = album ? `add album (${album.tracks.length})` : 'add selected';
+}
+
+function renderQueue() {
+  queueList.replaceChildren();
+  const activeInQueue = activeQueueId && queue.some((entry) => entry.id === activeQueueId);
+
+  if (selected && currentSource === 'direct' && !activeInQueue) {
+    const current = document.createElement('li');
+    current.className = 'queue-item is-current is-external';
+    current.innerHTML = `
+      <span class="queue-index">now</span>
+      <span class="queue-title-window"><span class="queue-title-text">${selected.title}</span></span>
+      <span class="queue-source">direct</span>
+    `;
+    queueList.append(current);
+  }
+
+  queue.forEach((entry, index) => {
+    const item = document.createElement('li');
+    item.className = 'queue-item';
+    item.classList.toggle('is-current', entry.id === activeQueueId);
+    item.draggable = true;
+    item.dataset.queueId = entry.id;
+    item.innerHTML = `
+      <button class="queue-play" type="button" aria-label="Play ${entry.title}">
+        <span class="queue-index">${String(index + 1).padStart(2, '0')}</span>
+        <span class="queue-title-window"><span class="queue-title-text">${entry.title}</span></span>
+      </button>
+      <span class="queue-reorder">
+        <button type="button" data-move="-1" aria-label="Move ${entry.title} up">▲</button>
+        <button type="button" data-move="1" aria-label="Move ${entry.title} down">▼</button>
+        <button type="button" data-remove aria-label="Remove ${entry.title}">×</button>
+      </span>
+    `;
+    item.querySelector<HTMLButtonElement>('.queue-play')!.addEventListener('click', () => {
+      void playQueueEntry(entry.id);
+    });
+    item.querySelectorAll<HTMLButtonElement>('[data-move]').forEach((button) => {
+      button.disabled = Number(button.dataset.move) < 0 ? index === 0 : index === queue.length - 1;
+      button.addEventListener('click', () => moveQueueEntry(entry.id, Number(button.dataset.move)));
+    });
+    item.querySelector<HTMLButtonElement>('[data-remove]')!.addEventListener('click', () => {
+      queue = queue.filter((candidate) => candidate.id !== entry.id);
+      if (activeQueueId === entry.id) activeQueueId = null;
+      persistQueue();
+      renderQueue();
+    });
+    item.addEventListener('dragstart', (event) => {
+      event.dataTransfer?.setData('application/x-queue-entry', entry.id);
+      if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
+    });
+    item.addEventListener('dragover', (event) => {
+      if (!event.dataTransfer?.types.includes('application/x-queue-entry')) return;
+      event.preventDefault();
+    });
+    item.addEventListener('drop', (event) => {
+      const draggedId = event.dataTransfer?.getData('application/x-queue-entry');
+      if (!draggedId || draggedId === entry.id) return;
+      event.preventDefault();
+      reorderQueue(draggedId, entry.id);
+    });
+    queueList.append(item);
+  });
+
+  queueCount.value = String(queue.length);
+  queueCount.textContent = String(queue.length).padStart(2, '0');
+  queueEmpty.hidden = Boolean(queue.length || selected);
+  queueShuffleButton.disabled = queue.length < 2;
+  queueNextButton.disabled = queue.length === 0;
+  queueClearButton.disabled = queue.length === 0;
+
+  requestAnimationFrame(() => {
+    queueList.querySelectorAll<HTMLElement>('.is-current .queue-title-window').forEach((windowElement) => {
+      const text = windowElement.querySelector<HTMLElement>('.queue-title-text');
+      if (!text || text.scrollWidth <= windowElement.clientWidth) return;
+      text.style.setProperty('--marquee-distance', `${text.scrollWidth - windowElement.clientWidth}px`);
+      text.classList.add('is-scrolling');
+    });
+  });
+}
+
+function addTitlesToQueue(titles: string[]) {
+  const validTitles = titles.filter((title) => catalog.songs.some((song) => song.title === title));
+  if (!validTitles.length) return;
+  queue.push(...validTitles.map(createQueueEntry));
+  persistQueue();
+  renderQueue();
+  announcement.textContent = `${validTitles.length} ${validTitles.length === 1 ? 'cassette' : 'cassettes'} added to queue`;
+}
+
+function moveQueueEntry(id: string, offset: number) {
+  const index = queue.findIndex((entry) => entry.id === id);
+  const target = Math.min(queue.length - 1, Math.max(0, index + offset));
+  if (index < 0 || target === index) return;
+  const [entry] = queue.splice(index, 1);
+  queue.splice(target, 0, entry);
+  persistQueue();
+  renderQueue();
+}
+
+function reorderQueue(draggedId: string, targetId: string) {
+  const from = queue.findIndex((entry) => entry.id === draggedId);
+  const to = queue.findIndex((entry) => entry.id === targetId);
+  if (from < 0 || to < 0 || from === to) return;
+  const [entry] = queue.splice(from, 1);
+  queue.splice(to, 0, entry);
+  persistQueue();
+  renderQueue();
+}
+
 function songCard(song: Song) {
-  const button = document.createElement('button');
-  button.className = 'cover-card song-card';
-  button.classList.toggle('is-held', deskPreviewTitle === song.title);
-  button.type = 'button';
-  button.dataset.title = song.title;
-  button.innerHTML = `
-    <span class="cover-frame"><img src="${asset(song.cover)}" alt="" /></span>
-    <strong>${song.title}</strong>
-    <small>${song.genre} · ${song.bpm} bpm</small>
+  const card = document.createElement('article');
+  card.className = 'cover-card song-card';
+  card.classList.toggle('is-held', deskPreviewTitle === song.title);
+  card.classList.toggle('is-selected', selectedTitles.has(song.title));
+  card.draggable = true;
+  card.dataset.title = song.title;
+  card.innerHTML = `
+    <button class="cover-card-main" type="button">
+      <span class="cover-frame"><img src="${asset(song.cover)}" alt="" /></span>
+      <strong>${song.title}</strong>
+      <small>${song.genre} · ${song.bpm} bpm</small>
+    </button>
+    <button class="queue-select" type="button" aria-pressed="${selectedTitles.has(song.title)}" aria-label="Select ${song.title} for queue">
+      ${selectedTitles.has(song.title) ? '✓' : '+'}
+    </button>
   `;
-  button.addEventListener('click', () => loadCassette(song));
-  return button;
+  card.querySelector<HTMLButtonElement>('.cover-card-main')!.addEventListener('click', () => {
+    activeQueueId = null;
+    void loadCassette(song);
+  });
+  card.querySelector<HTMLButtonElement>('.queue-select')!.addEventListener('click', () => {
+    if (selectedTitles.has(song.title)) selectedTitles.delete(song.title);
+    else selectedTitles.add(song.title);
+    renderShelf();
+  });
+  card.addEventListener('dragstart', (event) => {
+    event.dataTransfer?.setData('application/x-cassette-title', song.title);
+    event.dataTransfer?.setData('text/plain', song.title);
+    if (event.dataTransfer) event.dataTransfer.effectAllowed = 'copy';
+  });
+  return card;
 }
 
 function albumCard(album: Album) {
@@ -262,6 +441,7 @@ function renderShelf() {
     back.hidden = false;
     shelf.append(songCard(song));
     boxScene?.setSearchMatches([]);
+    updateQueueAddButton();
     return;
   }
   if (query) {
@@ -274,6 +454,7 @@ function renderShelf() {
       shelf.innerHTML = '<p class="empty">no tape found in this box.</p>';
     }
     boxScene?.setSearchMatches(matches.map((song) => song.title));
+    updateQueueAddButton();
     return;
   }
 
@@ -284,6 +465,7 @@ function renderShelf() {
     shelfLabel.textContent = album?.title ?? 'album';
     back.hidden = false;
     album?.tracks.forEach((title) => shelf.append(songCard(trackByTitle(title))));
+    updateQueueAddButton();
     return;
   }
 
@@ -297,9 +479,15 @@ function renderShelf() {
     card.querySelector('small')!.textContent = 'standalone cassette';
     shelf.append(card);
   }
+  updateQueueAddButton();
 }
 
-async function loadCassette(song: Song, autoplay = false) {
+async function loadCassette(
+  song: Song,
+  autoplay = false,
+  queueEntryId: string | null = null,
+  skipShowcase = false,
+) {
   if (loading) return false;
   loading = true;
   audio.pause();
@@ -308,7 +496,7 @@ async function loadCassette(song: Song, autoplay = false) {
   randomPlayButton.disabled = true;
   audio.src = asset(song.audio);
   playerScene.setProgress(0);
-  audio.loop = song.kind === 'loop';
+  audio.loop = queueEntryId === null && song.kind === 'loop';
   audio.muted = autoplay;
   const activation = autoplay
     ? audio.play().then(() => true).catch(() => false)
@@ -320,13 +508,18 @@ async function loadCassette(song: Song, autoplay = false) {
 
   try {
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced) {
+    if (skipShowcase) {
+      showcase.classList.remove('is-showing');
+      showcase.hidden = true;
+    } else if (reduced) {
       await new Promise((resolve) => setTimeout(resolve, 150));
     } else {
       await showcaseScene.show({ ...song, cover: asset(song.cover) });
     }
 
     selected = song;
+    activeQueueId = queueEntryId;
+    currentSource = queueEntryId ? 'queue' : 'direct';
     await playerScene.setCassette({ ...song, cover: asset(song.cover) });
     await boxScene.setTrack({ ...song, cover: asset(song.cover) });
     setTransportEnabled(true);
@@ -344,10 +537,14 @@ async function loadCassette(song: Song, autoplay = false) {
       playButton.focus({ preventScroll: true });
     }
     loaded = true;
+    renderQueue();
   } catch (error) {
     audio.pause();
     audio.muted = false;
     selected = null;
+    activeQueueId = null;
+    currentSource = null;
+    renderQueue();
     console.error(`Unable to load cassette: ${song.title}`, error);
     status.textContent = 'cassette load failed';
     announcement.textContent = `${song.title} cassette failed to load`;
@@ -357,7 +554,32 @@ async function loadCassette(song: Song, autoplay = false) {
     loading = false;
     randomPlayButton.disabled = false;
   }
+
   return loaded;
+}
+
+async function playQueueEntry(id: string, immediate = false) {
+  const entry = queue.find((candidate) => candidate.id === id);
+  if (!entry || loading) return;
+  enableAudioAnalysis();
+  await loadCassette(trackByTitle(entry.title), true, entry.id, immediate);
+}
+
+async function playNextQueued() {
+  if (!queue.length || loading) return;
+  const currentIndex = activeQueueId
+    ? queue.findIndex((entry) => entry.id === activeQueueId)
+    : -1;
+  const nextIndex = currentIndex + 1;
+  if (nextIndex >= queue.length) {
+    activeQueueId = null;
+    currentSource = null;
+    renderQueue();
+    status.textContent = 'queue finished';
+    announcement.textContent = 'Queue finished';
+    return;
+  }
+  await playQueueEntry(queue[nextIndex].id, true);
 }
 
 function setPlayingState(active: boolean) {
@@ -472,6 +694,10 @@ randomPlayButton.addEventListener('click', playRandomTape);
 audio.addEventListener('ended', () => {
   setPlayingState(false);
   playerScene.setProgress(1);
+  if (activeQueueId) {
+    void playNextQueued();
+    return;
+  }
   status.textContent = selected ? `finished / ${selected.title}` : 'choose a cassette';
   announcement.textContent = selected ? `${selected.title} finished` : '';
 });
@@ -498,6 +724,64 @@ toggleCrtIsolationButton.addEventListener('click', () => {
   toggleCrtIsolationButton.setAttribute('aria-pressed', String(active));
   toggleCrtIsolationButton.textContent = active ? 'restore surroundings' : 'dim surroundings';
 });
+queueAddButton.addEventListener('click', () => {
+  if (selectedTitles.size) {
+    addTitlesToQueue([...selectedTitles]);
+    selectedTitles.clear();
+    renderShelf();
+    return;
+  }
+  const album = currentAlbum
+    ? catalog.albums.find((candidate) => candidate.title === currentAlbum)
+    : null;
+  if (album) addTitlesToQueue(album.tracks);
+});
+queueShuffleButton.addEventListener('click', () => {
+  const currentIndex = activeQueueId
+    ? queue.findIndex((entry) => entry.id === activeQueueId)
+    : -1;
+  const current = currentIndex >= 0 ? queue.splice(currentIndex, 1)[0] : null;
+  for (let index = queue.length - 1; index > 0; index--) {
+    const swap = Math.floor(Math.random() * (index + 1));
+    [queue[index], queue[swap]] = [queue[swap], queue[index]];
+  }
+  if (current) queue.unshift(current);
+  persistQueue();
+  renderQueue();
+});
+queueNextButton.addEventListener('click', () => {
+  void playNextQueued();
+});
+queueClearButton.addEventListener('click', () => {
+  queue = [];
+  activeQueueId = null;
+  persistQueue();
+  renderQueue();
+  announcement.textContent = 'Queue cleared';
+});
+
+for (const target of [queuePanel, dropZone]) {
+  target.addEventListener('dragover', (event) => {
+    if (!event.dataTransfer?.types.includes('application/x-cassette-title')) return;
+    event.preventDefault();
+    target.classList.add('is-over');
+  });
+  target.addEventListener('dragleave', (event) => {
+    if (event.relatedTarget instanceof Node && target.contains(event.relatedTarget)) return;
+    target.classList.remove('is-over');
+  });
+  target.addEventListener('drop', (event) => {
+    const title = event.dataTransfer?.getData('application/x-cassette-title');
+    target.classList.remove('is-over');
+    if (!title) return;
+    event.preventDefault();
+    if (target === queuePanel) addTitlesToQueue([title]);
+    else {
+      activeQueueId = null;
+      void loadCassette(trackByTitle(title));
+    }
+  });
+}
 search.addEventListener('input', () => {
   deskPreviewTitle = null;
   renderShelf();
@@ -531,8 +815,19 @@ async function start() {
   const response = await fetch(asset('catalog.json'));
   if (!response.ok) throw new Error(`Catalog failed to load: ${response.status}`);
   catalog = await response.json() as Catalog;
+  try {
+    const storedQueue = JSON.parse(localStorage.getItem('subwoofer-lullabies-queue') ?? '[]') as QueueEntry[];
+    queue = storedQueue.filter((entry) => (
+      typeof entry.id === 'string'
+      && typeof entry.title === 'string'
+      && catalog.songs.some((song) => song.title === entry.title)
+    ));
+  } catch {
+    queue = [];
+  }
   audio.volume = Number(volume.value);
   renderShelf();
+  renderQueue();
   playerScene = createPlayerScene(required<HTMLCanvasElement>('player-3d'), (value) => {
     audio.volume = value;
     volume.value = String(value);
@@ -560,6 +855,8 @@ async function start() {
       exitCrtFocusButton.hidden = !active;
     },
     dropZone,
+    queuePanel,
+    (title) => addTitlesToQueue([title]),
     handCursorScene,
   );
   const visualizerModes: VisualizerMode[] = [

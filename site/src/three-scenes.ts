@@ -661,6 +661,8 @@ export function createBoxScene(
   onInspect: (title: string) => void,
   onCrtFocusChange: (active: boolean) => void,
   dropTarget: HTMLElement,
+  queueTarget: HTMLElement,
+  onQueue: (title: string) => void,
   handCursor: HandCursorController,
 ): BoxSceneController {
   const scene = new THREE.Scene();
@@ -1493,9 +1495,11 @@ export function createBoxScene(
   function updateDropTarget() {
     const target = document.elementFromPoint(latestClientX, latestClientY);
     const overDropTarget = Boolean(target && dropTarget.contains(target));
+    const overQueueTarget = Boolean(target && queueTarget.contains(target));
     dropTarget.classList.toggle('is-over', overDropTarget);
-    handCursor.move(latestClientX, latestClientY, overDropTarget);
-    return overDropTarget;
+    queueTarget.classList.toggle('is-over', overQueueTarget);
+    handCursor.move(latestClientX, latestClientY, overDropTarget || overQueueTarget);
+    return overDropTarget ? 'player' : overQueueTarget ? 'queue' : null;
   }
 
   function autoScroll() {
@@ -1525,6 +1529,7 @@ export function createBoxScene(
     canvas.classList.remove('is-dragging');
     canvas.style.cursor = 'default';
     dropTarget.classList.remove('awaiting-drop', 'is-over');
+    queueTarget.classList.remove('awaiting-drop', 'is-over');
     handCursor.release(false);
   }
 
@@ -1549,6 +1554,7 @@ export function createBoxScene(
     canvas.setPointerCapture(event.pointerId);
     canvas.classList.add('is-dragging');
     dropTarget.classList.add('awaiting-drop');
+    queueTarget.classList.add('awaiting-drop');
     canvas.style.cursor = 'none';
     latestClientX = event.clientX;
     latestClientY = event.clientY;
@@ -1591,7 +1597,11 @@ export function createBoxScene(
     if (!pressed || event.pointerId !== activePointerId) return;
     const chosen = pressed;
     const target = document.elementFromPoint(event.clientX, event.clientY);
-    const dropped = Boolean(target && dropTarget.contains(target));
+    const destination = target && dropTarget.contains(target)
+      ? 'player'
+      : target && queueTarget.contains(target)
+        ? 'queue'
+        : null;
     pressed = null;
     activePointerId = null;
     if (scrollFrame) cancelAnimationFrame(scrollFrame);
@@ -1599,12 +1609,17 @@ export function createBoxScene(
     canvas.releasePointerCapture(event.pointerId);
     canvas.classList.remove('is-dragging');
     dropTarget.classList.remove('awaiting-drop', 'is-over');
+    queueTarget.classList.remove('awaiting-drop', 'is-over');
     canvas.style.cursor = 'default';
-    handCursor.release(dropped);
-    if (dropped) {
+    handCursor.release(Boolean(destination));
+    if (destination) {
       chosen.position.copy(chosen.userData.home);
       chosen.rotation.copy(chosen.userData.rotationHome);
-      window.setTimeout(() => onSelect(String(chosen.userData.title)), 260);
+      const title = String(chosen.userData.title);
+      window.setTimeout(() => {
+        if (destination === 'player') onSelect(title);
+        else onQueue(title);
+      }, 260);
     } else if (!moved) {
       chosen.position.copy(chosen.userData.home);
       chosen.rotation.copy(chosen.userData.rotationHome);

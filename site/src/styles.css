@@ -305,6 +305,7 @@ h1 span {
 
 .cover-card:hover .cover-frame,
 .cover-card:focus-visible .cover-frame,
+.cover-card:focus-within .cover-frame,
 .cover-card.is-held .cover-frame {
   border-color: var(--orange);
   outline: 0;
@@ -1167,7 +1168,232 @@ body.playing .reel {
   .player-panel {
     min-height: 680px;
   }
+}
 
+.queue-panel {
+    position: relative;
+    grid-area: queue;
+    display: flex;
+    min-width: 0;
+    min-height: 360px;
+    padding: 14px;
+    border: 2px solid #6e4132;
+    overflow: hidden;
+    flex-direction: column;
+    background:
+      linear-gradient(rgba(31, 20, 20, .96), rgba(13, 12, 15, .98)),
+      repeating-linear-gradient(0deg, transparent 0 22px, rgba(224, 148, 70, .045) 23px 24px);
+    box-shadow: 8px 8px 0 #10090c;
+  }
+
+  .queue-panel.awaiting-drop {
+    border-color: #d3b76f;
+  }
+
+  .queue-panel.is-over {
+    border-color: var(--orange);
+    box-shadow: inset 0 0 28px rgba(235, 119, 52, .22), 8px 8px 0 #10090c;
+  }
+
+  .queue-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 9px;
+    border-bottom: 2px solid #53352d;
+  }
+
+  .queue-head span,
+  .queue-head strong {
+    display: block;
+    text-transform: uppercase;
+  }
+
+  .queue-head span {
+    color: #927268;
+    font-size: 6px;
+    letter-spacing: .13em;
+  }
+
+  .queue-head strong {
+    margin-top: 3px;
+    color: #f2ddb2;
+    font-size: 11px;
+  }
+
+  .queue-head output {
+    min-width: 27px;
+    padding: 4px 5px;
+    border: 1px solid #815340;
+    color: var(--orange);
+    background: #100b0e;
+    text-align: center;
+  }
+
+  .queue-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    margin-bottom: 9px;
+  }
+
+  .queue-actions button,
+  .queue-reorder button {
+    border: 1px solid #755044;
+    color: #d3b99a;
+    background: #211518;
+    cursor: pointer;
+    font: inherit;
+    font-size: 6px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+
+  .queue-actions button {
+    min-height: 27px;
+    padding: 5px;
+  }
+
+  .queue-actions button:hover:not(:disabled),
+  .queue-actions button:focus-visible,
+  .queue-reorder button:hover:not(:disabled),
+  .queue-reorder button:focus-visible {
+    outline: 1px solid var(--mint);
+    outline-offset: 1px;
+    color: #241416;
+    background: #e5cd98;
+  }
+
+  .queue-actions button:disabled,
+  .queue-reorder button:disabled {
+    cursor: not-allowed;
+    opacity: .28;
+  }
+
+  #queue-add:not(:disabled) {
+    color: #241416;
+    background: var(--orange);
+    box-shadow: inset 2px 2px 0 rgba(255, 225, 164, .28);
+  }
+
+  .queue-list {
+    display: flex;
+    min-height: 0;
+    margin: 0;
+    padding: 0 3px 10px 0;
+    overflow-y: auto;
+    flex: 1;
+    flex-direction: column;
+    gap: 5px;
+    list-style: none;
+    scrollbar-color: var(--orange) #120c0f;
+  }
+
+  .queue-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    min-height: 38px;
+    border: 1px solid #4e3430;
+    background: rgba(12, 10, 13, .86);
+  }
+
+  .queue-item.is-current {
+    border-color: #e79a4d;
+    background: linear-gradient(90deg, rgba(224, 124, 59, .26), rgba(41, 24, 27, .92));
+    box-shadow: inset 3px 0 0 var(--orange);
+  }
+
+  .queue-item.is-external {
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    align-items: center;
+    padding: 0 7px;
+  }
+
+  .queue-source {
+    color: #a9806a;
+    font-size: 5px;
+    text-transform: uppercase;
+  }
+
+  .queue-play {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    align-items: center;
+    min-width: 0;
+    border: 0;
+    padding: 0 6px;
+    color: #cdbb9a;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
+  }
+
+  .queue-index {
+    color: #a77863;
+    font-size: 6px;
+  }
+
+  .queue-item.is-current .queue-index {
+    color: #ffb65f;
+  }
+
+  .queue-title-window {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .queue-title-text {
+    display: inline-block;
+    font-size: 8px;
+    text-transform: lowercase;
+  }
+
+  .queue-item.is-current .queue-title-text {
+    color: #fff0bd;
+  }
+
+  .queue-title-text.is-scrolling {
+    animation: queue-marquee 4.8s ease-in-out infinite alternate;
+  }
+
+  .queue-reorder {
+    display: grid;
+    grid-template-columns: repeat(3, 19px);
+    gap: 2px;
+    align-items: stretch;
+    padding: 4px;
+  }
+
+  .queue-reorder button {
+    padding: 0;
+  }
+
+  .queue-empty {
+    position: absolute;
+    top: 56%;
+    right: 12px;
+    left: 12px;
+    color: #715550;
+    font-size: 7px;
+    line-height: 1.8;
+    text-align: center;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+
+@keyframes queue-marquee {
+    0%,
+    18% { transform: translateX(0); }
+    82%,
+    100% { transform: translateX(calc(-1 * var(--marquee-distance))); }
+  }
+
+@media (max-width: 1050px) {
   .player-panel {
     min-height: 760px;
   }
@@ -1365,7 +1591,8 @@ footer {
 
 .desk {
   grid-template-areas:
-    "library player"
+    "library queue"
+    "player queue"
     "room room";
   grid-template-columns: minmax(0, 1.3fr) minmax(430px, .7fr);
   gap: clamp(20px, 2vw, 36px);
@@ -1426,13 +1653,54 @@ footer {
 }
 
 .cover-grid .cover-card {
+  position: relative;
   width: 100%;
   min-width: 0;
 }
 
+.cover-card-main {
+  display: block;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.queue-select {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  border: 2px solid #291719;
+  color: #251416;
+  background: #d8bf8b;
+  box-shadow: 3px 3px 0 rgba(9, 5, 7, .8);
+  cursor: pointer;
+  font: 900 13px/1 monospace;
+}
+
+.cover-card.is-selected .cover-frame {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px #2b1718, 0 0 20px rgba(236, 127, 62, .55);
+}
+
+.cover-card.is-selected .queue-select {
+  color: #fff1bd;
+  background: var(--orange);
+}
+
 .cover-grid .cover-frame,
 .cover-grid .cover-card:hover .cover-frame,
-.cover-grid .cover-card:focus-visible .cover-frame {
+.cover-grid .cover-card:focus-visible .cover-frame,
+.cover-grid .cover-card:focus-within .cover-frame {
   transform: none;
 }
 
@@ -1635,14 +1903,20 @@ body.theater-mode .status {
   .desk {
     grid-template-areas:
       "library"
+      "queue"
       "player"
       "room";
     grid-template-columns: minmax(0, 1fr);
   }
 
   .library-panel,
-  .player-panel {
+  .player-panel,
+  .queue-panel {
     min-height: 720px;
+  }
+
+  .queue-panel {
+    min-height: 320px;
   }
 
   .cover-grid {
@@ -2030,9 +2304,9 @@ body.theater-mode .transport-controls > .play-button {
 
   .desk {
     grid-template-areas:
-      "library library"
-      "player room";
-    grid-template-columns: minmax(320px, 1fr) minmax(0, 2fr);
+      "library library library library library queue"
+      "player player room room room room";
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     grid-template-rows: minmax(260px, .75fr) minmax(340px, 1.25fr);
     gap: 18px;
     height: calc(100vh - 102px);
@@ -2040,6 +2314,7 @@ body.theater-mode .transport-controls > .play-button {
   }
 
   .library-panel,
+  .queue-panel,
   .player-panel,
   .room-panel,
   .box-scene {
@@ -2050,10 +2325,6 @@ body.theater-mode .transport-controls > .play-button {
     background:
       linear-gradient(to bottom, transparent 0 72%, rgba(93, 51, 35, .96) 72% 100%),
       repeating-linear-gradient(90deg, #6b3e2b 0 28px, #754831 29px 32px);
-  }
-
-  .library-panel {
-    grid-column: 1 / -1;
   }
 
   .library-ui {
@@ -2183,6 +2454,7 @@ body.theater-mode .transport-controls > .play-button {
 .masthead,
 .library-panel,
 .player-panel,
+.queue-panel,
 footer {
   transition: filter .28s steps(5), opacity .28s steps(5);
 }
@@ -2194,6 +2466,7 @@ body.crt-isolation-mode {
 body.crt-isolation-mode .masthead,
 body.crt-isolation-mode .library-panel,
 body.crt-isolation-mode .player-panel,
+body.crt-isolation-mode .queue-panel,
 body.crt-isolation-mode footer {
   filter: brightness(.08) saturate(.35);
   opacity: .16;
