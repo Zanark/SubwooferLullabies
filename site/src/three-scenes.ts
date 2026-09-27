@@ -1032,6 +1032,7 @@ export function createBoxScene(
   let waveformData = new Uint8Array(0);
   let smoothedEnergy = 0;
   let smoothedBass = 0;
+  let smoothedScopePeak = 0.08;
   const crtLightColor = new THREE.Color(0x8fcbd1);
 
   function updateCrtLightColor(image: CanvasImageSource) {
@@ -1115,14 +1116,29 @@ export function createBoxScene(
       crtContext.fillStyle = '#e66a32';
       crtContext.lineWidth = 5;
       if (visualizerMode === 'scope') {
+        let scopePeak = 0;
+        for (const value of waveformData) {
+          scopePeak = Math.max(scopePeak, Math.abs(value - 128) / 128);
+        }
+        smoothedScopePeak += (scopePeak - smoothedScopePeak) * (
+          scopePeak > smoothedScopePeak ? 0.58 : 0.1
+        );
+        const scopeGain = THREE.MathUtils.clamp(
+          0.82 / Math.max(smoothedScopePeak, 0.055),
+          1.8,
+          5.5,
+        );
+        const scopeAmplitude = height * 0.42;
         crtContext.beginPath();
         for (let x = 0; x <= width; x += 5) {
           const sampleIndex = Math.min(
             waveformData.length - 1,
             Math.floor(x / width * waveformData.length),
           );
-          const sample = waveformData.length ? (waveformData[sampleIndex] - 128) / 128 : 0;
-          const y = height / 2 + sample * (64 + smoothedEnergy * 78);
+          const sample = waveformData.length
+            ? THREE.MathUtils.clamp((waveformData[sampleIndex] - 128) / 128 * scopeGain, -1, 1)
+            : 0;
+          const y = height / 2 + sample * scopeAmplitude;
           if (x === 0) crtContext.moveTo(x, y);
           else crtContext.lineTo(x, y);
         }
