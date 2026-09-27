@@ -233,7 +233,7 @@ async function loadCassette(song: Song) {
 
     selected = song;
     audio.src = asset(song.audio);
-    playerScene.setCassette({ ...song, cover: asset(song.cover) });
+    await playerScene.setCassette({ ...song, cover: asset(song.cover) });
     status.textContent = `ready / ${formatDuration(song.duration_seconds)}`;
     theaterArt.style.backgroundImage = `url("${asset(song.cover)}")`;
     playButton.disabled = false;

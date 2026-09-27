@@ -15,6 +15,7 @@ type CassetteParts = {
   group: THREE.Group;
   reels: THREE.Mesh[];
   label: THREE.Mesh;
+  front: THREE.Mesh;
   back: THREE.Mesh;
 };
 
@@ -104,6 +105,26 @@ function textureMaterial(texture: THREE.Texture, transparent = false) {
   });
 }
 
+const coverTextures = new Map<string, Promise<THREE.Texture>>();
+
+function loadCoverTexture(path: string) {
+  let pending = coverTextures.get(path);
+  if (!pending) {
+    pending = new THREE.TextureLoader().loadAsync(path).then((texture) => {
+      texture.colorSpace = THREE.SRGBColorSpace;
+      return texture;
+    }).catch((error: unknown) => {
+      console.warn(`Unable to load cassette cover: ${path}`, error);
+      coverTextures.delete(path);
+      const fallback = canvasTexture('cover unavailable', 'audio remains playable', '#15272c', '#edf0d7');
+      fallback.userData.owned = false;
+      return fallback;
+    });
+    coverTextures.set(path, pending);
+  }
+  return pending;
+}
+
 function disposeMaterial(source: THREE.Material | THREE.Material[]) {
   const materials = Array.isArray(source) ? source : [source];
   materials.forEach((entry) => {
@@ -129,9 +150,14 @@ function createCassette(title: string, genre = '', cover?: THREE.Texture): Casse
   const edge = box(3.12, 1.9, 0.38, COLORS.tapeEdge, [0, 0, 0]);
   group.add(edge);
 
+  const frontTexture = cover ?? canvasTexture('subwave', 'cassette archive', '#15272c', '#edf0d7');
+  const front = new THREE.Mesh(new THREE.PlaneGeometry(3.02, 1.78), textureMaterial(frontTexture));
+  front.position.set(0, 0, 0.201);
+  group.add(front);
+
   const labelTexture = canvasTexture(title, genre);
-  const label = new THREE.Mesh(new THREE.PlaneGeometry(2.72, 0.82), textureMaterial(labelTexture));
-  label.position.set(0, 0.47, 0.201);
+  const label = new THREE.Mesh(new THREE.PlaneGeometry(2.72, 0.38), textureMaterial(labelTexture));
+  label.position.set(0, 0.68, 0.211);
   group.add(label);
 
   const backTexture = cover ?? canvasTexture('side b', 'subwoofer lullabies', '#192525', '#d3c99d');
@@ -165,7 +191,7 @@ function createCassette(title: string, genre = '', cover?: THREE.Texture): Casse
   group.add(lower);
   group.userData.title = title;
   group.userData.reels = reels;
-  return { group, reels, label, back };
+  return { group, reels, label, front, back };
 }
 
 function setupRenderer(canvas: HTMLCanvasElement, alpha = true) {
@@ -454,8 +480,13 @@ export function createPlayerScene(canvas: HTMLCanvasElement) {
   });
 
   return {
-    setCassette(song: VisualSong) {
+    async setCassette(song: VisualSong) {
+      const cover = await loadCoverTexture(song.cover);
+      disposeMaterial(cassette.front.material);
+      disposeMaterial(cassette.back.material);
       disposeMaterial(cassette.label.material);
+      cassette.front.material = textureMaterial(cover);
+      cassette.back.material = textureMaterial(cover);
       cassette.label.material = textureMaterial(canvasTexture(song.title, `${song.bpm} bpm`));
       cassette.group.visible = true;
     },
@@ -474,22 +505,6 @@ export function createShowcaseScene(canvas: HTMLCanvasElement) {
   addLighting(scene);
   let cassette: CassetteParts | null = null;
   let animation: { start: number; resolve: () => void } | null = null;
-  const covers = new Map<string, Promise<THREE.Texture>>();
-  const loadCover = (path: string) => {
-    let pending = covers.get(path);
-    if (!pending) {
-      pending = new THREE.TextureLoader().loadAsync(path).then((texture) => {
-        texture.colorSpace = THREE.SRGBColorSpace;
-        return texture;
-      }).catch((error: unknown) => {
-        console.warn(`Unable to load cassette cover: ${path}`, error);
-        covers.delete(path);
-        return canvasTexture('cover unavailable', 'audio remains playable', '#15272c', '#edf0d7');
-      });
-      covers.set(path, pending);
-    }
-    return pending;
-  };
 
   const dispose = animateScene(renderer, scene, camera, resize, (time) => {
     const aspect = canvas.clientWidth / Math.max(canvas.clientHeight, 1);
@@ -513,14 +528,14 @@ export function createShowcaseScene(canvas: HTMLCanvasElement) {
 
   return {
     preload(songs: VisualSong[]) {
-      songs.forEach((song) => { void loadCover(song.cover); });
+      songs.forEach((song) => { void loadCoverTexture(song.cover); });
     },
     async show(song: VisualSong) {
       if (cassette) {
         scene.remove(cassette.group);
         disposeObject(cassette.group);
       }
-      const cover = await loadCover(song.cover);
+      const cover = await loadCoverTexture(song.cover);
       cassette = createCassette(song.title, `${song.genre} / ${song.bpm} bpm`, cover);
       cassette.group.scale.setScalar(0.72);
       scene.add(cassette.group);
