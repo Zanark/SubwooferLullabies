@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="240" viewBox="0 0 1200 240" role="img" aria-labelledby="title description">
+  <title id="title">Subwoofer Lullabies</title>
+  <desc id="description">A transparent retro pixel-style wordmark with a small audio waveform.</desc>
+  <defs>
+    <linearGradient id="mint" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f0deb0"/>
+      <stop offset="0.48" stop-color="#94c9b4"/>
+      <stop offset="1" stop-color="#4b8580"/>
+    </linearGradient>
+    <linearGradient id="orange" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff9a48"/>
+      <stop offset="0.55" stop-color="#e65e32"/>
+      <stop offset="1" stop-color="#873246"/>
+    </linearGradient>
+    <filter id="pixel-shadow" x="-10%" y="-20%" width="125%" height="160%">
+      <feDropShadow dx="10" dy="12" stdDeviation="0" flood-color="#071315" flood-opacity="0.95"/>
+      <feDropShadow dx="4" dy="5" stdDeviation="0" flood-color="#26656a" flood-opacity="0.8"/>
+    </filter>
+  </defs>
+  <g fill="none" stroke-linecap="square">
+    <path d="M62 183h35v-18h26v-44h28v72h28v-98h28v78h28v-38h28v48h35"
+          stroke="#e86b36" stroke-width="8" opacity="0.88"/>
+    <path d="M922 183h35v-38h28v58h28v-92h28v72h28v-44h28v26h35"
+          stroke="#6ba9a1" stroke-width="8" opacity="0.8"/>
+  </g>
+  <g filter="url(#pixel-shadow)" font-family="'Courier New', Consolas, monospace" font-weight="900" letter-spacing="-7">
+    <text x="54" y="143" font-size="92" fill="url(#mint)">subwoofer</text>
+    <text x="535" y="143" font-size="92" fill="url(#orange)">lullabies</text>
+  </g>
+  <g fill="#e7d6a7" font-family="'Courier New', Consolas, monospace" font-size="18" font-weight="700" letter-spacing="6">
+    <text x="390" y="205">ORIGINAL MUSIC / CODE-COMPOSED TAPES</text>
+  </g>
+</svg>

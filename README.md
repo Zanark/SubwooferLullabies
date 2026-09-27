@@ -1,5 +1,16 @@
-# SubwooferLullabies
-Music generated with code
+<p align="center">
+  <img src="docs/assets/subwoofer-lullabies-logo.svg" alt="Subwoofer Lullabies" width="820">
+</p>
+
+<p align="center">
+  Original code-composed music, editable Strudel scores and a PS1-style cassette player.
+</p>
+
+<p align="center">
+  <a href="https://zanark.github.io/SubwooferLullabies/"><strong>Play the cassette archive</strong></a>
+  · <a href="STRUDEL/README.md">Browse the scores</a>
+  · <a href="artwork/covers/index.html">View the cover gallery</a>
+</p>
 
 ## STRUDEL collection
 
@@ -45,11 +56,10 @@ Generated `AUDIO` files are Git-ignored and are not automatically published.
 
 ## Playable website
 
-The `deployment/pages` branch contains a Vite and TypeScript static site for
-GitHub Pages. It presents the collection as a PS1-inspired cassette archive:
-search or browse the album grid, click a song or drag a cassette into the
-fictional portable player, inspect both cassette sides, and play the rendered
-track in theater mode.
+[Open the live PS1 cassette desk](https://zanark.github.io/SubwooferLullabies/).
+Browse or search by song title, move tapes around the desk, then drag one into
+the fictional player. Each tape has a two-second 3D inspection, mechanical
+controls, volume, animated reels and a convex CRT with selectable signals.
 
 ```powershell
 npm install
@@ -57,12 +67,9 @@ npm run dev
 npm run build
 ```
 
-The checked `site/public/audio` MP3 previews are derived from the verified local
-WAV exports. Run `npm run audio:encode` only after intentionally regenerating
-the complete `AUDIO` manifest. The Pages workflow builds and deploys only from
-`deployment/pages`; the repository's Pages source must remain **GitHub Actions**.
-The player is an original design and is not affiliated with Sony or another
-hardware manufacturer.
+The Vite, TypeScript and Three.js site deploys only from `deployment/pages`.
+Its checked MP3 previews come from the verified local WAV exports. The player
+is an original design and is not affiliated with Sony or another manufacturer.
 
 ## Songs
 
