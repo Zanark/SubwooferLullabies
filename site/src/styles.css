@@ -2190,6 +2190,32 @@ body.theater-mode .transport-controls > .play-button {
   bottom: auto;
 }
 
+.crt-back-button {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  z-index: 10;
+  border: 2px solid #815340;
+  padding: 7px 9px;
+  color: #211315;
+  background: var(--orange);
+  box-shadow: 4px 4px 0 rgba(9, 5, 7, .72);
+  font-size: 8px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.crt-back-button:hover,
+.crt-back-button:focus-visible {
+  outline: 2px solid #f0d38c;
+  outline-offset: 2px;
+  background: #f0d38c;
+}
+
+.room-panel.is-crt-focused .canvas-help {
+  display: none;
+}
+
 .crt-controls span {
   margin-right: 4px;
   color: #d0a878;

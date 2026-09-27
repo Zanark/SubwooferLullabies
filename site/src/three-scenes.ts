@@ -26,6 +26,7 @@ export type BoxSceneController = SceneController & {
   setAnalyser(analyser: AnalyserNode): void;
   setVisualizer(mode: VisualizerMode): void;
   setSearchMatches(titles: string[]): void;
+  setCrtFocus(active: boolean): void;
 };
 
 type CassetteParts = {
@@ -640,6 +641,7 @@ export function createBoxScene(
   songs: VisualSong[],
   onSelect: (title: string) => void,
   onInspect: (title: string) => void,
+  onCrtFocusChange: (active: boolean) => void,
   dropTarget: HTMLElement,
   handCursor: HandCursorController,
 ): BoxSceneController {
@@ -920,6 +922,8 @@ export function createBoxScene(
   crtScreenGlow.position.set(-0.38, 0.25, 1.695);
   crtScreenGlow.renderOrder = 952;
   television.add(crtScreenGlow);
+  const crtFocusPosition = television.localToWorld(new THREE.Vector3(-0.38, 0.25, 7.2));
+  const crtFocusTarget = television.localToWorld(new THREE.Vector3(-0.38, 0.25, 1.72));
 
   const books = new THREE.Group();
   books.position.set(-1.05, -1.84, 1.55);
@@ -1245,6 +1249,7 @@ export function createBoxScene(
   let latestClientY = 0;
   let scrollFrame = 0;
   let activePointerId: number | null = null;
+  let crtFocused = false;
 
   function hit(event: PointerEvent) {
     const rect = canvas.getBoundingClientRect();
@@ -1267,6 +1272,23 @@ export function createBoxScene(
     while (object && !switchRoots.includes(object as THREE.Group)) object = object.parent;
     const index = switchRoots.indexOf(object as THREE.Group);
     return index >= 0 ? wallSwitches[index] : null;
+  }
+
+  function hitTelevision(event: PointerEvent) {
+    const rect = canvas.getBoundingClientRect();
+    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(pointer, camera);
+    return Boolean(raycaster.intersectObject(television, true)[0]);
+  }
+
+  function setCrtFocus(active: boolean) {
+    if (crtFocused === active) return;
+    crtFocused = active;
+    hover = null;
+    canvas.style.cursor = 'default';
+    handCursor.hover(latestClientX, latestClientY, false);
+    onCrtFocusChange(active);
   }
 
   function updateDropTarget() {
@@ -1308,13 +1330,17 @@ export function createBoxScene(
   }
 
   canvas.addEventListener('pointerdown', (event) => {
-    if (pressed) return;
+    if (pressed || crtFocused) return;
     const wallSwitch = hitSwitch(event);
     if (wallSwitch) {
       toggleWallSwitch(wallSwitch);
       return;
     }
     pressed = hit(event);
+    if (!pressed && hitTelevision(event)) {
+      setCrtFocus(true);
+      return;
+    }
     if (!pressed) return;
     onInspect(String(pressed.userData.title));
     activePointerId = event.pointerId;
@@ -1339,12 +1365,18 @@ export function createBoxScene(
     if (pressed && event.pointerId !== activePointerId) return;
     latestClientX = event.clientX;
     latestClientY = event.clientY;
+    if (crtFocused) {
+      canvas.style.cursor = 'default';
+      handCursor.hover(event.clientX, event.clientY, false);
+      return;
+    }
     const nextSwitch = hitSwitch(event);
     const nextHover = hit(event);
+    const nextTelevision = !nextSwitch && !nextHover && hitTelevision(event);
     if (hover !== nextHover) {
       hover = nextHover;
     }
-    canvas.style.cursor = nextSwitch ? 'pointer' : hover || pressed ? 'none' : 'default';
+    canvas.style.cursor = nextSwitch || nextTelevision ? 'pointer' : hover || pressed ? 'none' : 'default';
     handCursor.hover(event.clientX, event.clientY, Boolean((hover || pressed) && !nextSwitch));
     if (pressed) {
       moved ||= Math.hypot(event.clientX - startX, event.clientY - startY) > 7;
@@ -1394,17 +1426,29 @@ export function createBoxScene(
 
   let pointerX = 0;
   let pointerY = 0;
+  const cameraTarget = new THREE.Vector3(0, -0.85, 0);
+  const desiredCameraPosition = new THREE.Vector3();
+  const desiredCameraTarget = new THREE.Vector3();
   canvas.addEventListener('pointermove', (event) => {
     const rect = canvas.getBoundingClientRect();
     pointerX = (event.clientX - rect.left) / rect.width - 0.5;
     pointerY = (event.clientY - rect.top) / rect.height - 0.5;
   });
 
-  const disposeAnimation = animateScene(renderer, scene, camera, resize, (time) => {
+  const disposeAnimation = animateScene(renderer, scene, camera, resize, (time, delta) => {
     const aspect = canvas.clientWidth / Math.max(canvas.clientHeight, 1);
     const cameraScale = Math.max(1, 1.72 / aspect);
-    camera.position.set(pointerX * 0.4, 8 * cameraScale - pointerY * 0.16, 17 * cameraScale);
-    camera.lookAt(0, -0.85, 0);
+    if (crtFocused) {
+      desiredCameraPosition.copy(crtFocusPosition);
+      desiredCameraTarget.copy(crtFocusTarget);
+    } else {
+      desiredCameraPosition.set(pointerX * 0.4, 8 * cameraScale - pointerY * 0.16, 17 * cameraScale);
+      desiredCameraTarget.set(0, -0.85, 0);
+    }
+    const cameraDamping = 1 - Math.exp(-delta * 6.5);
+    camera.position.lerp(desiredCameraPosition, cameraDamping);
+    cameraTarget.lerp(desiredCameraTarget, cameraDamping);
+    camera.lookAt(cameraTarget);
     const veilDistance = Math.abs(darknessVeil.position.z);
     const veilHeight = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5)) * veilDistance;
     darknessVeil.scale.set(veilHeight * camera.aspect, veilHeight, 1);
@@ -1465,6 +1509,7 @@ export function createBoxScene(
         .filter((tape) => matches.has(String(tape.userData.title)))
         .forEach(addSearchSpotlight);
     },
+    setCrtFocus,
     dispose() {
       if (scrollFrame) cancelAnimationFrame(scrollFrame);
       clearSearchSpotlights();

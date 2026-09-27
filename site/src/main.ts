@@ -107,8 +107,9 @@ app.innerHTML = `
       </div>
     </section>
 
-    <section class="room-panel box-scene" aria-label="Messy 2010 teenager room">
+    <section id="room-panel" class="room-panel box-scene" aria-label="Messy 2010 teenager room">
       <canvas id="box-3d" class="scene-canvas box-canvas" aria-label="Interactive 3D room with loose cassettes on a desk"></canvas>
+      <button id="exit-crt-focus" class="crt-back-button" type="button" hidden>back to room</button>
       <div class="crt-controls" role="group" aria-label="CRT visualizer">
         <span>crt signal</span>
         <button type="button" data-visualizer="scope" disabled>scope</button>
@@ -118,7 +119,7 @@ app.innerHTML = `
         <button type="button" data-visualizer="tunnel" disabled>tunnel</button>
         <button type="button" data-visualizer="rain" disabled>rain</button>
       </div>
-      <p class="canvas-help">move tapes / drag to player / click the wall switches</p>
+      <p class="canvas-help">move tapes / drag to player / click tv or wall switches</p>
     </section>
   </main>
 
@@ -156,6 +157,8 @@ const status = required<HTMLDivElement>('status');
 const announcement = required<HTMLDivElement>('announcement');
 const showcase = required<HTMLDivElement>('showcase');
 const showcaseTitle = required<HTMLElement>('showcase-title');
+const roomPanel = required<HTMLElement>('room-panel');
+const exitCrtFocusButton = required<HTMLButtonElement>('exit-crt-focus');
 const visualizerButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-visualizer]'));
 
 let catalog: Catalog;
@@ -476,6 +479,9 @@ visualizerButtons.forEach((button) => {
     });
   });
 });
+exitCrtFocusButton.addEventListener('click', () => {
+  boxScene.setCrtFocus(false);
+});
 search.addEventListener('input', () => {
   deskPreviewTitle = null;
   renderShelf();
@@ -522,6 +528,10 @@ async function start() {
     (title) => {
       deskPreviewTitle = title;
       renderShelf();
+    },
+    (active) => {
+      roomPanel.classList.toggle('is-crt-focused', active);
+      exitCrtFocusButton.hidden = !active;
     },
     dropZone,
     handCursorScene,
