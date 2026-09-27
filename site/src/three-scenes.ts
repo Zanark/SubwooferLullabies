@@ -472,9 +472,9 @@ export function createBoxScene(
   scene.add(wall);
 
   const posterLayouts: Array<[string, string, string, string, number, number, number, number, number]> = [
-    ['SATURDAY MIX', 'BOMBAY / 1996', '#d8a34b', '#3b1b20', -7.3, 2.5, 3.7, 2.1, -0.05],
-    ['TOP 10', 'RADIO REQUESTS', '#426d66', '#f1d7a8', 0.1, 3.0, 3.1, 1.8, 0.035],
-    ['MIDNIGHT FM', '90.4 / STEREO', '#31556c', '#ead59d', 6.7, 2.4, 3.8, 2.2, -0.025],
+    ['INDIE NIGHT', 'BANGALORE / 2010', '#d8a34b', '#3b1b20', -7.1, 2.5, 3.9, 2.2, -0.065],
+    ['LAN PARTY', 'FRIDAY / 10 PM', '#426d66', '#f1d7a8', 0.1, 3.0, 3.2, 1.9, 0.045],
+    ['MIXTAPE BLOG', 'NEW POST DAILY', '#31556c', '#ead59d', 6.7, 2.4, 3.9, 2.25, -0.035],
   ];
   posterLayouts.forEach(([title, subtitle, background, foreground, x, y, width, height, rotation]) => {
     const poster = new THREE.Mesh(
@@ -487,26 +487,38 @@ export function createBoxScene(
   });
 
   const boxGroup = new THREE.Group();
-  boxGroup.position.set(2.65, -0.12, 0.1);
+  boxGroup.position.set(3.15, -0.18, 0.15);
   scene.add(boxGroup);
 
-  boxGroup.add(box(9.6, 0.3, 3.5, COLORS.cardboardDark, [0, -1.62, 0]));
-  boxGroup.add(box(9.6, 2.75, 0.24, COLORS.cardboardLight, [0, -0.18, -1.63]));
-  boxGroup.add(box(0.25, 2.75, 3.5, COLORS.cardboard, [-4.68, -0.18, 0]));
-  boxGroup.add(box(0.25, 2.75, 3.5, COLORS.cardboard, [4.68, -0.18, 0]));
-  boxGroup.add(box(9.6, 0.5, 0.25, COLORS.cardboard, [0, -1.35, 1.58]));
-  for (let slot = -3; slot <= 3; slot++) {
-    boxGroup.add(box(0.06, 2.4, 0.16, COLORS.cardboardDark, [slot * 1.24, -0.15, -1.48]));
-  }
+  boxGroup.add(box(8.7, 0.3, 3.5, COLORS.cardboardDark, [0, -1.62, 0]));
+  boxGroup.add(box(8.7, 2.75, 0.24, COLORS.cardboardLight, [0, -0.18, -1.63]));
+  boxGroup.add(box(0.25, 2.75, 3.5, COLORS.cardboard, [-4.23, -0.18, 0]));
+  boxGroup.add(box(0.25, 2.75, 3.5, COLORS.cardboard, [4.23, -0.18, 0]));
+  boxGroup.add(box(8.7, 0.5, 0.25, COLORS.cardboard, [0, -1.35, 1.58]));
 
   const tapeRoots: THREE.Group[] = [];
+  const cassetteLayouts: Array<[[number, number, number], [number, number, number], number]> = [
+    [[-3.45, 0.35, 1.72], [0, -0.05, -0.13], 0.34],
+    [[-2.05, 0.28, 1.74], [0, 0.04, 0.09], 0.34],
+    [[-0.62, 0.4, 1.71], [0, -0.02, -0.07], 0.34],
+    [[0.85, 0.29, 1.73], [0, 0.05, 0.14], 0.34],
+    [[2.28, 0.38, 1.72], [0, -0.04, -0.1], 0.34],
+    [[3.5, 0.25, 1.76], [0, 0.02, 0.08], 0.31],
+    [[-3.38, -0.78, 1.75], [0, 0.03, 0.1], 0.33],
+    [[-1.94, -0.85, 1.73], [0, -0.05, -0.15], 0.33],
+    [[-0.48, -0.73, 1.76], [0, 0.02, 0.07], 0.33],
+    [[1.0, -0.86, 1.72], [0, -0.03, -0.08], 0.33],
+    [[2.48, -0.75, 1.74], [0, 0.05, 0.13], 0.33],
+    [[3.58, -0.88, 1.77], [0, -0.02, -0.05], 0.29],
+    [[-2.75, 1.25, 1.68], [0, 0.06, 0.23], 0.29],
+    [[2.9, 1.27, 1.69], [0, -0.05, -0.22], 0.29],
+  ];
   songs.forEach((song, index) => {
     const cassette = createCassette(song.title);
-    const column = index % 7;
-    const row = Math.floor(index / 7);
-    cassette.group.scale.setScalar(0.35);
-    cassette.group.position.set(-3.72 + column * 1.24, -0.78 + row * 1.08, 1.72);
-    cassette.group.rotation.set(0, (column - 3) * 0.012, ((index % 3) - 1) * 0.015);
+    const [position, rotation, scale] = cassetteLayouts[index];
+    cassette.group.scale.setScalar(scale);
+    cassette.group.position.set(...position);
+    cassette.group.rotation.set(...rotation);
     boxGroup.add(cassette.group);
     void loadCoverTexture(song.cover).then((cover) => {
       disposeMaterial(cassette.back.material);
@@ -522,16 +534,16 @@ export function createBoxScene(
   scene.add(box(19.5, 0.12, 7.5, 0xa56a3d, [0, -1.91, 0]));
 
   const television = new THREE.Group();
-  television.position.set(-6.45, -0.45, -0.05);
+  television.position.set(-5.9, -0.2, -0.05);
   television.rotation.y = 0.08;
-  television.add(box(3.7, 3.05, 2.35, 0x34302d, [0, 0, 0]));
-  television.add(box(2.75, 2.05, 0.12, 0x11191b, [-0.25, 0.2, 1.22]));
-  television.add(box(0.42, 0.42, 0.2, 0xd1963e, [1.35, 0.36, 1.25]));
-  television.add(box(0.42, 0.42, 0.2, 0x718b75, [1.35, -0.38, 1.25]));
-  television.add(box(0.7, 0.22, 0.5, 0x27201f, [-1.05, -1.68, 0]));
-  television.add(box(0.7, 0.22, 0.5, 0x27201f, [1.05, -1.68, 0]));
-  const antennaLeft = box(0.08, 2.2, 0.08, 0x8f8c7d, [-0.45, 2.25, -0.2], [0, 0, -0.28]);
-  const antennaRight = box(0.08, 2.2, 0.08, 0x8f8c7d, [0.45, 2.25, -0.2], [0, 0, 0.28]);
+  television.add(box(4.9, 3.8, 2.75, 0x34302d, [0, 0, 0]));
+  television.add(box(3.75, 2.72, 0.12, 0x11191b, [-0.32, 0.2, 1.42]));
+  television.add(box(0.5, 0.5, 0.2, 0xd1963e, [1.78, 0.45, 1.45]));
+  television.add(box(0.5, 0.5, 0.2, 0x718b75, [1.78, -0.38, 1.45]));
+  television.add(box(0.85, 0.22, 0.55, 0x27201f, [-1.35, -2.02, 0]));
+  television.add(box(0.85, 0.22, 0.55, 0x27201f, [1.35, -2.02, 0]));
+  const antennaLeft = box(0.08, 2.35, 0.08, 0x8f8c7d, [-0.52, 2.85, -0.2], [0, 0, -0.28]);
+  const antennaRight = box(0.08, 2.35, 0.08, 0x8f8c7d, [0.52, 2.85, -0.2], [0, 0, 0.28]);
   television.add(antennaLeft, antennaRight);
 
   const crtCanvas = document.createElement('canvas');
@@ -545,10 +557,10 @@ export function createBoxScene(
   crtTexture.magFilter = THREE.NearestFilter;
   crtTexture.minFilter = THREE.NearestFilter;
   const crtScreen = new THREE.Mesh(
-    new THREE.PlaneGeometry(2.55, 1.84),
+    new THREE.PlaneGeometry(3.48, 2.48),
     textureMaterial(crtTexture),
   );
-  crtScreen.position.set(-0.25, 0.2, 1.3);
+  crtScreen.position.set(-0.32, 0.2, 1.5);
   television.add(crtScreen);
   scene.add(television);
 
@@ -559,6 +571,25 @@ export function createBoxScene(
     books.add(box(1.75, 0.18, 1.05, color, [0, index * 0.2, 0]));
   });
   scene.add(books);
+
+  const cdStack = new THREE.Group();
+  cdStack.position.set(-2.85, -1.15, -0.65);
+  cdStack.rotation.set(0.08, -0.22, -0.12);
+  [0x6aa3af, 0xd06b52, 0x9897b9].forEach((color, index) => {
+    const caseMesh = box(1.2, 0.08, 1.2, color, [index * 0.16, index * 0.1, index * 0.07]);
+    (caseMesh.material as THREE.MeshStandardMaterial).transparent = true;
+    (caseMesh.material as THREE.MeshStandardMaterial).opacity = 0.72;
+    cdStack.add(caseMesh);
+  });
+  scene.add(cdStack);
+
+  const phone = new THREE.Group();
+  phone.position.set(-2.1, -1.45, 1.2);
+  phone.rotation.set(-0.08, 0.25, 0.16);
+  phone.add(box(0.7, 0.14, 1.35, 0x24282b, [0, 0, 0]));
+  phone.add(box(0.48, 0.04, 0.62, 0x6b938e, [0, 0.1, -0.18]));
+  phone.add(box(0.42, 0.04, 0.28, 0xb8a67c, [0, 0.1, 0.38]));
+  scene.add(phone);
 
   const pencilCup = new THREE.Group();
   pencilCup.position.set(-3.9, -1.15, -1.4);

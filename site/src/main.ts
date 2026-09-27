@@ -100,9 +100,9 @@ app.innerHTML = `
       </div>
     </section>
 
-    <section class="room-panel box-scene" aria-label="Messy 1990s cassette room">
+    <section class="room-panel box-scene" aria-label="Messy 2010 teenager room">
       <div class="box-label">
-        <span>teenage room / india / 1996</span>
+        <span>teenage room / india / 2010</span>
         <strong>pick up or drag a 3d tape</strong>
       </div>
       <canvas id="box-3d" class="scene-canvas box-canvas" aria-label="Interactive 3D room with a box and loose cassettes"></canvas>
