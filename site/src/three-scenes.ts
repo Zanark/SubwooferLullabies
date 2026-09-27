@@ -250,6 +250,24 @@ function createCassette(title: string, cover?: THREE.Texture): CassetteParts {
   return { group, reels, label, front, back };
 }
 
+function crtGlassGeometry(width: number, height: number) {
+  const geometry = new THREE.PlaneGeometry(width, height, 12, 9);
+  const positions = geometry.getAttribute('position');
+  for (let index = 0; index < positions.count; index++) {
+    const x = positions.getX(index);
+    const y = positions.getY(index);
+    const nx = x / (width * 0.5);
+    const ny = y / (height * 0.5);
+    positions.setX(index, x * (1 - ny * ny * 0.075));
+    positions.setY(index, y * (1 - nx * nx * 0.055));
+    const bulge = Math.max(0, 1 - nx * nx) * Math.max(0, 1 - ny * ny);
+    positions.setZ(index, bulge * 0.68);
+  }
+  positions.needsUpdate = true;
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
 function setupRenderer(canvas: HTMLCanvasElement, alpha = true) {
   const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -487,7 +505,7 @@ export function createBoxScene(
   });
 
   const boxGroup = new THREE.Group();
-  boxGroup.position.set(3.15, -0.18, 0.15);
+  boxGroup.position.set(3.55, -0.18, 0.15);
   scene.add(boxGroup);
 
   boxGroup.add(box(8.7, 0.3, 3.5, COLORS.cardboardDark, [0, -1.62, 0]));
@@ -534,16 +552,20 @@ export function createBoxScene(
   scene.add(box(19.5, 0.12, 7.5, 0xa56a3d, [0, -1.91, 0]));
 
   const television = new THREE.Group();
-  television.position.set(-5.9, -0.2, -0.05);
-  television.rotation.y = 0.08;
-  television.add(box(4.9, 3.8, 2.75, 0x34302d, [0, 0, 0]));
-  television.add(box(3.75, 2.72, 0.12, 0x11191b, [-0.32, 0.2, 1.42]));
-  television.add(box(0.5, 0.5, 0.2, 0xd1963e, [1.78, 0.45, 1.45]));
-  television.add(box(0.5, 0.5, 0.2, 0x718b75, [1.78, -0.38, 1.45]));
-  television.add(box(0.85, 0.22, 0.55, 0x27201f, [-1.35, -2.02, 0]));
-  television.add(box(0.85, 0.22, 0.55, 0x27201f, [1.35, -2.02, 0]));
-  const antennaLeft = box(0.08, 2.35, 0.08, 0x8f8c7d, [-0.52, 2.85, -0.2], [0, 0, -0.28]);
-  const antennaRight = box(0.08, 2.35, 0.08, 0x8f8c7d, [0.52, 2.85, -0.2], [0, 0, 0.28]);
+  television.position.set(-5.5, -0.02, -0.05);
+  television.rotation.y = 0.18;
+  television.add(box(5.8, 4.45, 3.1, 0x34302d, [0, 0, 0]));
+  television.add(box(4.55, 3.35, 0.18, 0x11191b, [-0.38, 0.24, 1.61]));
+  television.add(box(0.58, 3.15, 0.18, 0x252625, [2.24, 0.25, 1.63]));
+  for (let row = -5; row <= 5; row++) {
+    television.add(box(0.32, 0.045, 0.03, 0x777164, [2.24, 0.25 + row * 0.23, 1.74]));
+  }
+  television.add(box(0.48, 0.48, 0.22, 0xd1963e, [2.24, -1.48, 1.72]));
+  television.add(box(1.25, 0.16, 0.16, 0x171717, [0.2, -1.91, 1.66]));
+  television.add(box(1.0, 0.24, 0.62, 0x27201f, [-1.6, -2.36, 0]));
+  television.add(box(1.0, 0.24, 0.62, 0x27201f, [1.6, -2.36, 0]));
+  const antennaLeft = box(0.08, 2.2, 0.08, 0x8f8c7d, [-0.55, 3.3, -0.2], [0, 0, -0.28]);
+  const antennaRight = box(0.08, 2.2, 0.08, 0x8f8c7d, [0.55, 3.3, -0.2], [0, 0, 0.28]);
   television.add(antennaLeft, antennaRight);
 
   const crtCanvas = document.createElement('canvas');
@@ -557,11 +579,25 @@ export function createBoxScene(
   crtTexture.magFilter = THREE.NearestFilter;
   crtTexture.minFilter = THREE.NearestFilter;
   const crtScreen = new THREE.Mesh(
-    new THREE.PlaneGeometry(3.48, 2.48),
+    crtGlassGeometry(4.12, 2.94),
     textureMaterial(crtTexture),
   );
-  crtScreen.position.set(-0.32, 0.2, 1.5);
+  crtScreen.position.set(-0.38, 0.25, 1.72);
   television.add(crtScreen);
+  const glassHighlight = new THREE.Mesh(
+    crtGlassGeometry(4.14, 2.96),
+    new THREE.MeshStandardMaterial({
+      color: 0xb9d6ce,
+      transparent: true,
+      opacity: 0.12,
+      roughness: 0.18,
+      metalness: 0,
+      flatShading: true,
+      depthWrite: false,
+    }),
+  );
+  glassHighlight.position.set(-0.38, 0.25, 1.745);
+  television.add(glassHighlight);
   scene.add(television);
 
   const books = new THREE.Group();
