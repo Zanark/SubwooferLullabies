@@ -118,7 +118,7 @@ app.innerHTML = `
         <button type="button" data-visualizer="tunnel" disabled>tunnel</button>
         <button type="button" data-visualizer="rain" disabled>rain</button>
       </div>
-      <p class="canvas-help">move tapes around to search / drag one to the player</p>
+      <p class="canvas-help">move tapes / drag to player / click the wall switches</p>
     </section>
   </main>
 

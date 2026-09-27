@@ -485,10 +485,15 @@ export function createBoxScene(
   camera.position.set(0, 8, 17);
   camera.lookAt(0, -0.85, 0);
   const { renderer, resize } = setupRenderer(canvas);
-  scene.add(new THREE.HemisphereLight(0x637b86, 0x1b1014, 0.88));
+  const nightAmbient = new THREE.HemisphereLight(0x637b86, 0x1b1014, 0.88);
+  scene.add(nightAmbient);
   const moonlight = new THREE.DirectionalLight(0x557a8c, 0.95);
   moonlight.position.set(7, 5, -4);
   scene.add(moonlight);
+  const roomLight = new THREE.PointLight(0xffd7a0, 0, 20, 1.45);
+  roomLight.position.set(1.2, 5.4, 1.6);
+  roomLight.castShadow = true;
+  scene.add(roomLight);
 
   const wall = new THREE.Mesh(new THREE.PlaneGeometry(24, 11), material(0x4b2924, { roughness: 1 }));
   wall.position.set(0, 1.6, -4.8);
@@ -509,6 +514,46 @@ export function createBoxScene(
     poster.rotation.z = rotation;
     scene.add(poster);
   });
+
+  type WallSwitch = {
+    group: THREE.Group;
+    rocker: THREE.Mesh;
+    indicator: THREE.MeshStandardMaterial;
+    state: boolean;
+    kind: 'room' | 'lamp';
+  };
+
+  function createWallSwitch(label: string, kind: WallSwitch['kind'], x: number, initialState: boolean) {
+    const group = new THREE.Group();
+    group.position.set(x, 1.15, -4.55);
+    group.add(box(0.92, 1.35, 0.16, 0xd5c6a2, [0, 0, 0]));
+    group.add(box(0.72, 1.12, 0.09, 0x8f826b, [0, 0, 0.12]));
+    const rocker = box(0.42, 0.62, 0.2, 0x2f3535, [0, -0.05, 0.23]);
+    group.add(rocker);
+    const indicator = material(initialState ? 0xffb34d : 0x372820, {
+      emissive: initialState ? 0xff6d24 : 0x000000,
+      emissiveIntensity: initialState ? 1.8 : 0,
+      roughness: 0.45,
+    });
+    const indicatorMesh = new THREE.Mesh(new THREE.SphereGeometry(0.09, 6, 4), indicator);
+    indicatorMesh.position.set(0, 0.43, 0.23);
+    group.add(indicatorMesh);
+    const labelMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.72, 0.24),
+      textureMaterial(canvasTexture(label, 'light', '#d5c6a2', '#30261f'), true),
+    );
+    labelMesh.position.set(0, -0.52, 0.2);
+    group.add(labelMesh);
+    group.userData.switchKind = kind;
+    scene.add(group);
+    return { group, rocker, indicator, state: initialState, kind } satisfies WallSwitch;
+  }
+
+  const wallSwitches = [
+    createWallSwitch('ROOM', 'room', 2.45, false),
+    createWallSwitch('LAMP', 'lamp', 3.72, true),
+  ];
+  const switchRoots = wallSwitches.map(({ group }) => group);
 
   const tapeGroup = new THREE.Group();
   scene.add(tapeGroup);
@@ -651,6 +696,49 @@ export function createBoxScene(
   television.add(glassHighlight);
   scene.add(television);
 
+  const crtLightTarget = new THREE.Object3D();
+  crtLightTarget.position.set(-1.4, -1.55, 0.75);
+  scene.add(crtLightTarget);
+  const crtSpill = new THREE.SpotLight(0x8fcbd1, 16, 13, 1.02, 0.86, 1.3);
+  crtSpill.position.set(-5.55, 0.25, 2.05);
+  crtSpill.target = crtLightTarget;
+  scene.add(crtSpill);
+  const crtGlow = new THREE.PointLight(0x8fcbd1, 8, 9.5, 1.55);
+  crtGlow.position.set(-5.55, 0.25, 2.05);
+  scene.add(crtGlow);
+  const crtGlowCanvas = document.createElement('canvas');
+  crtGlowCanvas.width = 128;
+  crtGlowCanvas.height = 128;
+  const crtGlowContext = crtGlowCanvas.getContext('2d');
+  if (!crtGlowContext) throw new Error('CRT glow context unavailable.');
+  const crtGlowGradient = crtGlowContext.createRadialGradient(64, 64, 4, 64, 64, 64);
+  crtGlowGradient.addColorStop(0, 'rgba(255,255,255,.92)');
+  crtGlowGradient.addColorStop(0.42, 'rgba(255,255,255,.38)');
+  crtGlowGradient.addColorStop(1, 'rgba(255,255,255,0)');
+  crtGlowContext.fillStyle = crtGlowGradient;
+  crtGlowContext.fillRect(0, 0, 128, 128);
+  const crtGlowTexture = new THREE.CanvasTexture(crtGlowCanvas);
+  const crtWallGlowMaterial = new THREE.MeshBasicMaterial({
+    map: crtGlowTexture,
+    color: 0x8fcbd1,
+    transparent: true,
+    opacity: 0.18,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
+  const crtWallGlow = new THREE.Mesh(new THREE.PlaneGeometry(6.8, 5.1), crtWallGlowMaterial);
+  crtWallGlow.position.set(-5.5, 0.35, -4.62);
+  scene.add(crtWallGlow);
+  const crtDeskGlowMaterial = crtWallGlowMaterial.clone();
+  const crtDeskGlow = new THREE.Mesh(new THREE.PlaneGeometry(6.2, 4.0), crtDeskGlowMaterial);
+  crtDeskGlow.position.set(-3.55, -1.82, 0.72);
+  crtDeskGlow.rotation.x = -Math.PI / 2;
+  scene.add(crtDeskGlow);
+  const crtScreenGlowMaterial = crtWallGlowMaterial.clone();
+  const crtScreenGlow = new THREE.Mesh(new THREE.PlaneGeometry(5.05, 3.72), crtScreenGlowMaterial);
+  crtScreenGlow.position.set(-0.38, 0.25, 1.695);
+  television.add(crtScreenGlow);
+
   const books = new THREE.Group();
   books.position.set(-1.05, -1.84, 1.55);
   books.rotation.y = 0.16;
@@ -726,6 +814,25 @@ export function createBoxScene(
   const lampGlow = new THREE.PointLight(0xffb060, 5.5, 6.5, 1.5);
   lampGlow.position.set(0.08, 0.78, -1.25);
   scene.add(lampGlow);
+  let roomLightOn = false;
+  let lampOn = true;
+
+  function applySwitchVisual(control: WallSwitch) {
+    control.rocker.rotation.x = control.state ? -0.28 : 0.28;
+    control.rocker.position.y = control.state ? -0.01 : -0.09;
+    control.indicator.color.setHex(control.state ? 0xffb34d : 0x372820);
+    control.indicator.emissive.setHex(control.state ? 0xff6d24 : 0x000000);
+    control.indicator.emissiveIntensity = control.state ? 1.8 : 0;
+  }
+
+  function toggleWallSwitch(control: WallSwitch) {
+    control.state = !control.state;
+    if (control.kind === 'room') roomLightOn = control.state;
+    else lampOn = control.state;
+    applySwitchVisual(control);
+  }
+
+  wallSwitches.forEach(applySwitchVisual);
 
   const pencilCup = new THREE.Group();
   pencilCup.position.set(-3.9, -1.41, -1.4);
@@ -743,6 +850,38 @@ export function createBoxScene(
   let waveformData = new Uint8Array(0);
   let smoothedEnergy = 0;
   let smoothedBass = 0;
+  const crtLightColor = new THREE.Color(0x8fcbd1);
+
+  function updateCrtLightColor(image: CanvasImageSource) {
+    const sample = document.createElement('canvas');
+    sample.width = 12;
+    sample.height = 12;
+    const context = sample.getContext('2d', { willReadFrequently: true });
+    if (!context) return;
+    context.drawImage(image, 0, 0, sample.width, sample.height);
+    const pixels = context.getImageData(0, 0, sample.width, sample.height).data;
+    let red = 0;
+    let green = 0;
+    let blue = 0;
+    let weight = 0;
+    for (let index = 0; index < pixels.length; index += 4) {
+      const alpha = pixels[index + 3] / 255;
+      const luminance = (pixels[index] + pixels[index + 1] + pixels[index + 2]) / 765;
+      const pixelWeight = alpha * (0.35 + luminance);
+      red += pixels[index] * pixelWeight;
+      green += pixels[index + 1] * pixelWeight;
+      blue += pixels[index + 2] * pixelWeight;
+      weight += pixelWeight;
+    }
+    if (!weight) return;
+    crtLightColor.setRGB(red / weight / 255, green / weight / 255, blue / weight / 255);
+    crtLightColor.lerp(new THREE.Color(0xb8dddf), 0.3);
+    crtSpill.color.copy(crtLightColor);
+    crtGlow.color.copy(crtLightColor);
+    crtWallGlowMaterial.color.copy(crtLightColor);
+    crtDeskGlowMaterial.color.copy(crtLightColor);
+    crtScreenGlowMaterial.color.copy(crtLightColor);
+  }
 
   function averageBand(start: number, end: number) {
     if (!frequencyData.length) return 0;
@@ -920,6 +1059,18 @@ export function createBoxScene(
     return object as THREE.Group | null;
   }
 
+  function hitSwitch(event: PointerEvent) {
+    const rect = canvas.getBoundingClientRect();
+    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(pointer, camera);
+    const intersection = raycaster.intersectObjects(switchRoots, true)[0];
+    let object: THREE.Object3D | null = intersection?.object ?? null;
+    while (object && !switchRoots.includes(object as THREE.Group)) object = object.parent;
+    const index = switchRoots.indexOf(object as THREE.Group);
+    return index >= 0 ? wallSwitches[index] : null;
+  }
+
   function updateDropTarget() {
     const target = document.elementFromPoint(latestClientX, latestClientY);
     const overDropTarget = Boolean(target && dropTarget.contains(target));
@@ -960,6 +1111,11 @@ export function createBoxScene(
 
   canvas.addEventListener('pointerdown', (event) => {
     if (pressed) return;
+    const wallSwitch = hitSwitch(event);
+    if (wallSwitch) {
+      toggleWallSwitch(wallSwitch);
+      return;
+    }
     pressed = hit(event);
     if (!pressed) return;
     onInspect(String(pressed.userData.title));
@@ -985,12 +1141,13 @@ export function createBoxScene(
     if (pressed && event.pointerId !== activePointerId) return;
     latestClientX = event.clientX;
     latestClientY = event.clientY;
+    const nextSwitch = hitSwitch(event);
     const nextHover = hit(event);
     if (hover !== nextHover) {
       hover = nextHover;
     }
-    canvas.style.cursor = hover || pressed ? 'none' : 'default';
-    handCursor.hover(event.clientX, event.clientY, Boolean(hover || pressed));
+    canvas.style.cursor = nextSwitch ? 'pointer' : hover || pressed ? 'none' : 'default';
+    handCursor.hover(event.clientX, event.clientY, Boolean((hover || pressed) && !nextSwitch));
     if (pressed) {
       moved ||= Math.hypot(event.clientX - startX, event.clientY - startY) > 7;
       const home = pressed.userData.home as THREE.Vector3;
@@ -1050,6 +1207,18 @@ export function createBoxScene(
     const cameraScale = Math.max(1, 1.72 / aspect);
     camera.position.set(pointerX * 0.4, 8 * cameraScale - pointerY * 0.16, 17 * cameraScale);
     camera.lookAt(0, -0.85, 0);
+    roomLight.intensity += ((roomLightOn ? 13 : 0) - roomLight.intensity) * 0.12;
+    lampLight.intensity += ((lampOn ? 34 : 0) - lampLight.intensity) * 0.16;
+    lampGlow.intensity += ((lampOn ? 5.5 : 0) - lampGlow.intensity) * 0.16;
+    lampShadeMaterial.emissiveIntensity += ((lampOn ? 0.7 : 0.03) - lampShadeMaterial.emissiveIntensity) * 0.18;
+    const bulbMaterial = bulb.material as THREE.MeshStandardMaterial;
+    bulbMaterial.emissiveIntensity += ((lampOn ? 2.6 : 0.04) - bulbMaterial.emissiveIntensity) * 0.18;
+    const crtPulse = crtPlaying ? 0.96 + Math.sin(time * 47) * 0.018 + smoothedEnergy * 0.12 : 1;
+    crtSpill.intensity = (crtCover ? (crtPlaying ? 22 + smoothedEnergy * 12 : 16) : 5.5) * crtPulse;
+    crtGlow.intensity = (crtCover ? (crtPlaying ? 11 + smoothedBass * 7 : 8) : 3.2) * crtPulse;
+    crtWallGlowMaterial.opacity = (crtCover ? (crtPlaying ? 0.26 + smoothedEnergy * 0.12 : 0.2) : 0.08) * crtPulse;
+    crtDeskGlowMaterial.opacity = (crtCover ? (crtPlaying ? 0.22 + smoothedBass * 0.1 : 0.16) : 0.06) * crtPulse;
+    crtScreenGlowMaterial.opacity = (crtCover ? (crtPlaying ? 0.3 + smoothedEnergy * 0.1 : 0.24) : 0.1) * crtPulse;
     tapeRoots.forEach((tape, index) => {
       if (!tape.userData.searchMatch || tape === pressed) return;
       const home = tape.userData.home as THREE.Vector3;
@@ -1071,6 +1240,7 @@ export function createBoxScene(
     async setTrack(song: VisualSong) {
       const cover = await loadCoverTexture(song.cover);
       crtCover = cover.image as CanvasImageSource;
+      updateCrtLightColor(crtCover);
       drawCrt(performance.now() / 1000);
     },
     setPlaying(active: boolean) {
@@ -1095,6 +1265,10 @@ export function createBoxScene(
       if (scrollFrame) cancelAnimationFrame(scrollFrame);
       clearSearchSpotlights();
       crtTexture.dispose();
+      crtGlowTexture.dispose();
+      crtWallGlowMaterial.dispose();
+      crtDeskGlowMaterial.dispose();
+      crtScreenGlowMaterial.dispose();
       disposeAnimation();
     },
   };
