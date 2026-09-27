@@ -25,6 +25,7 @@ export type BoxSceneController = SceneController & {
   setPlaying(active: boolean): void;
   setAnalyser(analyser: AnalyserNode): void;
   setVisualizer(mode: VisualizerMode): void;
+  setSearchMatches(titles: string[]): void;
 };
 
 type CassetteParts = {
@@ -475,6 +476,7 @@ export function createBoxScene(
   canvas: HTMLCanvasElement,
   songs: VisualSong[],
   onSelect: (title: string) => void,
+  onInspect: (title: string) => void,
   dropTarget: HTMLElement,
   handCursor: HandCursorController,
 ): BoxSceneController {
@@ -512,6 +514,7 @@ export function createBoxScene(
   scene.add(tapeGroup);
 
   const tapeRoots: THREE.Group[] = [];
+  const searchSpotlights = new Map<THREE.Group, THREE.Group>();
   const cassetteLayouts: Array<[[number, number, number], [number, number, number], number]> = [
     [[0.05, -1.775, -1.2], [-Math.PI / 2, 0, -0.32], 0.44],
     [[1.62, -1.77, -0.72], [-Math.PI / 2, 0, 0.21], 0.44],
@@ -544,6 +547,57 @@ export function createBoxScene(
     cassette.group.userData.cover = song.cover;
     tapeRoots.push(cassette.group);
   });
+
+  function clearSearchSpotlights() {
+    searchSpotlights.forEach((spotlight, tape) => {
+      scene.remove(spotlight);
+      disposeObject(spotlight);
+      tape.userData.searchMatch = false;
+      if (tape !== pressed) {
+        tape.position.copy(tape.userData.home);
+        tape.rotation.copy(tape.userData.rotationHome);
+      }
+    });
+    searchSpotlights.clear();
+  }
+
+  function addSearchSpotlight(tape: THREE.Group) {
+    const spotlight = new THREE.Group();
+    const coneMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffd477,
+      transparent: true,
+      opacity: 0.12,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide,
+    });
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(1.05, 4.2, 12, 1, true), coneMaterial);
+    cone.position.y = 0.28;
+    spotlight.add(cone);
+
+    const pool = new THREE.Mesh(
+      new THREE.CircleGeometry(1.08, 16),
+      new THREE.MeshBasicMaterial({
+        color: 0xffcf65,
+        transparent: true,
+        opacity: 0.26,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        side: THREE.DoubleSide,
+      }),
+    );
+    pool.rotation.x = -Math.PI / 2;
+    pool.position.y = -1.7;
+    spotlight.add(pool);
+
+    const glow = new THREE.PointLight(0xffc45c, 3.8, 4.2, 1.7);
+    glow.position.y = -0.45;
+    spotlight.add(glow);
+    spotlight.position.set(tape.position.x, 0, tape.position.z);
+    scene.add(spotlight);
+    searchSpotlights.set(tape, spotlight);
+    tape.userData.searchMatch = true;
+  }
 
   scene.add(box(19.5, 0.65, 7.5, 0x70442e, [0, -2.28, 0]));
   scene.add(box(19.5, 0.12, 7.5, 0xa56a3d, [0, -1.91, 0]));
@@ -908,6 +962,7 @@ export function createBoxScene(
     if (pressed) return;
     pressed = hit(event);
     if (!pressed) return;
+    onInspect(String(pressed.userData.title));
     activePointerId = event.pointerId;
     moved = false;
     startX = event.clientX;
@@ -995,6 +1050,21 @@ export function createBoxScene(
     const cameraScale = Math.max(1, 1.72 / aspect);
     camera.position.set(pointerX * 0.4, 8 * cameraScale - pointerY * 0.16, 17 * cameraScale);
     camera.lookAt(0, -0.85, 0);
+    tapeRoots.forEach((tape, index) => {
+      if (!tape.userData.searchMatch || tape === pressed) return;
+      const home = tape.userData.home as THREE.Vector3;
+      const rotationHome = tape.userData.rotationHome as THREE.Euler;
+      tape.position.y = home.y + 0.58 + Math.sin(time * 2.2 + index * 0.7) * 0.08;
+      tape.rotation.x = rotationHome.x + Math.sin(time * 1.8 + index) * 0.07;
+      tape.rotation.y = rotationHome.y;
+      tape.rotation.z = rotationHome.z + time * 1.25;
+      const spotlight = searchSpotlights.get(tape);
+      if (spotlight) {
+        spotlight.position.x = tape.position.x;
+        spotlight.position.z = tape.position.z;
+        spotlight.rotation.y = Math.sin(time * 0.7 + index) * 0.08;
+      }
+    });
     drawCrt(time);
   });
   return {
@@ -1014,8 +1084,16 @@ export function createBoxScene(
     setVisualizer(mode: VisualizerMode) {
       visualizerMode = mode;
     },
+    setSearchMatches(titles: string[]) {
+      clearSearchSpotlights();
+      const matches = new Set(titles);
+      tapeRoots
+        .filter((tape) => matches.has(String(tape.userData.title)))
+        .forEach(addSearchSpotlight);
+    },
     dispose() {
       if (scrollFrame) cancelAnimationFrame(scrollFrame);
+      clearSearchSpotlights();
       crtTexture.dispose();
       disposeAnimation();
     },
@@ -1113,7 +1191,7 @@ export function createPlayerScene(canvas: HTMLCanvasElement) {
     camera.lookAt(0, 0.15, 0);
     rig.position.y = Math.sin(time * 0.7) * 0.04;
     if (playing) {
-      cassette.reels.forEach((reel) => { reel.rotation.z -= delta * 3.2; });
+      cassette.reels.forEach((reel) => { reel.rotation.z -= delta * 1.6; });
     }
   });
 

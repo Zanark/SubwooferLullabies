@@ -160,6 +160,7 @@ const visualizerButtons = Array.from(document.querySelectorAll<HTMLButtonElement
 
 let catalog: Catalog;
 let currentAlbum: string | null = null;
+let deskPreviewTitle: string | null = null;
 let selected: Song | null = null;
 let loading = false;
 let boxScene: ReturnType<typeof createBoxScene>;
@@ -211,6 +212,7 @@ function trackByTitle(title: string) {
 function songCard(song: Song) {
   const button = document.createElement('button');
   button.className = 'cover-card song-card';
+  button.classList.toggle('is-held', deskPreviewTitle === song.title);
   button.type = 'button';
   button.dataset.title = song.title;
   button.innerHTML = `
@@ -233,6 +235,7 @@ function albumCard(album: Album) {
   `;
   button.addEventListener('click', () => {
     currentAlbum = album.title;
+    deskPreviewTitle = null;
     search.value = '';
     renderShelf();
   });
@@ -242,6 +245,15 @@ function albumCard(album: Album) {
 function renderShelf() {
   const query = search.value.trim().toLowerCase();
   shelf.replaceChildren();
+  if (deskPreviewTitle) {
+    const song = trackByTitle(deskPreviewTitle);
+    shelfLabel.textContent = 'cassette in hand';
+    resultCount.textContent = 'drag to player or release to load';
+    back.hidden = false;
+    shelf.append(songCard(song));
+    boxScene?.setSearchMatches([]);
+    return;
+  }
   if (query) {
     const matches = catalog.songs.filter((song) => song.title.toLowerCase().includes(query));
     shelfLabel.textContent = 'search results';
@@ -251,9 +263,11 @@ function renderShelf() {
     if (!matches.length) {
       shelf.innerHTML = '<p class="empty">no tape found in this box.</p>';
     }
+    boxScene?.setSearchMatches(matches.map((song) => song.title));
     return;
   }
 
+  boxScene?.setSearchMatches([]);
   resultCount.textContent = '';
   if (currentAlbum) {
     const album = catalog.albums.find((candidate) => candidate.title === currentAlbum);
@@ -371,6 +385,41 @@ async function togglePlayback() {
   }
 }
 
+function playTransportClick() {
+  enableAudioAnalysis();
+  if (!audioContext) return;
+  const start = audioContext.currentTime;
+  const output = audioContext.createGain();
+  output.gain.setValueAtTime(0.0001, start);
+  output.gain.exponentialRampToValueAtTime(0.16, start + 0.004);
+  output.gain.exponentialRampToValueAtTime(0.0001, start + 0.075);
+  output.connect(audioContext.destination);
+
+  const thunk = audioContext.createOscillator();
+  thunk.type = 'square';
+  thunk.frequency.setValueAtTime(118, start);
+  thunk.frequency.exponentialRampToValueAtTime(54, start + 0.055);
+  thunk.connect(output);
+  thunk.start(start);
+  thunk.stop(start + 0.075);
+
+  const noise = audioContext.createBuffer(1, Math.ceil(audioContext.sampleRate * 0.045), audioContext.sampleRate);
+  const samples = noise.getChannelData(0);
+  for (let index = 0; index < samples.length; index++) {
+    samples[index] = (Math.random() * 2 - 1) * (1 - index / samples.length);
+  }
+  const snap = audioContext.createBufferSource();
+  const filter = audioContext.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.value = 1650;
+  filter.Q.value = 0.8;
+  snap.buffer = noise;
+  snap.connect(filter);
+  filter.connect(output);
+  snap.start(start);
+  snap.stop(start + 0.045);
+}
+
 function stopPlayback() {
   if (!selected) return;
   audio.pause();
@@ -396,7 +445,10 @@ async function playRandomTape() {
   await loadCassette(song, true);
 }
 
-playButton.addEventListener('click', togglePlayback);
+playButton.addEventListener('click', () => {
+  playTransportClick();
+  void togglePlayback();
+});
 stopButton.addEventListener('click', stopPlayback);
 rewindButton.addEventListener('click', () => seekBy(-10));
 forwardButton.addEventListener('click', () => seekBy(10));
@@ -424,9 +476,13 @@ visualizerButtons.forEach((button) => {
     });
   });
 });
-search.addEventListener('input', renderShelf);
+search.addEventListener('input', () => {
+  deskPreviewTitle = null;
+  renderShelf();
+});
 back.addEventListener('click', () => {
   currentAlbum = null;
+  deskPreviewTitle = null;
   search.value = '';
   renderShelf();
 });
@@ -463,6 +519,10 @@ async function start() {
     required<HTMLCanvasElement>('box-3d'),
     catalog.songs.map((song) => ({ ...song, cover: asset(song.cover) })),
     (title) => loadCassette(trackByTitle(title)),
+    (title) => {
+      deskPreviewTitle = title;
+      renderShelf();
+    },
     dropZone,
     handCursorScene,
   );

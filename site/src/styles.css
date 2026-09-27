@@ -304,11 +304,21 @@ h1 span {
 }
 
 .cover-card:hover .cover-frame,
-.cover-card:focus-visible .cover-frame {
+.cover-card:focus-visible .cover-frame,
+.cover-card.is-held .cover-frame {
   border-color: var(--orange);
   outline: 0;
   transform: translate(-2px, -2px);
   box-shadow: 6px 6px 0 #02090b;
+}
+
+.cover-card.is-held .cover-frame::before {
+  position: absolute;
+  inset: -7px;
+  z-index: -1;
+  content: "";
+  border: 2px solid rgba(244, 215, 137, .65);
+  box-shadow: 0 0 20px rgba(244, 166, 80, .34);
 }
 
 .cover-card:focus-visible {
