@@ -118,6 +118,11 @@ app.innerHTML = `
         <button type="button" data-visualizer="orbit" disabled>orbit</button>
         <button type="button" data-visualizer="tunnel" disabled>tunnel</button>
         <button type="button" data-visualizer="rain" disabled>rain</button>
+        <button type="button" data-visualizer="vectors" disabled>vectors</button>
+        <button type="button" data-visualizer="pulse" disabled>pulse</button>
+        <button type="button" data-visualizer="spiral" disabled>spiral</button>
+        <button type="button" data-visualizer="stars" disabled>stars</button>
+        <button type="button" data-visualizer="glitch" disabled>glitch</button>
       </div>
       <p class="canvas-help">move tapes / drag to player / click tv or wall switches</p>
     </section>
@@ -191,9 +196,9 @@ function enableAudioAnalysis() {
     audioSource = audioContext.createMediaElementSource(audio);
     audioAnalyser = audioContext.createAnalyser();
     audioAnalyser.fftSize = 256;
-    audioAnalyser.smoothingTimeConstant = 0.68;
-    audioAnalyser.minDecibels = -82;
-    audioAnalyser.maxDecibels = -12;
+    audioAnalyser.smoothingTimeConstant = 0.5;
+    audioAnalyser.minDecibels = -90;
+    audioAnalyser.maxDecibels = -18;
     audioSource.connect(audioAnalyser);
     audioAnalyser.connect(audioContext.destination);
     boxScene.setAnalyser(audioAnalyser);
@@ -536,7 +541,19 @@ async function start() {
     dropZone,
     handCursorScene,
   );
-  const visualizerModes: VisualizerMode[] = ['scope', 'bars', 'radar', 'orbit', 'tunnel', 'rain'];
+  const visualizerModes: VisualizerMode[] = [
+    'scope',
+    'bars',
+    'radar',
+    'orbit',
+    'tunnel',
+    'rain',
+    'vectors',
+    'pulse',
+    'spiral',
+    'stars',
+    'glitch',
+  ];
   const dailyVisualizer = visualizerModes[Math.floor(Date.now() / 86_400_000) % visualizerModes.length];
   boxScene.setVisualizer(dailyVisualizer);
   visualizerButtons.forEach((button) => {
