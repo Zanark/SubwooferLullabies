@@ -723,7 +723,7 @@ export function createBoxScene(
   roomLight.castShadow = true;
   scene.add(roomLight);
 
-  const wall = new THREE.Mesh(new THREE.PlaneGeometry(24, 11), material(0x4b2924, { roughness: 1 }));
+  const wall = new THREE.Mesh(new THREE.PlaneGeometry(44, 11), material(0x4b2924, { roughness: 1 }));
   wall.position.set(0, 1.6, -4.8);
   wall.receiveShadow = true;
   scene.add(wall);
