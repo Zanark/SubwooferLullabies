@@ -1597,34 +1597,6 @@ footer {
   background: #291719;
 }
 
-.volume-control {
-  position: absolute;
-  right: 13%;
-  bottom: 13%;
-  z-index: 9;
-  display: grid;
-  grid-template-columns: auto minmax(90px, 150px);
-  align-items: center;
-  gap: 9px;
-  width: 32%;
-  min-width: 150px;
-  padding: 6px 9px;
-  border: 2px solid #21191a;
-  color: #2a181a;
-  background: #d6c295;
-  box-shadow: 4px 4px 0 #10090c;
-  font-size: 7px;
-  font-weight: 900;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-}
-
-.volume-control input {
-  width: 100%;
-  accent-color: var(--orange);
-  cursor: pointer;
-}
-
 .status {
   right: 22%;
   bottom: 6%;
@@ -1645,12 +1617,6 @@ body.theater-mode .room-panel {
 
 body.theater-mode .transport-controls {
   top: 16%;
-}
-
-body.theater-mode .volume-control {
-  right: calc(50% - 270px);
-  bottom: 19%;
-  width: 210px;
 }
 
 body.theater-mode .status {
@@ -1750,12 +1716,6 @@ body.theater-mode .status {
     height: 36px;
   }
 
-  .volume-control {
-    right: 8%;
-    bottom: 12%;
-    width: 48%;
-  }
-
   .status {
     right: 18%;
     bottom: 5%;
@@ -1766,11 +1726,6 @@ body.theater-mode .status {
     top: 17%;
   }
 
-  body.theater-mode .volume-control {
-    right: 8%;
-    bottom: 17%;
-    width: 48%;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1870,7 +1825,13 @@ body.theater-mode .status {
   position: absolute;
   inset: 0;
   z-index: 2;
-  pointer-events: none;
+  pointer-events: auto;
+  touch-action: pan-y;
+}
+
+.player-canvas.can-adjust-volume,
+.player-canvas.is-adjusting-volume {
+  cursor: ew-resize;
 }
 
 .drop-hint {
@@ -2144,12 +2105,6 @@ body.theater-mode .transport-controls > .play-button {
   .play-button {
     width: 51px;
     height: 34px;
-  }
-
-  .volume-control {
-    right: 6%;
-    bottom: 9%;
-    width: 55%;
   }
 
   .status {

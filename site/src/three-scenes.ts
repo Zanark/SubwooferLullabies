@@ -40,6 +40,13 @@ export type BoxSceneController = SceneController & {
   setCrtFocus(active: boolean): void;
 };
 
+export type PlayerSceneController = SceneController & {
+  setCassette(song: VisualSong): Promise<void>;
+  setPlaying(value: boolean): void;
+  setVolume(value: number): void;
+  setProgress(value: number): void;
+};
+
 type CassetteParts = {
   group: THREE.Group;
   reels: THREE.Group[];
@@ -1704,7 +1711,10 @@ export function createBoxScene(
   };
 }
 
-export function createPlayerScene(canvas: HTMLCanvasElement) {
+export function createPlayerScene(
+  canvas: HTMLCanvasElement,
+  onVolumeChange: (value: number) => void = () => {},
+): PlayerSceneController {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
   camera.position.set(4.8, 2.2, 19.5);
@@ -1750,10 +1760,95 @@ export function createPlayerScene(canvas: HTMLCanvasElement) {
 
   const controls = new THREE.Group();
   controls.position.set(0, -2.92, 0.8);
-  controls.add(box(2.15, 0.1, 0.12, 0xb8c8c1, [-1.35, 0, 0]));
-  controls.add(box(0.62, 0.18, 0.16, COLORS.orange, [0.35, 0, 0]));
-  controls.add(box(1.85, 0.1, 0.12, 0xb8c8c1, [1.6, 0, 0]));
+  const volumeMin = -2.25;
+  const volumeMax = 2.25;
+  controls.add(box(4.7, 0.12, 0.12, 0x718883, [0, -0.16, 0]));
+  controls.add(box(4.4, 0.045, 0.16, 0x172426, [0, -0.16, 0.08]));
+  const volumeThumb = box(0.58, 0.28, 0.22, COLORS.orange, [0, -0.16, 0.18]);
+  controls.add(volumeThumb);
+
+  const progressMin = 0.45;
+  const progressMax = 2.35;
+  controls.add(box(2.15, 0.1, 0.12, 0x718883, [1.4, 0.28, 0]));
+  controls.add(box(1.9, 0.04, 0.16, 0x172426, [1.4, 0.28, 0.08]));
+  const progressFill = box(1, 0.07, 0.18, 0xd5b765, [progressMin, 0.28, 0.13]);
+  progressFill.geometry.translate(0.5, 0, 0);
+  progressFill.scale.x = 0.001;
+  controls.add(progressFill);
+  const progressThumb = box(0.24, 0.2, 0.2, 0xe7d69b, [progressMin, 0.28, 0.2]);
+  controls.add(progressThumb);
+
+  const volumeHit = box(
+    volumeMax - volumeMin + 0.5,
+    0.75,
+    0.18,
+    0xffffff,
+    [(volumeMin + volumeMax) / 2, -0.16, 0.22],
+  );
+  const volumeHitMaterial = volumeHit.material as THREE.MeshStandardMaterial;
+  volumeHitMaterial.transparent = true;
+  volumeHitMaterial.opacity = 0;
+  volumeHitMaterial.depthWrite = false;
+  controls.add(volumeHit);
   rig.add(controls);
+
+  const raycaster = new THREE.Raycaster();
+  const pointer = new THREE.Vector2();
+  let draggingVolume = false;
+
+  const setVolume = (value: number, notify = false) => {
+    const normalized = THREE.MathUtils.clamp(value, 0, 1);
+    volumeThumb.position.x = THREE.MathUtils.lerp(volumeMin, volumeMax, normalized);
+    if (notify) onVolumeChange(normalized);
+  };
+
+  const updatePointer = (event: PointerEvent) => {
+    const bounds = canvas.getBoundingClientRect();
+    pointer.set(
+      ((event.clientX - bounds.left) / bounds.width) * 2 - 1,
+      -((event.clientY - bounds.top) / bounds.height) * 2 + 1,
+    );
+    raycaster.setFromCamera(pointer, camera);
+    return raycaster.intersectObject(volumeHit, false)[0];
+  };
+
+  const updateVolumeFromPointer = (event: PointerEvent) => {
+    const hit = updatePointer(event);
+    if (!hit) return false;
+    const localPoint = controls.worldToLocal(hit.point.clone());
+    setVolume((localPoint.x - volumeMin) / (volumeMax - volumeMin), true);
+    return true;
+  };
+
+  const onPointerDown = (event: PointerEvent) => {
+    if (!updateVolumeFromPointer(event)) return;
+    draggingVolume = true;
+    canvas.setPointerCapture(event.pointerId);
+    canvas.classList.add('is-adjusting-volume');
+    event.preventDefault();
+  };
+  const onPointerMove = (event: PointerEvent) => {
+    if (draggingVolume) {
+      updateVolumeFromPointer(event);
+      event.preventDefault();
+      return;
+    }
+    canvas.classList.toggle('can-adjust-volume', Boolean(updatePointer(event)));
+  };
+  const onPointerUp = (event: PointerEvent) => {
+    if (!draggingVolume) return;
+    draggingVolume = false;
+    if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+    canvas.classList.remove('is-adjusting-volume');
+  };
+  const onPointerLeave = () => {
+    if (!draggingVolume) canvas.classList.remove('can-adjust-volume');
+  };
+  canvas.addEventListener('pointerdown', onPointerDown);
+  canvas.addEventListener('pointermove', onPointerMove);
+  canvas.addEventListener('pointerup', onPointerUp);
+  canvas.addEventListener('pointercancel', onPointerUp);
+  canvas.addEventListener('pointerleave', onPointerLeave);
 
   const headphoneGroup = new THREE.Group();
   const curve = new THREE.CatmullRomCurve3([
@@ -1788,7 +1883,7 @@ export function createPlayerScene(canvas: HTMLCanvasElement) {
   rig.add(new THREE.Mesh(new THREE.TubeGeometry(cableCurve, 8, 0.08, 5, false), material(COLORS.dark)));
 
   let playing = false;
-  const dispose = animateScene(renderer, scene, camera, resize, (time, delta) => {
+  const disposeScene = animateScene(renderer, scene, camera, resize, (time, delta) => {
     const aspect = canvas.clientWidth / Math.max(canvas.clientHeight, 1);
     const cameraScale = Math.max(1, 0.86 / aspect);
     camera.position.set(4.8 * cameraScale, 2.2 * cameraScale, 19.5 * cameraScale);
@@ -1813,7 +1908,23 @@ export function createPlayerScene(canvas: HTMLCanvasElement) {
     setPlaying(value: boolean) {
       playing = value;
     },
-    dispose,
+    setVolume(value: number) {
+      setVolume(value);
+    },
+    setProgress(value: number) {
+      const normalized = THREE.MathUtils.clamp(value, 0, 1);
+      const width = (progressMax - progressMin) * normalized;
+      progressFill.scale.x = Math.max(width, 0.001);
+      progressThumb.position.x = THREE.MathUtils.lerp(progressMin, progressMax, normalized);
+    },
+    dispose() {
+      canvas.removeEventListener('pointerdown', onPointerDown);
+      canvas.removeEventListener('pointermove', onPointerMove);
+      canvas.removeEventListener('pointerup', onPointerUp);
+      canvas.removeEventListener('pointercancel', onPointerUp);
+      canvas.removeEventListener('pointerleave', onPointerLeave);
+      disposeScene();
+    },
   };
 }
 

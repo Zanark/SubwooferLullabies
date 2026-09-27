@@ -98,8 +98,8 @@ app.innerHTML = `
             <span aria-hidden="true">&#9654;&#9654;</span><small>ff</small>
           </button>
         </div>
-        <label class="volume-control">
-          <span>vol</span>
+        <label class="sr-only">
+          <span>Player volume</span>
           <input id="volume" type="range" min="0" max="1" value="0.8" step="0.05" aria-label="Player volume" />
         </label>
         <div id="status" class="status">choose a cassette</div>
@@ -305,6 +305,7 @@ async function loadCassette(song: Song, autoplay = false) {
   setTransportEnabled(false);
   randomPlayButton.disabled = true;
   audio.src = asset(song.audio);
+  playerScene.setProgress(0);
   audio.loop = song.kind === 'loop';
   audio.muted = autoplay;
   const activation = autoplay
@@ -432,6 +433,7 @@ function stopPlayback() {
   if (!selected) return;
   audio.pause();
   audio.currentTime = 0;
+  playerScene.setProgress(0);
   setPlayingState(false);
   status.textContent = `stopped / ${selected.title}`;
   announcement.textContent = `${selected.title} stopped and rewound`;
@@ -441,7 +443,7 @@ function seekBy(seconds: number) {
   if (!selected) return;
   const duration = Number.isFinite(audio.duration) ? audio.duration : selected.duration_seconds;
   audio.currentTime = Math.min(duration, Math.max(0, audio.currentTime + seconds));
-  status.textContent = `${formatDuration(audio.currentTime)} / ${formatDuration(duration)}`;
+  playerScene.setProgress(duration > 0 ? audio.currentTime / duration : 0);
 }
 
 async function playRandomTape() {
@@ -462,17 +464,19 @@ rewindButton.addEventListener('click', () => seekBy(-10));
 forwardButton.addEventListener('click', () => seekBy(10));
 volume.addEventListener('input', () => {
   audio.volume = Number(volume.value);
+  playerScene?.setVolume(audio.volume);
 });
 randomPlayButton.addEventListener('click', playRandomTape);
 audio.addEventListener('ended', () => {
   setPlayingState(false);
+  playerScene.setProgress(1);
   status.textContent = selected ? `finished / ${selected.title}` : 'choose a cassette';
   announcement.textContent = selected ? `${selected.title} finished` : '';
 });
 audio.addEventListener('timeupdate', () => {
-  if (selected && !audio.paused) {
-    status.textContent = `${formatDuration(audio.currentTime)} / ${formatDuration(audio.duration || selected.duration_seconds)}`;
-  }
+  if (!selected) return;
+  const duration = Number.isFinite(audio.duration) ? audio.duration : selected.duration_seconds;
+  playerScene.setProgress(duration > 0 ? audio.currentTime / duration : 0);
 });
 visualizerButtons.forEach((button) => {
   button.addEventListener('click', () => {
@@ -522,7 +526,11 @@ async function start() {
   catalog = await response.json() as Catalog;
   audio.volume = Number(volume.value);
   renderShelf();
-  playerScene = createPlayerScene(required<HTMLCanvasElement>('player-3d'));
+  playerScene = createPlayerScene(required<HTMLCanvasElement>('player-3d'), (value) => {
+    audio.volume = value;
+    volume.value = String(value);
+  });
+  playerScene.setVolume(audio.volume);
   handCursorScene = createHandCursorScene(required<HTMLCanvasElement>('hand-3d'));
   showcaseScene = createShowcaseScene(required<HTMLCanvasElement>('showcase-3d'));
   showcaseScene.preload(catalog.songs.map((song) => ({ ...song, cover: asset(song.cover) })));
