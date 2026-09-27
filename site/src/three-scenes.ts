@@ -1385,6 +1385,23 @@ export function createBoxScene(
     crtContext.fillRect(0, 0, width, height);
     crtContext.fillStyle = 'rgba(0,0,0,.14)';
     for (let y = 0; y < height; y += 5) crtContext.fillRect(0, y, width, 2);
+    const scanCycle = time % 7.8;
+    if (scanCycle < 1.25) {
+      const scanProgress = scanCycle / 1.25;
+      const scanY = -22 + scanProgress * (height + 44);
+      const scanGlow = crtContext.createLinearGradient(0, scanY - 20, 0, scanY + 20);
+      scanGlow.addColorStop(0, 'rgba(180,235,225,0)');
+      scanGlow.addColorStop(0.42, 'rgba(180,235,225,.08)');
+      scanGlow.addColorStop(0.5, 'rgba(235,255,238,.3)');
+      scanGlow.addColorStop(0.58, 'rgba(180,235,225,.08)');
+      scanGlow.addColorStop(1, 'rgba(180,235,225,0)');
+      crtContext.globalCompositeOperation = 'screen';
+      crtContext.fillStyle = scanGlow;
+      crtContext.fillRect(0, scanY - 20, width, 40);
+      crtContext.globalCompositeOperation = 'source-over';
+      crtContext.fillStyle = 'rgba(3,10,12,.28)';
+      crtContext.fillRect(0, scanY + 10, width, 3);
+    }
     for (let index = 0; index < 55; index++) {
       crtContext.fillStyle = `rgba(220,235,205,${Math.random() * 0.16})`;
       crtContext.fillRect(Math.random() * width, Math.random() * height, 2, 2);
