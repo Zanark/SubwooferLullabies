@@ -917,14 +917,17 @@ export function createBoxScene(
   scene.add(television);
 
   const crtLightTarget = new THREE.Object3D();
-  crtLightTarget.position.set(-1.4, -1.55, 0.75);
+  crtLightTarget.position.set(-4.25, -1.82, 6.4);
   scene.add(crtLightTarget);
-  const crtSpill = new THREE.SpotLight(0x8fcbd1, 28, 16, 1.12, 0.9, 1.15);
-  crtSpill.position.set(-5.55, 0.25, 2.05);
+  const crtSpill = new THREE.SpotLight(0x8fcbd1, 52, 18, 0.78, 0.72, 1.05);
+  crtSpill.position.set(-5.45, 0.28, 2.12);
   crtSpill.target = crtLightTarget;
+  crtSpill.castShadow = true;
+  crtSpill.shadow.mapSize.set(512, 512);
+  crtSpill.shadow.bias = -0.001;
   scene.add(crtSpill);
-  const crtGlow = new THREE.PointLight(0x8fcbd1, 15, 13, 1.35);
-  crtGlow.position.set(-5.55, 0.25, 2.05);
+  const crtGlow = new THREE.PointLight(0x8fcbd1, 28, 3.4, 1.7);
+  crtGlow.position.set(-5.45, 0.28, 2.18);
   scene.add(crtGlow);
   const crtGlowCanvas = document.createElement('canvas');
   crtGlowCanvas.width = 128;
@@ -938,7 +941,7 @@ export function createBoxScene(
   crtGlowContext.fillStyle = crtGlowGradient;
   crtGlowContext.fillRect(0, 0, 128, 128);
   const crtGlowTexture = new THREE.CanvasTexture(crtGlowCanvas);
-  const crtWallGlowMaterial = new THREE.MeshBasicMaterial({
+  const crtDeskGlowMaterial = new THREE.MeshBasicMaterial({
     map: crtGlowTexture,
     color: 0x8fcbd1,
     transparent: true,
@@ -946,20 +949,15 @@ export function createBoxScene(
     depthWrite: false,
     blending: THREE.AdditiveBlending,
   });
-  const crtWallGlow = new THREE.Mesh(new THREE.PlaneGeometry(9.2, 6.8), crtWallGlowMaterial);
-  crtWallGlow.position.set(-5.5, 0.35, -4.62);
-  crtWallGlow.renderOrder = 950;
-  scene.add(crtWallGlow);
-  const crtDeskGlowMaterial = crtWallGlowMaterial.clone();
-  const crtDeskGlow = new THREE.Mesh(new THREE.PlaneGeometry(11.5, 7.2), crtDeskGlowMaterial);
-  crtDeskGlow.position.set(-2.7, -1.82, 1.25);
+  const crtDeskGlow = new THREE.Mesh(new THREE.PlaneGeometry(9.4, 6.4), crtDeskGlowMaterial);
+  crtDeskGlow.position.set(-3.7, -1.82, 1.8);
   crtDeskGlow.rotation.x = -Math.PI / 2;
   crtDeskGlow.renderOrder = 951;
   scene.add(crtDeskGlow);
-  const crtScreenGlowMaterial = crtWallGlowMaterial.clone();
-  const crtScreenGlow = new THREE.Mesh(new THREE.PlaneGeometry(5.65, 4.2), crtScreenGlowMaterial);
-  crtScreenGlow.position.set(-0.38, 0.25, 1.695);
-  crtScreenGlow.renderOrder = 952;
+  const crtScreenGlowMaterial = crtDeskGlowMaterial.clone();
+  const crtScreenGlow = new THREE.Mesh(crtGlassGeometry(5.35, 3.95), crtScreenGlowMaterial);
+  crtScreenGlow.position.set(-0.38, 0.25, 1.79);
+  crtScreenGlow.renderOrder = 1002;
   television.add(crtScreenGlow);
   const crtFocusPosition = television.localToWorld(new THREE.Vector3(-0.38, 0.25, 7.2));
   const crtFocusTarget = television.localToWorld(new THREE.Vector3(-0.38, 0.25, 1.72));
@@ -1086,10 +1084,12 @@ export function createBoxScene(
     if (!context) return;
     context.drawImage(image, 0, 0, sample.width, sample.height);
     const pixels = context.getImageData(0, 0, sample.width, sample.height).data;
-    let red = 0;
-    let green = 0;
-    let blue = 0;
-    let weight = 0;
+    const hueWeights = new Float32Array(12);
+    const hueRed = new Float32Array(12);
+    const hueGreen = new Float32Array(12);
+    const hueBlue = new Float32Array(12);
+    const pixelColor = new THREE.Color();
+    const pixelHsl = { h: 0, s: 0, l: 0 };
     for (let index = 0; index < pixels.length; index += 4) {
       const alpha = pixels[index + 3] / 255;
       const luminance = (pixels[index] + pixels[index + 1] + pixels[index + 2]) / 765;
@@ -1097,15 +1097,27 @@ export function createBoxScene(
         Math.max(pixels[index], pixels[index + 1], pixels[index + 2])
         - Math.min(pixels[index], pixels[index + 1], pixels[index + 2])
       ) / 255;
-      const pixelWeight = alpha * (0.25 + luminance) * (0.55 + chroma * 2.4);
-      red += pixels[index] * pixelWeight;
-      green += pixels[index + 1] * pixelWeight;
-      blue += pixels[index + 2] * pixelWeight;
-      weight += pixelWeight;
+      if (alpha < 0.08 || luminance < 0.06) continue;
+      pixelColor.setRGB(pixels[index] / 255, pixels[index + 1] / 255, pixels[index + 2] / 255);
+      pixelColor.getHSL(pixelHsl);
+      const hueIndex = Math.min(11, Math.floor(pixelHsl.h * 12));
+      const pixelWeight = alpha * (0.2 + luminance * 1.4) * (0.2 + chroma * 3.4);
+      hueWeights[hueIndex] += pixelWeight;
+      hueRed[hueIndex] += pixels[index] * pixelWeight;
+      hueGreen[hueIndex] += pixels[index + 1] * pixelWeight;
+      hueBlue[hueIndex] += pixels[index + 2] * pixelWeight;
     }
+    let dominantHue = 0;
+    for (let index = 1; index < hueWeights.length; index++) {
+      if (hueWeights[index] > hueWeights[dominantHue]) dominantHue = index;
+    }
+    const weight = hueWeights[dominantHue];
     if (!weight) return;
-    crtLightColor.setRGB(red / weight / 255, green / weight / 255, blue / weight / 255);
-    crtLightColor.lerp(new THREE.Color(0x75cfff), 0.12);
+    crtLightColor.setRGB(
+      hueRed[dominantHue] / weight / 255,
+      hueGreen[dominantHue] / weight / 255,
+      hueBlue[dominantHue] / weight / 255,
+    );
     const sampledHsl = { h: 0, s: 0, l: 0 };
     crtLightColor.getHSL(sampledHsl);
     crtLightColor.setHSL(
@@ -1115,7 +1127,6 @@ export function createBoxScene(
     );
     crtSpill.color.copy(crtLightColor);
     crtGlow.color.copy(crtLightColor);
-    crtWallGlowMaterial.color.copy(crtLightColor);
     crtDeskGlowMaterial.color.copy(crtLightColor);
     crtScreenGlowMaterial.color.copy(crtLightColor);
   }
@@ -1640,19 +1651,15 @@ export function createBoxScene(
     lampShadeMaterial.emissiveIntensity += ((lampOn ? 0.7 : 0.03) - lampShadeMaterial.emissiveIntensity) * 0.18;
     bulbMaterial.emissiveIntensity += ((lampOn ? 2.6 : 0.04) - bulbMaterial.emissiveIntensity) * 0.18;
     const crtPulse = crtPlaying ? 0.96 + Math.sin(time * 47) * 0.018 + smoothedEnergy * 0.12 : 1;
-    crtSpill.intensity = (crtCover ? (crtPlaying ? 64 + smoothedEnergy * 32 : 32) : 8) * crtPulse;
-    crtGlow.intensity = (crtCover ? (crtPlaying ? 30 + smoothedBass * 14 : 17) : 5) * crtPulse;
-    crtWallGlowMaterial.opacity = Math.min(
-      1,
-      (crtCover ? (crtPlaying ? 0.58 + smoothedEnergy * 0.18 : 0.38) : 0.12) * crtPulse,
-    );
+    crtSpill.intensity = (crtCover ? (crtPlaying ? 145 + smoothedEnergy * 55 : 82) : 18) * crtPulse;
+    crtGlow.intensity = (crtCover ? (crtPlaying ? 150 + smoothedBass * 45 : 82) : 18) * crtPulse;
     crtDeskGlowMaterial.opacity = Math.min(
       1,
-      (crtCover ? (crtPlaying ? 0.82 + smoothedBass * 0.12 : 0.46) : 0.1) * crtPulse,
+      (crtCover ? (crtPlaying ? 0.96 + smoothedBass * 0.04 : 0.62) : 0.12) * crtPulse,
     );
     crtScreenGlowMaterial.opacity = Math.min(
       1,
-      (crtCover ? (crtPlaying ? 0.94 + smoothedEnergy * 0.05 : 0.6) : 0.18) * crtPulse,
+      (crtCover ? (crtPlaying ? 0.72 + smoothedEnergy * 0.12 : 0.48) : 0.12) * crtPulse,
     );
     tapeRoots.forEach((tape, index) => {
       if (!tape.userData.searchMatch || tape === pressed) return;
@@ -1702,7 +1709,6 @@ export function createBoxScene(
       clearSearchSpotlights();
       crtTexture.dispose();
       crtGlowTexture.dispose();
-      crtWallGlowMaterial.dispose();
       crtDeskGlowMaterial.dispose();
       crtScreenGlowMaterial.dispose();
       darknessMaterial.dispose();
