@@ -10,8 +10,12 @@
     "build": "npm run assets:prepare && tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1"
   },
+  "dependencies": {
+    "three": "0.180.0"
+  },
   "devDependencies": {
     "@types/node": "24.10.1",
+    "@types/three": "0.180.0",
     "lamejs": "1.2.1",
     "typescript": "7.0.2",
     "vite": "8.3.0"

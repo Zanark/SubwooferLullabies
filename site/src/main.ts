@@ -1,4 +1,5 @@
 import './styles.css';
+import { createBoxScene, createPlayerScene, createShowcaseScene } from './three-scenes';
 
 type Song = {
   title: string;
@@ -58,55 +59,22 @@ app.innerHTML = `
       <div class="box-scene">
         <div class="box-label">
           <span>random access</span>
-          <strong>drag a tape →</strong>
+          <strong>drag a 3d tape →</strong>
         </div>
-        <div id="cassette-box" class="cassette-box" aria-label="Box of draggable cassettes">
-          <div class="box-flap flap-back"></div>
-          <div class="box-flap flap-left"></div>
-          <div class="box-flap flap-right"></div>
-          <div id="box-tapes" class="box-tapes"></div>
-          <div class="box-front"><span>fragile<br>music inside</span></div>
-        </div>
+        <canvas id="box-3d" class="scene-canvas box-canvas" aria-label="Interactive 3D box of cassettes"></canvas>
+        <p class="canvas-help">click a tape or drag it across to the player</p>
       </div>
     </section>
 
     <section class="player-panel" aria-label="Cassette player">
-      <div class="headphones" aria-hidden="true">
-        <div class="headband"></div>
-        <div class="ear left-ear"></div>
-        <div class="ear right-ear"></div>
-        <div class="cable"></div>
-      </div>
       <div id="walkman-drop" class="walkman-drop">
         <p class="drop-hint">drop tape here</p>
-        <div class="walkman">
-          <div class="walkman-top">
-            <i></i><i></i><i></i><i></i>
-          </div>
-          <div class="walkman-side"></div>
-          <div class="brand">
-            <span>SUBWAVE</span>
-            <small>TPS-14 / stereo personal player</small>
-          </div>
-          <div class="walkman-stripe"></div>
-          <div class="window">
-            <div id="loaded-tape" class="loaded-tape">
-              <span id="loaded-title">no tape</span>
-              <div class="reel left-reel"></div>
-              <div class="reel right-reel"></div>
-              <div class="tape-line"></div>
-            </div>
-            <div class="window-shine"></div>
-          </div>
-          <div class="hardware">
-            <span>auto reverse</span><b></b><span>dolby-ish*</span>
-          </div>
-          <button id="play" class="play-button" type="button" disabled aria-label="Play selected cassette">
-            <span class="play-icon"></span>
-            <span class="pause-icon"></span>
-          </button>
-          <div id="status" class="status">choose a cassette</div>
-        </div>
+        <canvas id="player-3d" class="scene-canvas player-canvas" aria-label="3D cassette player and headphones"></canvas>
+        <button id="play" class="play-button" type="button" disabled aria-label="Play selected cassette">
+          <span class="play-icon"></span>
+          <span class="pause-icon"></span>
+        </button>
+        <div id="status" class="status">choose a cassette</div>
       </div>
     </section>
   </main>
@@ -117,26 +85,10 @@ app.innerHTML = `
   </footer>
 
   <div id="showcase" class="showcase" hidden>
+    <canvas id="showcase-3d" class="scene-canvas showcase-canvas" aria-hidden="true"></canvas>
     <div class="showcase-copy">
       <span>loading side a / side b</span>
       <strong id="showcase-title"></strong>
-    </div>
-    <div class="cassette-stage">
-      <div id="hero-cassette" class="hero-cassette">
-        <div class="cassette-face cassette-front">
-          <div class="cassette-label">
-            <span>subwoofer lullabies</span>
-            <strong id="cassette-title"></strong>
-            <small id="cassette-meta"></small>
-          </div>
-          <div class="cassette-reels"><i></i><b></b><i></i></div>
-          <div class="cassette-bottom"></div>
-        </div>
-        <div class="cassette-face cassette-back">
-          <img id="cassette-cover" alt="" />
-          <span>side b / artwork</span>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -154,17 +106,12 @@ const shelfLabel = required<HTMLParagraphElement>('shelf-label');
 const resultCount = required<HTMLSpanElement>('result-count');
 const search = required<HTMLInputElement>('search');
 const back = required<HTMLButtonElement>('back');
-const boxTapes = required<HTMLDivElement>('box-tapes');
 const dropZone = required<HTMLDivElement>('walkman-drop');
 const playButton = required<HTMLButtonElement>('play');
 const audio = required<HTMLAudioElement>('audio');
 const status = required<HTMLDivElement>('status');
-const loadedTitle = required<HTMLSpanElement>('loaded-title');
 const showcase = required<HTMLDivElement>('showcase');
 const showcaseTitle = required<HTMLElement>('showcase-title');
-const cassetteTitle = required<HTMLElement>('cassette-title');
-const cassetteMeta = required<HTMLElement>('cassette-meta');
-const cassetteCover = required<HTMLImageElement>('cassette-cover');
 const theater = required<HTMLDivElement>('theater');
 const theaterArt = required<HTMLDivElement>('theater-art');
 const exitTheater = required<HTMLButtonElement>('exit-theater');
@@ -176,6 +123,9 @@ let catalog: Catalog;
 let currentAlbum: string | null = null;
 let selected: Song | null = null;
 let loading = false;
+let boxScene: ReturnType<typeof createBoxScene>;
+let playerScene: ReturnType<typeof createPlayerScene>;
+let showcaseScene: ReturnType<typeof createShowcaseScene>;
 
 function required<T extends HTMLElement>(id: string): T {
   const element = document.getElementById(id);
@@ -263,58 +213,41 @@ function renderShelf() {
   }
 }
 
-function renderBox() {
-  const angles = [-10, 7, -3, 12, -7, 4, -13, 9];
-  boxTapes.replaceChildren();
-  catalog.songs.forEach((song, index) => {
-    const tape = document.createElement('button');
-    tape.type = 'button';
-    tape.className = 'box-tape';
-    tape.draggable = true;
-    tape.dataset.title = song.title;
-    tape.style.setProperty('--tilt', `${angles[index % angles.length]}deg`);
-    tape.style.setProperty('--depth', `${(index % 5) * 3}px`);
-    tape.innerHTML = `<span>${song.title}</span><i></i><b></b>`;
-    tape.addEventListener('click', () => loadCassette(song));
-    tape.addEventListener('dragstart', (event) => {
-      event.dataTransfer?.setData('text/plain', song.title);
-      event.dataTransfer?.setDragImage(tape, tape.offsetWidth / 2, tape.offsetHeight / 2);
-      dropZone.classList.add('awaiting-drop');
-    });
-    tape.addEventListener('dragend', () => dropZone.classList.remove('awaiting-drop'));
-    boxTapes.append(tape);
-  });
-}
-
 async function loadCassette(song: Song) {
   if (loading) return;
   loading = true;
   audio.pause();
   document.body.classList.remove('playing');
   playButton.classList.remove('is-playing');
+  playerScene.setPlaying(false);
   playButton.disabled = true;
   showcaseTitle.textContent = song.title;
-  cassetteTitle.textContent = song.title;
-  cassetteMeta.textContent = `${song.genre} / ${song.bpm} bpm`;
-  cassetteCover.src = asset(song.cover);
-  cassetteCover.alt = `${song.title} cover artwork`;
   showcase.hidden = false;
-  requestAnimationFrame(() => showcase.classList.add('is-showing'));
+  showcase.classList.add('is-showing');
 
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  await new Promise((resolve) => setTimeout(resolve, reduced ? 250 : 3900));
+  try {
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) {
+      await new Promise((resolve) => setTimeout(resolve, 150));
+    } else {
+      await showcaseScene.show({ ...song, cover: asset(song.cover) });
+    }
 
-  selected = song;
-  audio.src = asset(song.audio);
-  loadedTitle.textContent = song.title;
-  status.textContent = `ready / ${formatDuration(song.duration_seconds)}`;
-  theaterArt.style.backgroundImage = `url("${asset(song.cover)}")`;
-  playButton.disabled = false;
-  showcase.classList.remove('is-showing');
-  await new Promise((resolve) => setTimeout(resolve, reduced ? 0 : 250));
-  showcase.hidden = true;
-  loading = false;
-  playButton.focus({ preventScroll: true });
+    selected = song;
+    audio.src = asset(song.audio);
+    playerScene.setCassette({ ...song, cover: asset(song.cover) });
+    status.textContent = `ready / ${formatDuration(song.duration_seconds)}`;
+    theaterArt.style.backgroundImage = `url("${asset(song.cover)}")`;
+    playButton.disabled = false;
+    playButton.focus({ preventScroll: true });
+  } catch (error) {
+    console.error(`Unable to load cassette: ${song.title}`, error);
+    status.textContent = 'cassette load failed';
+  } finally {
+    showcase.classList.remove('is-showing');
+    showcase.hidden = true;
+    loading = false;
+  }
 }
 
 async function togglePlayback() {
@@ -323,6 +256,7 @@ async function togglePlayback() {
     try {
       await audio.play();
       playButton.classList.add('is-playing');
+      playerScene.setPlaying(true);
       setTheaterMode(true);
       document.body.classList.add('playing');
       status.textContent = `playing / ${selected.title}`;
@@ -332,6 +266,7 @@ async function togglePlayback() {
   } else {
     audio.pause();
     playButton.classList.remove('is-playing');
+    playerScene.setPlaying(false);
     document.body.classList.remove('playing');
     status.textContent = `paused / ${selected.title}`;
   }
@@ -340,6 +275,7 @@ async function togglePlayback() {
 function leaveTheater() {
   audio.pause();
   playButton.classList.remove('is-playing');
+  playerScene.setPlaying(false);
   document.body.classList.remove('playing');
   setTheaterMode(false);
   status.textContent = selected ? `paused / ${selected.title}` : 'choose a cassette';
@@ -356,20 +292,10 @@ function setTheaterMode(active: boolean) {
   if (active) exitTheater.focus({ preventScroll: true });
 }
 
-dropZone.addEventListener('dragover', (event) => {
-  event.preventDefault();
-  dropZone.classList.add('is-over');
-});
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('is-over'));
-dropZone.addEventListener('drop', (event) => {
-  event.preventDefault();
-  dropZone.classList.remove('is-over', 'awaiting-drop');
-  const title = event.dataTransfer?.getData('text/plain');
-  if (title) loadCassette(trackByTitle(title));
-});
 playButton.addEventListener('click', togglePlayback);
 audio.addEventListener('ended', () => {
   playButton.classList.remove('is-playing');
+  playerScene.setPlaying(false);
   document.body.classList.remove('playing');
   status.textContent = selected ? `finished / ${selected.title}` : 'choose a cassette';
 });
@@ -409,7 +335,15 @@ async function start() {
   if (!response.ok) throw new Error(`Catalog failed to load: ${response.status}`);
   catalog = await response.json() as Catalog;
   renderShelf();
-  renderBox();
+  playerScene = createPlayerScene(required<HTMLCanvasElement>('player-3d'));
+  showcaseScene = createShowcaseScene(required<HTMLCanvasElement>('showcase-3d'));
+  showcaseScene.preload(catalog.songs.map((song) => ({ ...song, cover: asset(song.cover) })));
+  boxScene = createBoxScene(
+    required<HTMLCanvasElement>('box-3d'),
+    catalog.songs.map((song) => ({ ...song, cover: asset(song.cover) })),
+    (title) => loadCassette(trackByTitle(title)),
+    dropZone,
+  );
   initGrain();
 }
 
