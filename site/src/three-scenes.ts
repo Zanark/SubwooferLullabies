@@ -673,7 +673,7 @@ export function createBoxScene(
       const targetRatio = width / height;
       const drawWidth = sourceRatio > targetRatio ? width : height * sourceRatio;
       const drawHeight = sourceRatio > targetRatio ? width / sourceRatio : height;
-      crtContext.globalAlpha = crtPlaying ? 0.28 : 0.82;
+      crtContext.globalAlpha = crtPlaying ? 0.72 : 0.9;
       crtContext.drawImage(crtCover, (width - drawWidth) / 2, (height - drawHeight) / 2, drawWidth, drawHeight);
       crtContext.globalAlpha = 1;
     } else {
@@ -779,10 +779,10 @@ export function createBoxScene(
 
     const vignette = crtContext.createRadialGradient(width / 2, height / 2, 45, width / 2, height / 2, 205);
     vignette.addColorStop(0, 'rgba(0,0,0,0)');
-    vignette.addColorStop(1, 'rgba(0,0,0,.72)');
+    vignette.addColorStop(1, 'rgba(0,0,0,.46)');
     crtContext.fillStyle = vignette;
     crtContext.fillRect(0, 0, width, height);
-    crtContext.fillStyle = 'rgba(0,0,0,.22)';
+    crtContext.fillStyle = 'rgba(0,0,0,.14)';
     for (let y = 0; y < height; y += 5) crtContext.fillRect(0, y, width, 2);
     for (let index = 0; index < 55; index++) {
       crtContext.fillStyle = `rgba(220,235,205,${Math.random() * 0.16})`;
