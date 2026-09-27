@@ -328,11 +328,35 @@ export function createHandCursorScene(canvas: HTMLCanvasElement): HandCursorCont
   let targetGrip = 0;
   let overPlayer = false;
   let hideTimer = 0;
+  let pointerVisible = false;
 
   function position(x: number, y: number) {
     canvas.style.left = `${x - canvas.clientWidth * 0.5}px`;
     canvas.style.top = `${y - canvas.clientHeight * 0.42}px`;
   }
+
+  function trackPointer(event: PointerEvent) {
+    if (event.pointerType === 'touch' && event.buttons === 0) return;
+    pointerVisible = true;
+    position(event.clientX, event.clientY);
+    canvas.classList.add('is-visible');
+  }
+
+  function hidePointer(event: MouseEvent) {
+    if (event.relatedTarget) return;
+    pointerVisible = false;
+    if (targetGrip === 0) canvas.classList.remove('is-visible');
+  }
+
+  function hideOnBlur() {
+    pointerVisible = false;
+    if (targetGrip === 0) canvas.classList.remove('is-visible');
+  }
+
+  document.documentElement.classList.add('ps1-hand-cursor');
+  window.addEventListener('pointermove', trackPointer, { passive: true });
+  document.addEventListener('mouseout', hidePointer);
+  window.addEventListener('blur', hideOnBlur);
 
   function setCassette(title: string) {
     if (heldCassette) {
@@ -367,7 +391,8 @@ export function createHandCursorScene(canvas: HTMLCanvasElement): HandCursorCont
     hover(x, y, active) {
       if (targetGrip > 0) return;
       position(x, y);
-      canvas.classList.toggle('is-visible', active);
+      canvas.classList.toggle('is-hovering-tape', active);
+      if (pointerVisible) canvas.classList.add('is-visible');
     },
     grab(title, x, y) {
       window.clearTimeout(hideTimer);
@@ -387,7 +412,8 @@ export function createHandCursorScene(canvas: HTMLCanvasElement): HandCursorCont
       canvas.classList.remove('is-grabbing', 'is-over-player');
       if (dropped) canvas.classList.add('is-dropping');
       hideTimer = window.setTimeout(() => {
-        canvas.classList.remove('is-visible', 'is-dropping');
+        canvas.classList.remove('is-dropping');
+        canvas.classList.toggle('is-visible', pointerVisible);
         if (heldCassette) {
           hand.remove(heldCassette.group);
           disposeObject(heldCassette.group);
@@ -397,6 +423,10 @@ export function createHandCursorScene(canvas: HTMLCanvasElement): HandCursorCont
     },
     dispose() {
       window.clearTimeout(hideTimer);
+      document.documentElement.classList.remove('ps1-hand-cursor');
+      window.removeEventListener('pointermove', trackPointer);
+      document.removeEventListener('mouseout', hidePointer);
+      window.removeEventListener('blur', hideOnBlur);
       disposeObject(hand);
       disposeAnimation();
     },

@@ -20,6 +20,11 @@
   box-sizing: border-box;
 }
 
+html.ps1-hand-cursor,
+html.ps1-hand-cursor * {
+  cursor: none !important;
+}
+
 html {
   min-width: 320px;
   min-height: 100%;
@@ -1968,6 +1973,10 @@ body.theater-mode .transport-controls > .play-button {
 
 .hand-cursor-canvas.is-visible {
   opacity: 1;
+}
+
+.hand-cursor-canvas.is-hovering-tape {
+  transform: scale(.94) rotate(-1deg);
 }
 
 .hand-cursor-canvas.is-grabbing {
