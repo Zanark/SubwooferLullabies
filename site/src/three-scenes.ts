@@ -11,6 +11,13 @@ type SceneController = {
   dispose(): void;
 };
 
+export type HandCursorController = SceneController & {
+  hover(x: number, y: number, active: boolean): void;
+  grab(title: string, x: number, y: number): void;
+  move(x: number, y: number, overPlayer: boolean): void;
+  release(dropped: boolean): void;
+};
+
 type CassetteParts = {
   group: THREE.Group;
   reels: THREE.Group[];
@@ -264,11 +271,144 @@ function animateScene(
   };
 }
 
+export function createHandCursorScene(canvas: HTMLCanvasElement): HandCursorController {
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 30);
+  camera.position.set(0, 0, 8);
+  const { renderer, resize } = setupRenderer(canvas);
+  const key = new THREE.DirectionalLight(0xffd3a0, 3.5);
+  key.position.set(-3, 5, 7);
+  scene.add(key, new THREE.HemisphereLight(0xd6a06f, 0x351d24, 2.2));
+
+  const hand = new THREE.Group();
+  hand.rotation.set(0.08, -0.18, -0.18);
+  scene.add(hand);
+
+  const skin = 0x9b5e3f;
+  const skinLight = 0xc17a50;
+  hand.add(box(1.5, 1.65, 0.42, skin, [0, -0.25, 0]));
+  hand.add(box(0.85, 1.25, 0.38, skin, [0, -1.55, -0.04]));
+  hand.add(box(0.95, 0.28, 0.47, skinLight, [0, 0.48, 0.02]));
+
+  const fingers: THREE.Group[] = [];
+  for (let index = 0; index < 4; index++) {
+    const finger = new THREE.Group();
+    finger.position.set(-0.57 + index * 0.38, 0.52, 0);
+    const length = index === 0 || index === 3 ? 0.92 : 1.08;
+    const proximal = new THREE.Mesh(
+      new THREE.CapsuleGeometry(0.16, length, 2, 5),
+      material(index % 2 ? skinLight : skin),
+    );
+    proximal.position.y = length * 0.5;
+    finger.add(proximal);
+    const tip = new THREE.Mesh(
+      new THREE.CapsuleGeometry(0.155, 0.45, 2, 5),
+      material(skinLight),
+    );
+    tip.position.set(0, length + 0.28, 0.03);
+    tip.rotation.x = -0.18;
+    finger.add(tip);
+    hand.add(finger);
+    fingers.push(finger);
+  }
+
+  const thumb = new THREE.Group();
+  thumb.position.set(-0.86, -0.12, 0.1);
+  thumb.rotation.z = 0.78;
+  const thumbMesh = new THREE.Mesh(
+    new THREE.CapsuleGeometry(0.2, 0.85, 2, 5),
+    material(skinLight),
+  );
+  thumbMesh.position.y = 0.45;
+  thumb.add(thumbMesh);
+  hand.add(thumb);
+
+  let heldCassette: CassetteParts | null = null;
+  let grip = 0;
+  let targetGrip = 0;
+  let overPlayer = false;
+  let hideTimer = 0;
+
+  function position(x: number, y: number) {
+    canvas.style.left = `${x - canvas.clientWidth * 0.5}px`;
+    canvas.style.top = `${y - canvas.clientHeight * 0.42}px`;
+  }
+
+  function setCassette(title: string) {
+    if (heldCassette) {
+      hand.remove(heldCassette.group);
+      disposeObject(heldCassette.group);
+    }
+    heldCassette = createCassette(title);
+    heldCassette.group.scale.setScalar(0.46);
+    heldCassette.group.position.set(0.05, 0.52, 0.72);
+    heldCassette.group.rotation.set(-0.08, 0.04, -0.05);
+    hand.add(heldCassette.group);
+  }
+
+  const disposeAnimation = animateScene(renderer, scene, camera, resize, (_time, delta) => {
+    grip += (targetGrip - grip) * Math.min(1, delta * 14);
+    fingers.forEach((finger, index) => {
+      finger.rotation.x = -grip * (1.03 + index * 0.04);
+      finger.rotation.z = (index - 1.5) * (0.035 + (1 - grip) * 0.055);
+    });
+    thumb.rotation.x = -grip * 0.68;
+    thumb.rotation.z = 0.78 - grip * 0.44;
+    hand.rotation.z += ((overPlayer ? 0.18 : -0.18) - hand.rotation.z) * 0.12;
+    hand.rotation.y += ((overPlayer ? 0.16 : -0.18) - hand.rotation.y) * 0.12;
+    if (heldCassette) {
+      heldCassette.group.position.z = 0.72 + grip * 0.16;
+      const cassetteRotation = overPlayer ? 0.08 : -0.05;
+      heldCassette.group.rotation.z += (cassetteRotation - heldCassette.group.rotation.z) * 0.12;
+    }
+  });
+
+  return {
+    hover(x, y, active) {
+      if (targetGrip > 0) return;
+      position(x, y);
+      canvas.classList.toggle('is-visible', active);
+    },
+    grab(title, x, y) {
+      window.clearTimeout(hideTimer);
+      position(x, y);
+      setCassette(title);
+      targetGrip = 1;
+      canvas.classList.remove('is-dropping');
+      canvas.classList.add('is-visible', 'is-grabbing');
+    },
+    move(x, y, isOverPlayer) {
+      position(x, y);
+      overPlayer = isOverPlayer;
+      canvas.classList.toggle('is-over-player', isOverPlayer);
+    },
+    release(dropped) {
+      targetGrip = 0;
+      canvas.classList.remove('is-grabbing', 'is-over-player');
+      if (dropped) canvas.classList.add('is-dropping');
+      hideTimer = window.setTimeout(() => {
+        canvas.classList.remove('is-visible', 'is-dropping');
+        if (heldCassette) {
+          hand.remove(heldCassette.group);
+          disposeObject(heldCassette.group);
+          heldCassette = null;
+        }
+      }, dropped ? 280 : 150);
+    },
+    dispose() {
+      window.clearTimeout(hideTimer);
+      disposeObject(hand);
+      disposeAnimation();
+    },
+  };
+}
+
 export function createBoxScene(
   canvas: HTMLCanvasElement,
   songs: VisualSong[],
   onSelect: (title: string) => void,
   dropTarget: HTMLElement,
+  handCursor: HandCursorController,
 ): SceneController {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(31, 1, 0.1, 100);
@@ -394,6 +534,10 @@ export function createBoxScene(
   let startX = 0;
   let startY = 0;
   let hover: THREE.Group | null = null;
+  let latestClientX = 0;
+  let latestClientY = 0;
+  let scrollFrame = 0;
+  let activePointerId: number | null = null;
 
   function hit(event: PointerEvent) {
     const rect = canvas.getBoundingClientRect();
@@ -406,47 +550,108 @@ export function createBoxScene(
     return object as THREE.Group | null;
   }
 
+  function updateDropTarget() {
+    const target = document.elementFromPoint(latestClientX, latestClientY);
+    const overDropTarget = Boolean(target && dropTarget.contains(target));
+    dropTarget.classList.toggle('is-over', overDropTarget);
+    handCursor.move(latestClientX, latestClientY, overDropTarget);
+    return overDropTarget;
+  }
+
+  function autoScroll() {
+    if (!pressed) {
+      scrollFrame = 0;
+      return;
+    }
+    const scrollEdge = 90;
+    if (latestClientY < scrollEdge) {
+      window.scrollBy(0, -Math.max(8, (scrollEdge - latestClientY) * 0.18));
+    } else if (latestClientY > window.innerHeight - scrollEdge) {
+      window.scrollBy(0, Math.max(8, (latestClientY - window.innerHeight + scrollEdge) * 0.18));
+    }
+    updateDropTarget();
+    scrollFrame = requestAnimationFrame(autoScroll);
+  }
+
+  function cancelDrag(event?: PointerEvent) {
+    if (!pressed) return;
+    if (event && activePointerId !== null && event.pointerId !== activePointerId) return;
+    pressed.position.copy(pressed.userData.home);
+    pressed.rotation.copy(pressed.userData.rotationHome);
+    pressed = null;
+    activePointerId = null;
+    if (scrollFrame) cancelAnimationFrame(scrollFrame);
+    scrollFrame = 0;
+    canvas.classList.remove('is-dragging');
+    canvas.style.cursor = 'grab';
+    dropTarget.classList.remove('awaiting-drop', 'is-over');
+    handCursor.release(false);
+  }
+
   canvas.addEventListener('pointerdown', (event) => {
+    if (pressed) return;
     pressed = hit(event);
     if (!pressed) return;
+    activePointerId = event.pointerId;
     moved = false;
     startX = event.clientX;
     startY = event.clientY;
     canvas.setPointerCapture(event.pointerId);
     canvas.classList.add('is-dragging');
     dropTarget.classList.add('awaiting-drop');
+    canvas.style.cursor = 'none';
+    latestClientX = event.clientX;
+    latestClientY = event.clientY;
+    handCursor.grab(String(pressed.userData.title), event.clientX, event.clientY);
+    if (!scrollFrame) scrollFrame = requestAnimationFrame(autoScroll);
   });
   canvas.addEventListener('pointermove', (event) => {
+    if (pressed && event.pointerId !== activePointerId) return;
+    latestClientX = event.clientX;
+    latestClientY = event.clientY;
     const nextHover = hit(event);
     if (hover !== nextHover) {
       if (hover && hover !== pressed) hover.position.y = hover.userData.home.y;
       hover = nextHover;
     }
     if (hover && hover !== pressed) hover.position.y = hover.userData.home.y + 0.22;
+    canvas.style.cursor = hover || pressed ? 'none' : 'grab';
+    handCursor.hover(event.clientX, event.clientY, Boolean(hover));
     if (pressed) {
       moved ||= Math.hypot(event.clientX - startX, event.clientY - startY) > 7;
       pressed.position.y = pressed.userData.home.y + 0.72;
       pressed.rotation.y += 0.04;
-      const target = document.elementFromPoint(event.clientX, event.clientY);
-      dropTarget.classList.toggle('is-over', Boolean(target && dropTarget.contains(target)));
+      updateDropTarget();
     }
   });
   canvas.addEventListener('pointerup', (event) => {
-    if (!pressed) return;
+    if (!pressed || event.pointerId !== activePointerId) return;
     const chosen = pressed;
     const target = document.elementFromPoint(event.clientX, event.clientY);
     const dropped = Boolean(target && dropTarget.contains(target));
     chosen.position.copy(chosen.userData.home);
     chosen.rotation.copy(chosen.userData.rotationHome);
     pressed = null;
+    activePointerId = null;
+    if (scrollFrame) cancelAnimationFrame(scrollFrame);
+    scrollFrame = 0;
     canvas.releasePointerCapture(event.pointerId);
     canvas.classList.remove('is-dragging');
     dropTarget.classList.remove('awaiting-drop', 'is-over');
-    if (dropped || !moved) onSelect(String(chosen.userData.title));
+    canvas.style.cursor = 'grab';
+    handCursor.release(dropped);
+    if (dropped) {
+      window.setTimeout(() => onSelect(String(chosen.userData.title)), 260);
+    } else if (!moved) {
+      onSelect(String(chosen.userData.title));
+    }
   });
-  canvas.addEventListener('pointerleave', () => {
+  canvas.addEventListener('pointercancel', cancelDrag);
+  canvas.addEventListener('lostpointercapture', cancelDrag);
+  canvas.addEventListener('pointerleave', (event) => {
     if (hover && hover !== pressed) hover.position.y = hover.userData.home.y;
     hover = null;
+    handCursor.hover(event.clientX, event.clientY, false);
   });
 
   let pointerX = 0;
@@ -457,7 +662,7 @@ export function createBoxScene(
     pointerY = (event.clientY - rect.top) / rect.height - 0.5;
   });
 
-  const dispose = animateScene(renderer, scene, camera, resize, (time) => {
+  const disposeAnimation = animateScene(renderer, scene, camera, resize, (time) => {
     const aspect = canvas.clientWidth / Math.max(canvas.clientHeight, 1);
     const cameraScale = Math.max(1, 1.45 / aspect);
     camera.position.set(8.8 * cameraScale, 6.6 * cameraScale, 13.8 * cameraScale);
@@ -466,7 +671,12 @@ export function createBoxScene(
     boxGroup.rotation.x += (-pointerY * 0.08 - boxGroup.rotation.x) * 0.06;
     boxGroup.position.y = -0.45 + Math.sin(time * 0.8) * 0.025;
   });
-  return { dispose };
+  return {
+    dispose() {
+      if (scrollFrame) cancelAnimationFrame(scrollFrame);
+      disposeAnimation();
+    },
+  };
 }
 
 export function createPlayerScene(canvas: HTMLCanvasElement) {

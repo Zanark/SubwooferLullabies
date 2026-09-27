@@ -1947,6 +1947,49 @@ body.theater-mode .transport-controls > .play-button {
   bottom: auto;
 }
 
+.hand-cursor-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 130;
+  display: block;
+  width: 190px;
+  height: 190px;
+  opacity: 0;
+  pointer-events: none;
+  image-rendering: pixelated;
+  transform: scale(.88) rotate(-4deg);
+  transform-origin: 50% 45%;
+  transition:
+    opacity 80ms steps(2),
+    transform 140ms steps(4);
+  filter: drop-shadow(10px 12px 0 rgba(14, 7, 9, .55));
+}
+
+.hand-cursor-canvas.is-visible {
+  opacity: 1;
+}
+
+.hand-cursor-canvas.is-grabbing {
+  transform: scale(1) rotate(2deg);
+}
+
+.hand-cursor-canvas.is-over-player {
+  transform: scale(.9) rotate(12deg);
+}
+
+.hand-cursor-canvas.is-dropping {
+  opacity: .15;
+  transform: translateY(34px) scale(.48) rotate(18deg);
+}
+
+@media (pointer: coarse) {
+  .hand-cursor-canvas {
+    width: 150px;
+    height: 150px;
+  }
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

@@ -1,5 +1,5 @@
 import './styles.css';
-import { createBoxScene, createPlayerScene, createShowcaseScene } from './three-scenes';
+import { createBoxScene, createHandCursorScene, createPlayerScene, createShowcaseScene } from './three-scenes';
 
 type Song = {
   title: string;
@@ -32,6 +32,7 @@ const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('Application root is missing.');
 
 app.innerHTML = `
+  <canvas id="hand-3d" class="hand-cursor-canvas" aria-hidden="true"></canvas>
   <header class="masthead">
     <div>
       <p class="eyebrow">playable archive / no. 0014</p>
@@ -156,6 +157,7 @@ let currentAlbum: string | null = null;
 let selected: Song | null = null;
 let loading = false;
 let boxScene: ReturnType<typeof createBoxScene>;
+let handCursorScene: ReturnType<typeof createHandCursorScene>;
 let playerScene: ReturnType<typeof createPlayerScene>;
 let showcaseScene: ReturnType<typeof createShowcaseScene>;
 
@@ -432,6 +434,7 @@ async function start() {
   audio.volume = Number(volume.value);
   renderShelf();
   playerScene = createPlayerScene(required<HTMLCanvasElement>('player-3d'));
+  handCursorScene = createHandCursorScene(required<HTMLCanvasElement>('hand-3d'));
   showcaseScene = createShowcaseScene(required<HTMLCanvasElement>('showcase-3d'));
   showcaseScene.preload(catalog.songs.map((song) => ({ ...song, cover: asset(song.cover) })));
   boxScene = createBoxScene(
@@ -439,6 +442,7 @@ async function start() {
     catalog.songs.map((song) => ({ ...song, cover: asset(song.cover) })),
     (title) => loadCassette(trackByTitle(title)),
     dropZone,
+    handCursorScene,
   );
   randomPlayButton.disabled = false;
   initGrain();
