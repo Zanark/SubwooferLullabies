@@ -206,6 +206,7 @@ let selected: Song | null = null;
 let queue: QueueEntry[] = [];
 let activeQueueId: string | null = null;
 let currentSource: 'direct' | 'queue' | null = null;
+let playerHasCassette = false;
 const selectedTitles = new Set<string>();
 const cassetteFocusReasons = new Set<string>();
 let loading = false;
@@ -509,9 +510,12 @@ async function loadCassette(
   autoplay = false,
   queueEntryId: string | null = null,
   skipShowcase = false,
+  animateDoorRequested = false,
 ) {
   if (loading) return false;
   loading = true;
+  const animateDoor = animateDoorRequested && !playerHasCassette;
+  const showInspection = !skipShowcase && !animateDoor;
   if (!skipShowcase) setCassetteFocus('cassette-showcase', true, true);
   audio.pause();
   setPlayingState(false);
@@ -525,13 +529,14 @@ async function loadCassette(
     ? audio.play().then(() => true).catch(() => false)
     : Promise.resolve(false);
   showcaseTitle.textContent = song.title;
-  showcase.hidden = false;
-  showcase.classList.add('is-showing');
+  showcase.hidden = !showInspection;
+  showcase.classList.toggle('is-showing', showInspection);
+  if (animateDoor) status.textContent = 'loading / opening cassette door';
   let loaded = false;
 
   try {
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (skipShowcase) {
+    if (!showInspection) {
       showcase.classList.remove('is-showing');
       showcase.hidden = true;
     } else if (reduced) {
@@ -543,7 +548,8 @@ async function loadCassette(
     selected = song;
     activeQueueId = queueEntryId;
     currentSource = queueEntryId ? 'queue' : 'direct';
-    await playerScene.setCassette({ ...song, cover: asset(song.cover) });
+    await playerScene.setCassette({ ...song, cover: asset(song.cover) }, animateDoor);
+    playerHasCassette = true;
     await boxScene.setTrack({ ...song, cover: asset(song.cover) });
     setTransportEnabled(true);
     announcement.textContent = `${song.title} cassette loaded`;
@@ -803,7 +809,7 @@ for (const target of [queuePanel, dropZone]) {
     if (target === queuePanel) addTitlesToQueue([title]);
     else {
       activeQueueId = null;
-      void loadCassette(trackByTitle(title));
+      void loadCassette(trackByTitle(title), false, null, false, true);
     }
   });
 }
@@ -882,7 +888,13 @@ async function start() {
   boxScene = createBoxScene(
     required<HTMLCanvasElement>('box-3d'),
     catalog.songs.map((song) => ({ ...song, cover: asset(song.cover) })),
-    (title) => loadCassette(trackByTitle(title)),
+    (title, droppedOnPlayer) => loadCassette(
+      trackByTitle(title),
+      false,
+      null,
+      false,
+      droppedOnPlayer,
+    ),
     (title) => {
       deskPreviewTitle = title;
       renderShelf();

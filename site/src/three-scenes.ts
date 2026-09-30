@@ -46,7 +46,7 @@ export type BoxSceneController = SceneController & {
 };
 
 export type PlayerSceneController = SceneController & {
-  setCassette(song: VisualSong): Promise<void>;
+  setCassette(song: VisualSong, animateDoor?: boolean): Promise<void>;
   setPlaying(value: boolean): void;
   setTransportEnabled(value: boolean): void;
   setTransportFocus(action: TransportAction | null): void;
@@ -694,7 +694,7 @@ export function createHandCursorScene(canvas: HTMLCanvasElement): HandCursorCont
 export function createBoxScene(
   canvas: HTMLCanvasElement,
   songs: VisualSong[],
-  onSelect: (title: string) => void,
+  onSelect: (title: string, droppedOnPlayer: boolean) => void,
   onInspect: (title: string) => void,
   onCassetteFocusChange: (active: boolean) => void,
   onCrtFocusChange: (active: boolean) => void,
@@ -1819,14 +1819,14 @@ export function createBoxScene(
       chosen.rotation.copy(chosen.userData.rotationHome);
       const title = String(chosen.userData.title);
       window.setTimeout(() => {
-        if (destination === 'player') onSelect(title);
+        if (destination === 'player') onSelect(title, true);
         else onQueue(title);
       }, 260);
       window.setTimeout(() => onCassetteFocusChange(false), 320);
     } else if (!moved) {
       chosen.position.copy(chosen.userData.home);
       chosen.rotation.copy(chosen.userData.rotationHome);
-      onSelect(String(chosen.userData.title));
+      onSelect(String(chosen.userData.title), false);
       onCassetteFocusChange(false);
     } else {
       chosen.position.y = (chosen.userData.home as THREE.Vector3).y;
@@ -2000,16 +2000,40 @@ export function createPlayerScene(
   brand.position.set(-1.65, 2.85, 0.76);
   rig.add(brand);
 
-  const windowFrame = box(4.9, 3.65, 0.28, COLORS.dark, [0, 0.05, 0.75]);
-  rig.add(windowFrame);
-  const windowGlass = box(4.35, 3.08, 0.12, COLORS.glass, [0, 0.05, 0.92]);
+  const cassetteBay = box(4.58, 3.28, 0.18, 0x0b1519, [0, 0.05, 0.79]);
+  rig.add(cassetteBay);
+  for (const x of [-1.14, 1.14]) {
+    const spindle = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.3, 0.3, 0.2, 10),
+      material(COLORS.metal, { roughness: 0.62 }),
+    );
+    spindle.geometry.rotateX(Math.PI / 2);
+    spindle.position.set(x, -0.2, 0.96);
+    rig.add(spindle);
+  }
+  rig.add(box(1.35, 0.28, 0.26, COLORS.metal, [0, -1.27, 0.98]));
+  rig.add(box(3.95, 0.1, 0.2, COLORS.blueDark, [0, 1.48, 0.96]));
+
+  const cassetteDoor = new THREE.Group();
+  cassetteDoor.position.set(-2.55, 0.05, 1.18);
+  const doorCenterX = 2.55;
+  cassetteDoor.add(box(4.9, 0.3, 0.28, COLORS.dark, [doorCenterX, 1.68, 0]));
+  cassetteDoor.add(box(4.9, 0.3, 0.28, COLORS.dark, [doorCenterX, -1.68, 0]));
+  cassetteDoor.add(box(0.3, 3.65, 0.28, COLORS.dark, [doorCenterX - 2.3, 0, 0]));
+  cassetteDoor.add(box(0.3, 3.65, 0.28, COLORS.dark, [doorCenterX + 2.3, 0, 0]));
+  cassetteDoor.add(box(0.18, 3.3, 0.34, COLORS.orange, [0.08, 0, -0.02]));
+  const windowGlass = box(4.32, 3.06, 0.1, COLORS.glass, [doorCenterX, 0, 0.15]);
   (windowGlass.material as THREE.MeshStandardMaterial).transparent = true;
-  (windowGlass.material as THREE.MeshStandardMaterial).opacity = 0.72;
-  rig.add(windowGlass);
+  (windowGlass.material as THREE.MeshStandardMaterial).opacity = 0.3;
+  (windowGlass.material as THREE.MeshStandardMaterial).depthWrite = false;
+  cassetteDoor.add(windowGlass);
+  rig.add(cassetteDoor);
 
   const cassette = createCassette('no tape');
   cassette.group.scale.setScalar(1.04);
-  cassette.group.position.set(0, -0.02, 1.08);
+  const cassetteHome = new THREE.Vector3(0, -0.02, 0.92);
+  const cassetteInsertStart = new THREE.Vector3(3.55, 0.72, 3.25);
+  cassette.group.position.copy(cassetteHome);
   cassette.group.visible = false;
   rig.add(cassette.group);
 
@@ -2170,6 +2194,7 @@ export function createPlayerScene(
   let hoveredTransport: TransportKey | null = null;
   let focusedTransport: TransportKey | null = null;
   let playing = false;
+  let doorAnimation: { start: number; resolve: () => void } | null = null;
 
   const refreshTransportKeys = () => {
     for (const key of transportKeys) {
@@ -2343,13 +2368,45 @@ export function createPlayerScene(
     camera.position.set(4.8 * cameraScale, 2.2 * cameraScale, 19.5 * cameraScale);
     camera.lookAt(0, 0.15, 0);
     rig.position.y = Math.sin(time * 0.7) * 0.04;
+    if (doorAnimation) {
+      const progress = THREE.MathUtils.clamp((time - doorAnimation.start) / 2, 0, 1);
+      if (progress < 0.28) {
+        const opening = THREE.MathUtils.smootherstep(progress / 0.28, 0, 1);
+        cassetteDoor.rotation.y = THREE.MathUtils.lerp(0, -1.35, opening);
+        cassette.group.visible = false;
+      } else if (progress < 0.65) {
+        cassetteDoor.rotation.y = -1.35;
+        const inserting = THREE.MathUtils.smootherstep((progress - 0.28) / 0.37, 0, 1);
+        cassette.group.visible = true;
+        cassette.group.position.lerpVectors(cassetteInsertStart, cassetteHome, inserting);
+        cassette.group.rotation.set(
+          THREE.MathUtils.lerp(-0.08, 0, inserting),
+          THREE.MathUtils.lerp(-0.42, 0, inserting),
+          THREE.MathUtils.lerp(0.08, 0, inserting),
+        );
+      } else {
+        cassette.group.visible = true;
+        cassette.group.position.copy(cassetteHome);
+        cassette.group.rotation.set(0, 0, 0);
+        const closing = THREE.MathUtils.smootherstep((progress - 0.65) / 0.35, 0, 1);
+        cassetteDoor.rotation.y = THREE.MathUtils.lerp(-1.35, 0, closing);
+      }
+      if (progress >= 1) {
+        cassetteDoor.rotation.y = 0;
+        cassette.group.position.copy(cassetteHome);
+        cassette.group.rotation.set(0, 0, 0);
+        const resolve = doorAnimation.resolve;
+        doorAnimation = null;
+        resolve();
+      }
+    }
     if (playing) {
       cassette.reels.forEach((reel) => { reel.rotation.z -= delta * 1.6; });
     }
   });
 
   return {
-    async setCassette(song: VisualSong) {
+    async setCassette(song: VisualSong, animateDoor = false) {
       const cover = await loadCoverTexture(song.cover);
       disposeMaterial(cassette.front.material);
       disposeMaterial(cassette.back.material);
@@ -2357,7 +2414,17 @@ export function createPlayerScene(
       cassette.front.material = textureMaterial(canvasTexture('', '', '#1b292a', '#1b292a'));
       cassette.back.material = textureMaterial(cover);
       cassette.label.material = textureMaterial(maskingTapeTexture(song.title), true);
-      cassette.group.visible = true;
+      if (!animateDoor) {
+        cassetteDoor.rotation.y = 0;
+        cassette.group.position.copy(cassetteHome);
+        cassette.group.rotation.set(0, 0, 0);
+        cassette.group.visible = true;
+        return;
+      }
+      cassette.group.visible = false;
+      await new Promise<void>((resolve) => {
+        doorAnimation = { start: performance.now() / 1000, resolve };
+      });
     },
     setPlaying(value: boolean) {
       playing = value;
