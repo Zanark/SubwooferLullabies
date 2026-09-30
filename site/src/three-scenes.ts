@@ -2015,14 +2015,14 @@ export function createPlayerScene(
   rig.add(box(3.95, 0.1, 0.2, COLORS.blueDark, [0, 1.48, 0.96]));
 
   const cassetteDoor = new THREE.Group();
-  cassetteDoor.position.set(-2.55, 0.05, 1.18);
-  const doorCenterX = 2.55;
-  cassetteDoor.add(box(4.9, 0.3, 0.28, COLORS.dark, [doorCenterX, 1.68, 0]));
-  cassetteDoor.add(box(4.9, 0.3, 0.28, COLORS.dark, [doorCenterX, -1.68, 0]));
-  cassetteDoor.add(box(0.3, 3.65, 0.28, COLORS.dark, [doorCenterX - 2.3, 0, 0]));
-  cassetteDoor.add(box(0.3, 3.65, 0.28, COLORS.dark, [doorCenterX + 2.3, 0, 0]));
-  cassetteDoor.add(box(0.18, 3.3, 0.34, COLORS.orange, [0.08, 0, -0.02]));
-  const windowGlass = box(4.32, 3.06, 0.1, COLORS.glass, [doorCenterX, 0, 0.15]);
+  cassetteDoor.position.set(0, -1.63, 1.18);
+  const doorCenterY = 1.68;
+  cassetteDoor.add(box(4.9, 0.3, 0.28, COLORS.dark, [0, doorCenterY + 1.68, 0]));
+  cassetteDoor.add(box(4.9, 0.3, 0.28, COLORS.dark, [0, doorCenterY - 1.68, 0]));
+  cassetteDoor.add(box(0.3, 3.65, 0.28, COLORS.dark, [-2.3, doorCenterY, 0]));
+  cassetteDoor.add(box(0.3, 3.65, 0.28, COLORS.dark, [2.3, doorCenterY, 0]));
+  cassetteDoor.add(box(4.6, 0.18, 0.34, COLORS.orange, [0, 0.08, -0.02]));
+  const windowGlass = box(4.32, 3.06, 0.1, COLORS.glass, [0, doorCenterY, 0.15]);
   (windowGlass.material as THREE.MeshStandardMaterial).transparent = true;
   (windowGlass.material as THREE.MeshStandardMaterial).opacity = 0.3;
   (windowGlass.material as THREE.MeshStandardMaterial).depthWrite = false;
@@ -2032,7 +2032,7 @@ export function createPlayerScene(
   const cassette = createCassette('no tape');
   cassette.group.scale.setScalar(1.04);
   const cassetteHome = new THREE.Vector3(0, -0.02, 0.92);
-  const cassetteInsertStart = new THREE.Vector3(3.55, 0.72, 3.25);
+  const cassetteInsertStart = new THREE.Vector3(0, 2.85, 3.35);
   cassette.group.position.copy(cassetteHome);
   cassette.group.visible = false;
   rig.add(cassette.group);
@@ -2372,27 +2372,27 @@ export function createPlayerScene(
       const progress = THREE.MathUtils.clamp((time - doorAnimation.start) / 2, 0, 1);
       if (progress < 0.28) {
         const opening = THREE.MathUtils.smootherstep(progress / 0.28, 0, 1);
-        cassetteDoor.rotation.y = THREE.MathUtils.lerp(0, -1.35, opening);
+        cassetteDoor.rotation.x = THREE.MathUtils.lerp(0, 1.28, opening);
         cassette.group.visible = false;
       } else if (progress < 0.65) {
-        cassetteDoor.rotation.y = -1.35;
+        cassetteDoor.rotation.x = 1.28;
         const inserting = THREE.MathUtils.smootherstep((progress - 0.28) / 0.37, 0, 1);
         cassette.group.visible = true;
         cassette.group.position.lerpVectors(cassetteInsertStart, cassetteHome, inserting);
         cassette.group.rotation.set(
-          THREE.MathUtils.lerp(-0.08, 0, inserting),
-          THREE.MathUtils.lerp(-0.42, 0, inserting),
-          THREE.MathUtils.lerp(0.08, 0, inserting),
+          THREE.MathUtils.lerp(-0.32, 0, inserting),
+          0,
+          0,
         );
       } else {
         cassette.group.visible = true;
         cassette.group.position.copy(cassetteHome);
         cassette.group.rotation.set(0, 0, 0);
         const closing = THREE.MathUtils.smootherstep((progress - 0.65) / 0.35, 0, 1);
-        cassetteDoor.rotation.y = THREE.MathUtils.lerp(-1.35, 0, closing);
+        cassetteDoor.rotation.x = THREE.MathUtils.lerp(1.28, 0, closing);
       }
       if (progress >= 1) {
-        cassetteDoor.rotation.y = 0;
+        cassetteDoor.rotation.x = 0;
         cassette.group.position.copy(cassetteHome);
         cassette.group.rotation.set(0, 0, 0);
         const resolve = doorAnimation.resolve;
@@ -2415,7 +2415,7 @@ export function createPlayerScene(
       cassette.back.material = textureMaterial(cover);
       cassette.label.material = textureMaterial(maskingTapeTexture(song.title), true);
       if (!animateDoor) {
-        cassetteDoor.rotation.y = 0;
+        cassetteDoor.rotation.x = 0;
         cassette.group.position.copy(cassetteHome);
         cassette.group.rotation.set(0, 0, 0);
         cassette.group.visible = true;

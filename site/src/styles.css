@@ -2502,21 +2502,21 @@ body.cassette-focus-mode .queue-panel {
 body.cassette-focus-mode .player-panel {
   overflow: visible;
   border-color: #a8fff0;
-  filter: brightness(1.45) saturate(1.35) contrast(1.08);
+  filter: brightness(1.16) saturate(1.15) contrast(1.03);
   box-shadow:
-    0 0 0 4px rgba(168, 255, 240, .55),
-    0 0 34px 12px rgba(93, 255, 224, .95),
-    0 0 90px 34px rgba(50, 194, 255, .72),
-    0 0 148px 58px rgba(255, 153, 60, .42),
-    inset 0 0 48px rgba(171, 255, 237, .38);
+    0 0 0 2px rgba(168, 255, 240, .25),
+    0 0 24px 8px rgba(93, 255, 224, .35),
+    0 0 56px 18px rgba(50, 194, 255, .24),
+    0 0 88px 28px rgba(255, 153, 60, .14),
+    inset 0 0 34px rgba(171, 255, 237, .18);
 }
 
 body.cassette-focus-mode .player-panel::after {
   position: absolute;
   z-index: 1;
-  inset: -12% 0;
+  inset: -6% 0;
   background:
-    radial-gradient(circle at 50% 48%, rgba(212, 255, 242, .7) 0 8%, rgba(89, 255, 221, .34) 22%, rgba(48, 174, 255, .2) 42%, transparent 68%);
+    radial-gradient(circle at 50% 48%, rgba(212, 255, 242, .32) 0 8%, rgba(89, 255, 221, .16) 22%, rgba(48, 174, 255, .09) 42%, transparent 66%);
   content: "";
   mix-blend-mode: screen;
   pointer-events: none;
@@ -2524,19 +2524,19 @@ body.cassette-focus-mode .player-panel::after {
 
 body.cassette-focus-mode .walkman-drop {
   filter:
-    brightness(1.42)
-    saturate(1.38)
-    drop-shadow(0 0 18px rgba(223, 255, 247, 1))
-    drop-shadow(0 0 42px rgba(88, 255, 223, .92))
-    drop-shadow(0 0 76px rgba(255, 151, 58, .7));
+    brightness(1.12)
+    saturate(1.15)
+    drop-shadow(0 0 10px rgba(223, 255, 247, .38))
+    drop-shadow(0 0 24px rgba(88, 255, 223, .28))
+    drop-shadow(0 0 42px rgba(255, 151, 58, .18));
 }
 
 body.cassette-focus-mode .queue-panel {
   border-color: #7adbcf;
-  filter: brightness(1.08) saturate(1.08);
+  filter: brightness(1.02) saturate(1.03);
   box-shadow:
-    0 0 0 2px rgba(122, 219, 207, .32),
-    0 0 28px rgba(82, 222, 205, .32);
+    0 0 0 1px rgba(122, 219, 207, .16),
+    0 0 18px rgba(82, 222, 205, .12);
 }
 
 /* Transport keys are physical Three.js controls; retain these buttons for keyboard and screen-reader access. */
@@ -2627,55 +2627,59 @@ body.theater-mode .status {
 }
 
 /* Keep the pixel UI readable at normal browser zoom without losing its compact console rhythm. */
+h1 {
+  font-size: clamp(12.6667px, 1.6667vw, 25.3333px);
+}
+
 .eyebrow,
 .mast-copy {
-  font-size: 20px;
+  font-size: 6.6667px;
 }
 
 .random-play span {
-  font-size: 18px;
+  font-size: 6px;
 }
 
 .random-play strong {
-  font-size: 26px;
+  font-size: 8.6667px;
 }
 
 .search span,
 .shelf-head {
-  font-size: 22px;
+  font-size: 7.3333px;
 }
 
 .search input {
-  font-size: 28px;
+  font-size: 9.3333px;
 }
 
 .pixel-button {
-  font-size: 20px;
+  font-size: 6.6667px;
 }
 
 .cover-card strong {
-  font-size: 26px;
+  font-size: 8.6667px;
 }
 
 .cover-card small {
-  font-size: 20px;
+  font-size: 6.6667px;
 }
 
 .queue-head span {
-  font-size: 16px;
+  font-size: 5.3333px;
 }
 
 .queue-head strong {
-  font-size: 26px;
+  font-size: 8.6667px;
 }
 
 .queue-head output {
-  font-size: 22px;
+  font-size: 7.3333px;
 }
 
 .queue-actions button,
 .queue-reorder button {
-  font-size: 18px;
+  font-size: 6px;
 }
 
 .queue-actions button {
@@ -2687,79 +2691,83 @@ body.theater-mode .status {
 }
 
 .queue-source {
-  font-size: 14px;
+  font-size: 4.6667px;
 }
 
 .queue-index {
-  font-size: 16px;
+  font-size: 5.3333px;
 }
 
 .queue-title-text {
-  font-size: 20px;
+  font-size: 6.6667px;
 }
 
 .queue-empty {
-  font-size: 18px;
+  font-size: 6px;
 }
 
 .drop-hint {
-  font-size: 22px;
+  font-size: 7.3333px;
 }
 
 .transport-button span {
-  font-size: 26px;
+  font-size: 8.6667px;
 }
 
 .transport-button small {
-  font-size: 16px;
+  font-size: 5.3333px;
 }
 
 .status,
 .canvas-help {
-  font-size: 20px;
+  font-size: 6.6667px;
 }
 
 .crt-back-button,
 .crt-isolation-button {
-  font-size: 20px;
+  font-size: 6.6667px;
 }
 
 .crt-controls span,
 .crt-controls button {
-  font-size: 18px;
+  font-size: 6px;
 }
 
 .showcase-copy span {
-  font-size: 22px;
+  font-size: 7.3333px;
 }
 
 footer {
-  font-size: 20px;
+  font-size: 6.6667px;
 }
 
 @media (max-width: 650px) {
+  h1 {
+    font-size: clamp(12.6667px, 1.6667vw, 25.3333px);
+  }
+
   .eyebrow,
   .mast-copy {
-    font-size: 22px;
+    font-size: 7.3333px;
   }
 
   .search span,
   .shelf-head,
   .pixel-button {
-    font-size: 24px;
+    font-size: 8px;
   }
 
   .search input {
-    font-size: 32px;
+    font-size: 10.6667px;
   }
 
   .cover-card strong {
-    font-size: 28px;
+    font-size: 9.3333px;
   }
 
   .cover-card small,
   .status {
-    font-size: 22px;
+    font-size: 7.3333px;
   }
 }
 
@@ -2782,6 +2790,10 @@ footer {
 }
 
 @media (min-width: 1181px) {
+  h1 {
+    font-size: clamp(10px, 1.0667vw, 18px);
+  }
+
   .random-play {
     min-width: 320px;
   }
@@ -2858,93 +2870,93 @@ footer {
   }
 }
 
-/* The queue is intentionally oversized for long-distance readability. */
+/* The queue retains its hierarchy at one-third of the previously oversized type scale. */
 .queue-panel {
-  padding: 22px;
+  padding: 12px;
 }
 
 .queue-head {
   align-items: flex-start;
   flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 18px;
-  padding-bottom: 16px;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
 }
 
 .queue-head span {
-  font-size: 48px;
+  font-size: 16px;
   line-height: 1.05;
 }
 
 .queue-head strong {
-  font-size: 78px;
+  font-size: 26px;
   line-height: 1;
 }
 
 .queue-head output {
-  min-width: 112px;
-  padding: 10px 12px;
-  font-size: 66px;
+  min-width: 44px;
+  padding: 4px 6px;
+  font-size: 22px;
   line-height: 1;
 }
 
 .queue-actions {
-  gap: 10px;
-  margin-bottom: 18px;
+  gap: 6px;
+  margin-bottom: 8px;
 }
 
 .queue-actions button,
 .queue-reorder button {
-  font-size: 54px;
+  font-size: 18px;
   line-height: 1.05;
   white-space: normal;
 }
 
 .queue-actions button {
-  min-height: 110px;
-  padding: 12px;
+  min-height: 42px;
+  padding: 6px;
 }
 
 .queue-list {
-  gap: 10px;
+  gap: 6px;
 }
 
 .queue-item {
-  min-height: 120px;
+  min-height: 52px;
 }
 
 .queue-item.is-external {
-  grid-template-columns: 72px minmax(0, 1fr) auto;
-  padding-inline: 12px;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  padding-inline: 6px;
 }
 
 .queue-source {
-  font-size: 42px;
+  font-size: 14px;
 }
 
 .queue-play {
-  grid-template-columns: 72px minmax(0, 1fr);
-  padding-inline: 12px;
+  grid-template-columns: 30px minmax(0, 1fr);
+  padding-inline: 6px;
 }
 
 .queue-index {
-  font-size: 48px;
+  font-size: 16px;
 }
 
 .queue-title-text {
-  font-size: 60px;
+  font-size: 20px;
 }
 
 .queue-reorder {
-  grid-template-columns: repeat(3, 60px);
-  gap: 5px;
-  padding: 8px;
+  grid-template-columns: repeat(3, 30px);
+  gap: 4px;
+  padding: 4px;
 }
 
 .queue-empty {
   position: static;
   margin: auto 0;
-  font-size: 54px;
+  font-size: 18px;
   line-height: 1.35;
 }
 
@@ -2957,9 +2969,9 @@ footer {
 
   .desk {
     grid-template-areas:
-      "library library library queue queue queue"
+      "library library library library queue queue"
       "room room room room player player";
-    grid-template-rows: minmax(720px, .9fr) minmax(300px, 1.1fr);
+    grid-template-rows: minmax(420px, .9fr) minmax(300px, 1.1fr);
     height: auto;
     min-height: calc(100vh - 102px);
   }
@@ -2967,7 +2979,7 @@ footer {
 
 @media (max-width: 650px) {
   .queue-panel {
-    min-height: 1100px;
+    min-height: 720px;
   }
 
   .queue-head span {
@@ -2975,25 +2987,25 @@ footer {
   }
 
   .queue-actions {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .queue-actions button {
-    min-height: 92px;
+    min-height: 48px;
   }
 
   .queue-reorder {
-    grid-template-columns: repeat(3, 54px);
+    grid-template-columns: repeat(3, 36px);
   }
 
   .queue-item,
   .queue-item.is-external {
     grid-template-columns: minmax(0, 1fr);
-    min-height: 220px;
+    min-height: 96px;
   }
 
   .queue-play {
-    min-height: 110px;
+    min-height: 64px;
   }
 
   .queue-reorder {
