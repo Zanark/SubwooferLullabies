@@ -1644,6 +1644,7 @@ footer {
 
 .cover-grid {
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  align-items: start;
   gap: 22px 18px;
   max-height: 610px;
   overflow-x: hidden;
@@ -1654,8 +1655,15 @@ footer {
 
 .cover-grid .cover-card {
   position: relative;
+  align-self: start;
   width: 100%;
   min-width: 0;
+}
+
+.album-card {
+  display: block;
+  color: inherit;
+  font: inherit;
 }
 
 .cover-card-main {
