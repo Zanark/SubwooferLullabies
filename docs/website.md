@@ -185,10 +185,11 @@ At desktop widths, the library spans the top row. The lower row uses a two-third
 and one-third player split, with the room on the left. Below 1181 px the sections stack
 instead of compressing the Three.js scenes.
 
-Above 1920 px, the masthead and workstation share a centered 2200 px maximum workspace.
-The three primary cover cards remain in bounded columns instead of drifting apart on
-2K and ultrawide monitors. Controls wrap rather than introducing horizontal scrolling,
-and the enlarged interface typography remains readable at normal browser zoom.
+Above 1920 px, the masthead and workstation use nearly the full viewport with 32 px
+outer gutters and a 3000 px maximum workspace. The three primary cover cards remain in
+bounded columns instead of drifting apart on 2K and ultrawide monitors. Controls wrap
+rather than introducing horizontal scrolling, and the enlarged interface typography
+remains readable at normal browser zoom.
 
 ## 8. Runtime architecture
 

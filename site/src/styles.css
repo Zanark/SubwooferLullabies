@@ -2782,8 +2782,8 @@ footer {
 @media (min-width: 1921px) {
   .masthead,
   .desk {
-    width: calc(100% - 80px);
-    max-width: 2200px;
+    width: calc(100% - 64px);
+    max-width: 3000px;
     margin-inline: auto;
   }
 
