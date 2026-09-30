@@ -638,6 +638,7 @@ function setTransportEnabled(enabled: boolean) {
     button.disabled = !enabled;
   }
   playerScene?.setTransportEnabled(enabled);
+  boxScene?.setTransportEnabled(enabled);
 }
 
 async function togglePlayback() {
@@ -732,6 +733,7 @@ forwardButton.addEventListener('click', () => seekBy(10));
 volume.addEventListener('input', () => {
   audio.volume = Number(volume.value);
   playerScene?.setVolume(audio.volume);
+  boxScene?.setVolume(audio.volume);
 });
 randomPlayButton.addEventListener('click', playRandomTape);
 audio.addEventListener('ended', () => {
@@ -765,7 +767,9 @@ exitCrtFocusButton.addEventListener('click', () => {
 toggleCrtIsolationButton.addEventListener('click', () => {
   const active = document.body.classList.toggle('crt-isolation-mode');
   toggleCrtIsolationButton.setAttribute('aria-pressed', String(active));
-  toggleCrtIsolationButton.textContent = active ? 'restore surroundings' : 'dim surroundings';
+  const label = active ? 'Restore surroundings' : 'Dim surroundings';
+  toggleCrtIsolationButton.setAttribute('aria-label', label);
+  toggleCrtIsolationButton.title = label;
 });
 queueAddButton.addEventListener('click', () => {
   if (selectedTitles.size) {
@@ -917,16 +921,25 @@ async function start() {
       if (!active) {
         document.body.classList.remove('crt-isolation-mode');
         toggleCrtIsolationButton.setAttribute('aria-pressed', 'false');
-        toggleCrtIsolationButton.textContent = 'dim surroundings';
+        toggleCrtIsolationButton.setAttribute('aria-label', 'Dim surroundings');
+        toggleCrtIsolationButton.title = 'Dim surroundings';
       }
       toggleCrtIsolationButton.hidden = !active;
       exitCrtFocusButton.hidden = !active;
+    },
+    () => playButton.click(),
+    (value) => {
+      audio.volume = value;
+      volume.value = String(value);
+      playerScene.setVolume(value);
     },
     dropZone,
     queuePanel,
     (title) => addTitlesToQueue([title]),
     handCursorScene,
   );
+  boxScene.setVolume(audio.volume);
+  boxScene.setTransportEnabled(!playButton.disabled);
   const visualizerModes: VisualizerMode[] = [
     'scope',
     'bars',

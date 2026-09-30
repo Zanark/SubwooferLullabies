@@ -40,6 +40,8 @@ export type TransportAction = 'rewind' | 'play' | 'stop' | 'forward';
 export type BoxSceneController = SceneController & {
   setTrack(song: VisualSong): Promise<void>;
   setPlaying(active: boolean): void;
+  setTransportEnabled(active: boolean): void;
+  setVolume(value: number): void;
   setAnalyser(analyser: AnalyserNode): void;
   setVisualizer(mode: VisualizerMode): void;
   setSearchMatches(titles: string[]): void;
@@ -700,6 +702,8 @@ export function createBoxScene(
   onInspect: (title: string) => void,
   onCassetteFocusChange: (active: boolean) => void,
   onCrtFocusChange: (active: boolean) => void,
+  onTogglePlayback: () => void,
+  onVolumeChange: (value: number) => void,
   dropTarget: HTMLElement,
   queueTarget: HTMLElement,
   onQueue: (title: string) => void,
@@ -959,7 +963,77 @@ export function createBoxScene(
   for (let row = -5; row <= 5; row++) {
     television.add(box(0.32, 0.045, 0.03, 0x777164, [2.24, 0.25 + row * 0.23, 1.74]));
   }
-  television.add(box(0.48, 0.48, 0.22, 0xd1963e, [2.24, -1.48, 1.72]));
+
+  const tvPlayControl = new THREE.Group();
+  tvPlayControl.position.set(2.24, 0.05, 1.72);
+  tvPlayControl.userData.tvAudioControl = 'play';
+  const tvPlaySocket = box(0.62, 0.58, 0.12, 0x171719, [0, 0, 0]);
+  const tvPlayCapMaterial = material(0x697574, {
+    emissive: 0x000000,
+    emissiveIntensity: 0,
+    transparent: true,
+    opacity: 0.82,
+  });
+  const tvPlayCap = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.44, 0.2), tvPlayCapMaterial);
+  tvPlayCap.position.z = 0.13;
+  tvPlayCap.castShadow = true;
+  const tvPlayIconMaterial = new THREE.MeshBasicMaterial({ color: 0x263033 });
+  const tvPlayTriangleShape = new THREE.Shape();
+  tvPlayTriangleShape.moveTo(-0.1, -0.13);
+  tvPlayTriangleShape.lineTo(0.15, 0);
+  tvPlayTriangleShape.lineTo(-0.1, 0.13);
+  tvPlayTriangleShape.closePath();
+  const tvPlayTriangle = new THREE.Mesh(
+    new THREE.ShapeGeometry(tvPlayTriangleShape),
+    tvPlayIconMaterial,
+  );
+  tvPlayTriangle.position.z = 0.245;
+  const tvPauseBars = new THREE.Group();
+  tvPauseBars.add(box(0.07, 0.25, 0.035, 0x263033, [-0.07, 0, 0]));
+  tvPauseBars.add(box(0.07, 0.25, 0.035, 0x263033, [0.07, 0, 0]));
+  tvPauseBars.position.z = 0.245;
+  tvPauseBars.visible = false;
+  tvPlayControl.add(tvPlaySocket, tvPlayCap, tvPlayTriangle, tvPauseBars);
+
+  const tvVolumeControl = new THREE.Group();
+  tvVolumeControl.position.set(2.24, -0.65, 1.72);
+  tvVolumeControl.userData.tvAudioControl = 'volume';
+  const tvVolumeRing = new THREE.Mesh(
+    new THREE.TorusGeometry(0.29, 0.055, 6, 16),
+    material(0x171719),
+  );
+  tvVolumeRing.position.z = 0.06;
+  const tvVolumeKnobMaterial = material(0xc28a3d, {
+    emissive: 0x5f2b0d,
+    emissiveIntensity: 0.35,
+  });
+  const tvVolumeKnob = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.23, 0.27, 0.2, 10),
+    tvVolumeKnobMaterial,
+  );
+  tvVolumeKnob.rotation.x = Math.PI / 2;
+  tvVolumeKnob.position.z = 0.16;
+  tvVolumeKnob.castShadow = true;
+  const tvVolumeIndicator = new THREE.Group();
+  tvVolumeIndicator.add(box(0.055, 0.2, 0.035, 0xf3deb0, [0, 0.13, 0]));
+  tvVolumeIndicator.position.z = 0.285;
+  const tvVolumeTicks: THREE.MeshStandardMaterial[] = [];
+  for (let index = 0; index < 11; index++) {
+    const angle = THREE.MathUtils.degToRad(135 - index * 27);
+    const tickMaterial = material(0x554438, {
+      emissive: 0x000000,
+      emissiveIntensity: 0,
+    });
+    const tick = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.1, 0.035), tickMaterial);
+    tick.position.set(Math.sin(angle) * 0.39, Math.cos(angle) * 0.39, 0.07);
+    tick.rotation.z = -angle;
+    tvVolumeTicks.push(tickMaterial);
+    tvVolumeControl.add(tick);
+  }
+  tvVolumeControl.add(tvVolumeRing, tvVolumeKnob, tvVolumeIndicator);
+  const tvAudioControlRoots = [tvPlayControl, tvVolumeControl];
+  television.add(tvPlayControl, tvVolumeControl);
+
   television.add(box(1.25, 0.16, 0.16, 0x171717, [0.2, -1.91, 1.66]));
   television.add(box(1.0, 0.24, 0.62, 0x27201f, [-1.6, -2.36, 0]));
   television.add(box(1.0, 0.24, 0.62, 0x27201f, [1.6, -2.36, 0]));
@@ -1041,8 +1115,8 @@ export function createBoxScene(
   crtScreenGlow.position.set(-0.38, 0.25, 1.79);
   crtScreenGlow.renderOrder = 1002;
   television.add(crtScreenGlow);
-  const crtFocusPosition = television.localToWorld(new THREE.Vector3(-0.38, 0.25, 7.2));
-  const crtFocusTarget = television.localToWorld(new THREE.Vector3(-0.38, 0.25, 1.72));
+  const crtFocusPosition = television.localToWorld(new THREE.Vector3(0.05, 0.15, 7.6));
+  const crtFocusTarget = television.localToWorld(new THREE.Vector3(0.05, 0.15, 1.72));
 
   const books = new THREE.Group();
   books.position.set(-1.05, -1.84, 1.55);
@@ -1156,6 +1230,41 @@ export function createBoxScene(
   let smoothedEnergy = 0;
   let smoothedBass = 0;
   let smoothedScopePeak = 0.08;
+  let tvTransportEnabled = false;
+  let tvVolume = 0.8;
+
+  function refreshTvPlayControl() {
+    tvPlayCapMaterial.color.setHex(
+      tvTransportEnabled ? crtPlaying ? 0xde823d : 0xc7d0bb : 0x657d81,
+    );
+    tvPlayCapMaterial.emissive.setHex(tvTransportEnabled && crtPlaying ? 0x6f2f0c : 0x000000);
+    tvPlayCapMaterial.emissiveIntensity = tvTransportEnabled && crtPlaying ? 0.8 : 0;
+    tvPlayCapMaterial.opacity = tvTransportEnabled ? 1 : 0.62;
+    tvPlayTriangle.visible = !crtPlaying;
+    tvPauseBars.visible = crtPlaying;
+    tvPlayIconMaterial.color.setHex(tvTransportEnabled ? 0x192124 : 0x24383d);
+    tvPauseBars.children.forEach((bar) => {
+      const barMaterial = (bar as THREE.Mesh).material as THREE.MeshStandardMaterial;
+      barMaterial.color.setHex(tvTransportEnabled ? 0x192124 : 0x24383d);
+    });
+  }
+
+  function setTvVolume(value: number, notify = false) {
+    tvVolume = THREE.MathUtils.clamp(value, 0, 1);
+    tvVolumeIndicator.rotation.z = THREE.MathUtils.degToRad(135 - tvVolume * 270);
+    const activeTick = Math.round(tvVolume * (tvVolumeTicks.length - 1));
+    tvVolumeTicks.forEach((tickMaterial, index) => {
+      const active = index <= activeTick;
+      tickMaterial.color.setHex(active ? 0xe3b35f : 0x554438);
+      tickMaterial.emissive.setHex(active ? 0x7a310d : 0x000000);
+      tickMaterial.emissiveIntensity = active ? 0.7 : 0;
+    });
+    tvVolumeKnobMaterial.emissiveIntensity = 0.25 + tvVolume * 0.55;
+    if (notify) onVolumeChange(tvVolume);
+  }
+
+  refreshTvPlayControl();
+  setTvVolume(tvVolume);
   const pong = {
     ballX: 0.5,
     ballY: 0.5,
@@ -2008,6 +2117,11 @@ export function createBoxScene(
   let latestClientY = 0;
   let scrollFrame = 0;
   let activePointerId: number | null = null;
+  let tvVolumePointerId: number | null = null;
+  let tvPlayPointerId: number | null = null;
+  let tvVolumeDragStartX = 0;
+  let tvVolumeDragStartY = 0;
+  let tvVolumeDragStartValue = 1;
   let crtFocused = false;
 
   function hit(event: PointerEvent) {
@@ -2031,6 +2145,40 @@ export function createBoxScene(
     while (object && !switchRoots.includes(object as THREE.Group)) object = object.parent;
     const index = switchRoots.indexOf(object as THREE.Group);
     return index >= 0 ? wallSwitches[index] : null;
+  }
+
+  function hitTvAudioControl(event: PointerEvent) {
+    const rect = canvas.getBoundingClientRect();
+    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(pointer, camera);
+    const intersection = raycaster.intersectObjects(tvAudioControlRoots, true)[0];
+    let object: THREE.Object3D | null = intersection?.object ?? null;
+    while (object && !tvAudioControlRoots.includes(object as THREE.Group)) object = object.parent;
+    return object?.userData.tvAudioControl as 'play' | 'volume' | undefined;
+  }
+
+  function updateTvVolumeFromPointer(event: PointerEvent) {
+    const dragDistance = (event.clientX - tvVolumeDragStartX)
+      - (event.clientY - tvVolumeDragStartY);
+    setTvVolume(tvVolumeDragStartValue + dragDistance * 0.008, true);
+  }
+
+  function releaseTvAudioControl(event?: PointerEvent) {
+    if (
+      event
+      && event.pointerId !== tvVolumePointerId
+      && event.pointerId !== tvPlayPointerId
+    ) return;
+    if (tvVolumePointerId !== null && canvas.hasPointerCapture(tvVolumePointerId)) {
+      canvas.releasePointerCapture(tvVolumePointerId);
+    }
+    if (tvPlayPointerId !== null && canvas.hasPointerCapture(tvPlayPointerId)) {
+      canvas.releasePointerCapture(tvPlayPointerId);
+    }
+    tvVolumePointerId = null;
+    tvPlayPointerId = null;
+    tvPlayCap.position.z = 0.13;
   }
 
   function hitTelevision(event: PointerEvent) {
@@ -2093,7 +2241,25 @@ export function createBoxScene(
   }
 
   canvas.addEventListener('pointerdown', (event) => {
-    if (pressed || crtFocused) return;
+    if (pressed || tvVolumePointerId !== null || tvPlayPointerId !== null) return;
+    const tvAudioControl = hitTvAudioControl(event);
+    if (tvAudioControl === 'play') {
+      tvPlayPointerId = event.pointerId;
+      canvas.setPointerCapture(event.pointerId);
+      tvPlayCap.position.z = 0.07;
+      if (tvTransportEnabled) onTogglePlayback();
+      return;
+    }
+    if (tvAudioControl === 'volume') {
+      tvVolumePointerId = event.pointerId;
+      tvVolumeDragStartX = event.clientX;
+      tvVolumeDragStartY = event.clientY;
+      tvVolumeDragStartValue = tvVolume;
+      canvas.setPointerCapture(event.pointerId);
+      canvas.style.cursor = 'grabbing';
+      return;
+    }
+    if (crtFocused) return;
     const wallSwitch = hitSwitch(event);
     if (wallSwitch) {
       toggleWallSwitch(wallSwitch);
@@ -2127,21 +2293,37 @@ export function createBoxScene(
     if (!scrollFrame) scrollFrame = requestAnimationFrame(autoScroll);
   });
   canvas.addEventListener('pointermove', (event) => {
+    if (tvVolumePointerId === event.pointerId) {
+      updateTvVolumeFromPointer(event);
+      return;
+    }
+    if (tvPlayPointerId === event.pointerId) return;
     if (pressed && event.pointerId !== activePointerId) return;
     latestClientX = event.clientX;
     latestClientY = event.clientY;
+    const nextTvAudioControl = hitTvAudioControl(event);
     if (crtFocused) {
-      canvas.style.cursor = 'default';
+      canvas.style.cursor = nextTvAudioControl === 'volume'
+        ? 'grab'
+        : nextTvAudioControl === 'play'
+          ? 'pointer'
+          : 'default';
       handCursor.hover(event.clientX, event.clientY, false);
       return;
     }
     const nextSwitch = hitSwitch(event);
     const nextHover = hit(event);
-    const nextTelevision = !nextSwitch && !nextHover && hitTelevision(event);
+    const nextTelevision = !nextTvAudioControl && !nextSwitch && !nextHover && hitTelevision(event);
     if (hover !== nextHover) {
       hover = nextHover;
     }
-    canvas.style.cursor = nextSwitch || nextTelevision ? 'pointer' : hover || pressed ? 'none' : 'default';
+    canvas.style.cursor = nextTvAudioControl === 'volume'
+      ? 'grab'
+      : nextTvAudioControl || nextSwitch || nextTelevision
+        ? 'pointer'
+        : hover || pressed
+          ? 'none'
+          : 'default';
     handCursor.hover(event.clientX, event.clientY, Boolean((hover || pressed) && !nextSwitch));
     if (pressed) {
       moved ||= Math.hypot(event.clientX - startX, event.clientY - startY) > 7;
@@ -2154,6 +2336,11 @@ export function createBoxScene(
     }
   });
   canvas.addEventListener('pointerup', (event) => {
+    if (event.pointerId === tvVolumePointerId || event.pointerId === tvPlayPointerId) {
+      releaseTvAudioControl(event);
+      canvas.style.cursor = hitTvAudioControl(event) === 'volume' ? 'grab' : 'pointer';
+      return;
+    }
     if (!pressed || event.pointerId !== activePointerId) return;
     const chosen = pressed;
     const target = document.elementFromPoint(event.clientX, event.clientY);
@@ -2193,8 +2380,14 @@ export function createBoxScene(
       onCassetteFocusChange(false);
     }
   });
-  canvas.addEventListener('pointercancel', cancelDrag);
-  canvas.addEventListener('lostpointercapture', cancelDrag);
+  canvas.addEventListener('pointercancel', (event) => {
+    releaseTvAudioControl(event);
+    cancelDrag(event);
+  });
+  canvas.addEventListener('lostpointercapture', (event) => {
+    releaseTvAudioControl(event);
+    cancelDrag(event);
+  });
   canvas.addEventListener('pointerleave', (event) => {
     if (hover && hover !== pressed) hover.position.y = hover.userData.home.y;
     hover = null;
@@ -2288,6 +2481,14 @@ export function createBoxScene(
     setPlaying(active: boolean) {
       crtPlaying = active;
       activeTapePlaying = active;
+      refreshTvPlayControl();
+    },
+    setTransportEnabled(active: boolean) {
+      tvTransportEnabled = active;
+      refreshTvPlayControl();
+    },
+    setVolume(value: number) {
+      setTvVolume(value);
     },
     setAnalyser(analyser: AnalyserNode) {
       audioAnalyser = analyser;

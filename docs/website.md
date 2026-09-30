@@ -142,6 +142,12 @@ screen is a bowed low-poly mesh with recessed bezel, deep cabinet, speaker grill
 bright phosphor bloom. **Dim surroundings** darkens the rest of the page without
 turning off the room, and **back to room** restores the original camera.
 
+The television's right-side control strip is also functional Three.js geometry. Its
+recessed key mirrors the shared PLAY/PAUSE transport state, while the illuminated
+rotary knob follows a 270-degree arc and changes the same browser-audio volume used by
+the SUBWAVE player's slider when dragged horizontally or vertically. Both controls
+remain raycastable in the wide room and first-person CRT views.
+
 All signals use live Web Audio analyser data. Nonlinear frequency amplification and
 adaptive waveform gain keep quieter recordings visibly responsive.
 
