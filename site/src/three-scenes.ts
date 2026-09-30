@@ -2569,6 +2569,7 @@ export function createPlayerScene(
   canvas: HTMLCanvasElement,
   onVolumeChange: (value: number) => void = () => {},
   onTransport: (action: TransportAction) => void = () => {},
+  onCassetteDoorLoadStart: () => void = () => {},
 ): PlayerSceneController {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
@@ -3019,6 +3020,7 @@ export function createPlayerScene(
         return;
       }
       cassette.group.visible = false;
+      onCassetteDoorLoadStart();
       await new Promise<void>((resolve) => {
         doorAnimation = { start: performance.now() / 1000, resolve };
       });

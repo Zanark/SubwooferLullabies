@@ -198,6 +198,8 @@ const forwardButton = required<HTMLButtonElement>('forward');
 const volume = required<HTMLInputElement>('volume');
 const randomPlayButton = required<HTMLButtonElement>('random-play');
 const audio = required<HTMLAudioElement>('audio');
+const cassetteLoadSound = new Audio(asset('sfx/cassette-load.wav'));
+cassetteLoadSound.preload = 'auto';
 const status = required<HTMLDivElement>('status');
 const announcement = required<HTMLDivElement>('announcement');
 const showcase = required<HTMLDivElement>('showcase');
@@ -517,6 +519,15 @@ function renderShelf() {
   updateQueueAddButton();
 }
 
+function playCassetteLoadSound() {
+  cassetteLoadSound.pause();
+  cassetteLoadSound.currentTime = 0;
+  cassetteLoadSound.volume = audio.volume;
+  void cassetteLoadSound.play().catch((error) => {
+    console.warn('Unable to play cassette loading sound.', error);
+  });
+}
+
 async function loadCassette(
   song: Song,
   autoplay = false,
@@ -732,6 +743,7 @@ rewindButton.addEventListener('click', () => seekBy(-10));
 forwardButton.addEventListener('click', () => seekBy(10));
 volume.addEventListener('input', () => {
   audio.volume = Number(volume.value);
+  cassetteLoadSound.volume = audio.volume;
   playerScene?.setVolume(audio.volume);
   boxScene?.setVolume(audio.volume);
 });
@@ -873,10 +885,12 @@ async function start() {
     queue = [];
   }
   audio.volume = Number(volume.value);
+  cassetteLoadSound.volume = audio.volume;
   renderShelf();
   renderQueue();
   playerScene = createPlayerScene(required<HTMLCanvasElement>('player-3d'), (value) => {
     audio.volume = value;
+    cassetteLoadSound.volume = value;
     volume.value = String(value);
   }, (action) => {
     const button = {
@@ -886,7 +900,7 @@ async function start() {
       forward: forwardButton,
     }[action];
     button.click();
-  });
+  }, playCassetteLoadSound);
   const transportFocusTargets = [
     ['rewind', rewindButton],
     ['play', playButton],
@@ -930,6 +944,7 @@ async function start() {
     () => playButton.click(),
     (value) => {
       audio.volume = value;
+      cassetteLoadSound.volume = value;
       volume.value = String(value);
       playerScene.setVolume(value);
     },
