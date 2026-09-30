@@ -23,16 +23,17 @@ export type VisualizerMode =
   | 'bars'
   | 'tunnel'
   | 'rain'
-  | 'vectors'
-  | 'spiral'
+  | 'tesla'
+  | 'radar'
   | 'stars'
-  | 'glitch'
   | 'atari'
   | 'plasma'
   | 'copper'
-  | 'kaleido'
+  | 'sequencer'
   | 'metaballs'
-  | 'rotozoom';
+  | 'vinyl'
+  | 'synthwave'
+  | 'fireworks';
 
 export type TransportAction = 'rewind' | 'play' | 'stop' | 'forward';
 
@@ -1358,8 +1359,11 @@ export function createBoxScene(
       } else if (visualizerMode === 'bars') {
         for (let index = 0; index < 16; index++) {
           const start = index / 16;
-          const bandEnergy = sensitiveBand(start * start, ((index + 1) / 16) ** 2, 2);
-          const barHeight = Math.max(4, bandEnergy * 188);
+          const measured = sensitiveBand(start * start, ((index + 1) / 16) ** 2, 2);
+          const floor = 0.075 + index / 15 * 0.045;
+          const sharedMotion = smoothedEnergy * (0.12 + index / 15 * 0.08);
+          const bandEnergy = THREE.MathUtils.clamp(floor + measured * 0.82 + sharedMotion, 0, 1);
+          const barHeight = 10 + bandEnergy * 178;
           crtContext.fillRect(10 + index * 19, height - 28 - barHeight, 11, barHeight);
         }
       } else if (visualizerMode === 'atari') {
@@ -1538,61 +1542,139 @@ export function createBoxScene(
         crtContext.globalAlpha = 1;
         crtContext.restore();
       } else if (visualizerMode === 'rain') {
-        for (let column = 0; column < 18; column++) {
-          const x = 7 + column * 18;
-          const columnEnergy = sensitiveBand(column / 18, (column + 1) / 18, 2.1);
-          const speed = 20 + columnEnergy * 178;
-          const offset = (time * speed + column * 31) % (height + 80);
-          const drops = 2 + Math.round(columnEnergy * 7);
-          for (let drop = 0; drop < drops; drop++) {
-            const y = offset - drop * 18 - 40;
-            if (y < 0 || y > height) continue;
-            crtContext.globalAlpha = Math.max(0.2, 0.45 + columnEnergy - drop * 0.13);
-            crtContext.fillRect(x, y, 8, 7 + columnEnergy * 13);
+        crtContext.save();
+        crtContext.fillStyle = 'rgba(0,10,5,.72)';
+        crtContext.fillRect(0, 0, width, height);
+        crtContext.font = '700 13px monospace';
+        crtContext.textAlign = 'center';
+        crtContext.textBaseline = 'middle';
+        const glyphs = '01ZX#$+*';
+        const columns = 24;
+        for (let column = 0; column < columns; column++) {
+          const columnEnergy = sensitiveBand(column / columns, (column + 1) / columns, 2);
+          const speed = 24 + columnEnergy * 94 + smoothedEnergy * 28;
+          const head = (time * speed + column * 47) % (height + 150) - 36;
+          const trailLength = 7 + Math.round(columnEnergy * 9);
+          const x = 8 + column * ((width - 16) / (columns - 1));
+          for (let trail = 0; trail < trailLength; trail++) {
+            const y = head - trail * 14;
+            if (y < -12 || y > height + 12) continue;
+            const glyphIndex = Math.abs(Math.floor(column * 5 + trail * 3 + time * (3 + column % 4))) % glyphs.length;
+            const fade = 1 - trail / trailLength;
+            crtContext.fillStyle = trail === 0 ? '#eaffef' : trail < 3 ? '#77ff9b' : '#16a34a';
+            crtContext.globalAlpha = trail === 0 ? 0.94 : 0.16 + fade * (0.45 + columnEnergy * 0.34);
+            crtContext.fillText(glyphs[glyphIndex], x, y);
           }
         }
         crtContext.globalAlpha = 1;
-      } else if (visualizerMode === 'vectors') {
-        crtContext.save();
-        crtContext.translate(width / 2, height / 2);
-        crtContext.beginPath();
-        for (let point = 0; point <= 180; point++) {
-          const progress = point / 180;
-          const sampleIndex = waveformData.length
-            ? Math.min(waveformData.length - 1, Math.floor(progress * waveformData.length))
-            : 0;
-          const shiftedIndex = waveformData.length
-            ? (sampleIndex + Math.floor(waveformData.length * 0.24)) % waveformData.length
-            : 0;
-          const sampleX = waveformData.length
-            ? THREE.MathUtils.clamp((waveformData[sampleIndex] - 128) / 128 * waveformGain, -1, 1)
-            : 0;
-          const sampleY = waveformData.length
-            ? THREE.MathUtils.clamp((waveformData[shiftedIndex] - 128) / 128 * waveformGain, -1, 1)
-            : 0;
-          const phase = progress * Math.PI * 2;
-          const x = sampleX * width * 0.4 + Math.sin(phase * 3 + time * 2) * mid * 24;
-          const y = sampleY * height * 0.4 + Math.cos(phase * 2 - time * 1.7) * bass * 20;
-          if (point === 0) crtContext.moveTo(x, y);
-          else crtContext.lineTo(x, y);
-        }
-        crtContext.stroke();
         crtContext.restore();
-      } else if (visualizerMode === 'spiral') {
+      } else if (visualizerMode === 'tesla') {
         crtContext.save();
-        crtContext.translate(width / 2, height / 2);
-        crtContext.beginPath();
-        for (let point = 0; point <= 180; point++) {
-          const progress = point / 180;
-          const bandEnergy = sensitiveBand(progress ** 2, Math.min(1, progress ** 2 + 0.08), 2.1);
-          const angle = progress * Math.PI * 7 - time * (0.7 + treble * 3.5);
-          const radius = 6 + progress * 105 + bandEnergy * 34;
-          const x = Math.cos(angle) * radius;
-          const y = Math.sin(angle) * radius * (0.64 + mid * 0.18);
-          if (point === 0) crtContext.moveTo(x, y);
-          else crtContext.lineTo(x, y);
+        crtContext.fillStyle = 'rgba(4,5,19,.62)';
+        crtContext.fillRect(0, 0, width, height);
+        const coilX = width / 2;
+        const domeY = height * 0.42;
+        const baseY = height * 0.82;
+        crtContext.fillStyle = '#18213d';
+        crtContext.fillRect(coilX - 42, baseY, 84, 18);
+        crtContext.fillStyle = '#e66a32';
+        crtContext.fillRect(coilX - 31, baseY + 4, 62, 8);
+        crtContext.fillStyle = '#23345a';
+        crtContext.fillRect(coilX - 15, domeY + 12, 30, baseY - domeY - 12);
+        for (let ring = 0; ring < 11; ring++) {
+          const y = domeY + 18 + ring * ((baseY - domeY - 25) / 10);
+          const ringEnergy = sensitiveBand(ring / 11, (ring + 1) / 11, 2);
+          crtContext.fillStyle = ring % 2 ? '#64c9bd' : '#f4d789';
+          crtContext.globalAlpha = 0.45 + ringEnergy * 0.5;
+          crtContext.fillRect(coilX - 21 - ringEnergy * 5, y, 42 + ringEnergy * 10, 3);
         }
+        crtContext.globalAlpha = 1;
+        crtContext.fillStyle = '#d9fff9';
+        crtContext.beginPath();
+        crtContext.arc(coilX, domeY, 17 + beat * 12, 0, Math.PI * 2);
+        crtContext.fill();
+
+        const boltCount = 4 + Math.round(smoothedEnergy * 3);
+        crtContext.lineCap = 'round';
+        for (let bolt = 0; bolt < boltCount; bolt++) {
+          const bandEnergy = sensitiveBand(bolt / boltCount, (bolt + 1) / boltCount, 2.1);
+          const side = bolt % 2 ? 1 : -1;
+          const endX = coilX + side * (92 + bandEnergy * 62);
+          const endY = 24 + ((bolt * 53 + time * (18 + treble * 34)) % (height * 0.58));
+          crtContext.strokeStyle = bolt % 3 ? '#b9f5ff' : '#f1b5ff';
+          crtContext.lineWidth = 2 + bandEnergy * 3 + beat * 3;
+          crtContext.globalAlpha = 0.48 + bandEnergy * 0.5;
+          crtContext.beginPath();
+          crtContext.moveTo(coilX, domeY);
+          const segments = 8;
+          for (let segment = 1; segment <= segments; segment++) {
+            const progress = segment / segments;
+            const jitter = Math.sin(time * 31 + bolt * 7.1 + segment * 12.7) * (10 + bandEnergy * 14);
+            crtContext.lineTo(
+              THREE.MathUtils.lerp(coilX, endX, progress) + (segment === segments ? 0 : jitter),
+              THREE.MathUtils.lerp(domeY, endY, progress),
+            );
+          }
+          crtContext.stroke();
+        }
+        crtContext.globalAlpha = 1;
+        crtContext.fillStyle = '#f4d789';
+        crtContext.font = '700 9px monospace';
+        crtContext.textAlign = 'center';
+        crtContext.fillText('TESLA AUDIO COIL', coilX, height - 12);
+        crtContext.restore();
+      } else if (visualizerMode === 'radar') {
+        crtContext.save();
+        crtContext.fillStyle = 'rgba(1,18,11,.64)';
+        crtContext.fillRect(0, 0, width, height);
+        crtContext.translate(width / 2, height / 2);
+        const radarRadius = Math.min(width, height) * 0.4;
+        crtContext.strokeStyle = '#54f58c';
+        crtContext.lineWidth = 2;
+        for (let ring = 1; ring <= 4; ring++) {
+          crtContext.globalAlpha = 0.2 + ring * 0.08;
+          crtContext.beginPath();
+          crtContext.arc(0, 0, radarRadius * ring / 4, 0, Math.PI * 2);
+          crtContext.stroke();
+        }
+        crtContext.globalAlpha = 0.32;
+        crtContext.beginPath();
+        crtContext.moveTo(-radarRadius, 0);
+        crtContext.lineTo(radarRadius, 0);
+        crtContext.moveTo(0, -radarRadius);
+        crtContext.lineTo(0, radarRadius);
         crtContext.stroke();
+        const sweepAngle = time * (0.45 + smoothedEnergy * 0.3);
+        const sweep = crtContext.createRadialGradient(0, 0, 0, 0, 0, radarRadius);
+        sweep.addColorStop(0, 'rgba(118,255,157,.72)');
+        sweep.addColorStop(1, 'rgba(118,255,157,0)');
+        crtContext.fillStyle = sweep;
+        crtContext.globalAlpha = 0.35 + bass * 0.28;
+        crtContext.beginPath();
+        crtContext.moveTo(0, 0);
+        crtContext.arc(0, 0, radarRadius, sweepAngle - 0.34, sweepAngle);
+        crtContext.closePath();
+        crtContext.fill();
+        crtContext.strokeStyle = '#d8ffe5';
+        crtContext.globalAlpha = 0.9;
+        crtContext.beginPath();
+        crtContext.moveTo(0, 0);
+        crtContext.lineTo(Math.cos(sweepAngle) * radarRadius, Math.sin(sweepAngle) * radarRadius);
+        crtContext.stroke();
+        for (let blip = 0; blip < 8; blip++) {
+          const bandEnergy = sensitiveBand(blip / 8, (blip + 1) / 8, 2);
+          const angle = blip * 2.399 + time * 0.04;
+          const radius = radarRadius * (0.2 + blip % 4 * 0.18);
+          const sweepDistance = Math.abs(Math.atan2(
+            Math.sin(sweepAngle - angle),
+            Math.cos(sweepAngle - angle),
+          ));
+          crtContext.fillStyle = sweepDistance < 0.42 ? '#effff3' : '#54f58c';
+          crtContext.globalAlpha = 0.18 + bandEnergy * 0.72 + (sweepDistance < 0.42 ? 0.35 : 0);
+          const size = 2 + bandEnergy * 5;
+          crtContext.fillRect(Math.cos(angle) * radius - size / 2, Math.sin(angle) * radius - size / 2, size, size);
+        }
+        crtContext.globalAlpha = 1;
         crtContext.restore();
       } else if (visualizerMode === 'plasma') {
         const cellSize = 12;
@@ -1631,28 +1713,43 @@ export function createBoxScene(
           crtContext.fillRect(0, centerY - thickness, width, thickness * 2);
         }
         crtContext.restore();
-      } else if (visualizerMode === 'kaleido') {
+      } else if (visualizerMode === 'sequencer') {
         crtContext.save();
-        crtContext.translate(width / 2, height / 2);
-        const segmentCount = 12;
-        for (let segment = 0; segment < segmentCount; segment++) {
-          const angle = segment / segmentCount * Math.PI * 2 + time * (0.15 + treble * 0.7);
-          const bandEnergy = sensitiveBand(segment / segmentCount, (segment + 1) / segmentCount, 2.1);
-          const inner = 12 + bass * 26;
-          const outer = 64 + bandEnergy * 92;
-          const spread = 0.16 + mid * 0.12;
-          crtContext.fillStyle = segment % 2 ? '#e66a32' : '#64c9bd';
-          crtContext.globalAlpha = 0.22 + bandEnergy * 0.62;
-          crtContext.beginPath();
-          crtContext.moveTo(Math.cos(angle) * inner, Math.sin(angle) * inner);
-          crtContext.lineTo(Math.cos(angle - spread) * outer, Math.sin(angle - spread) * outer);
-          crtContext.lineTo(
-            Math.cos(angle) * (outer * (0.58 + beat * 0.3)),
-            Math.sin(angle) * (outer * (0.58 + beat * 0.3)),
-          );
-          crtContext.lineTo(Math.cos(angle + spread) * outer, Math.sin(angle + spread) * outer);
-          crtContext.closePath();
-          crtContext.fill();
+        crtContext.fillStyle = 'rgba(10,7,16,.7)';
+        crtContext.fillRect(0, 0, width, height);
+        const columns = 16;
+        const rows = 8;
+        const marginX = 14;
+        const marginY = 38;
+        const gap = 3;
+        const cellWidth = (width - marginX * 2 - gap * (columns - 1)) / columns;
+        const cellHeight = (height - marginY - 24 - gap * (rows - 1)) / rows;
+        const playhead = Math.floor(time * (3.2 + bass * 4.5)) % columns;
+        crtContext.font = '700 9px monospace';
+        crtContext.textAlign = 'left';
+        crtContext.fillStyle = '#f4d789';
+        crtContext.globalAlpha = 0.9;
+        crtContext.fillText('STEP SIGNAL / 16', marginX, 15);
+        for (let row = 0; row < rows; row++) {
+          const rowEnergy = sensitiveBand(row / rows, (row + 1) / rows, 2);
+          for (let column = 0; column < columns; column++) {
+            const x = marginX + column * (cellWidth + gap);
+            const y = marginY + row * (cellHeight + gap);
+            const programmed = ((column * 3 + row * 5) % 11) < 3;
+            const active = programmed && rowEnergy > 0.2;
+            crtContext.strokeStyle = column === playhead ? '#f4d789' : '#385a61';
+            crtContext.globalAlpha = 0.35 + rowEnergy * 0.45;
+            crtContext.strokeRect(x, y, cellWidth, cellHeight);
+            if (active || column === playhead) {
+              crtContext.fillStyle = column === playhead
+                ? '#f4d789'
+                : row % 2 ? '#e66a32' : '#64c9bd';
+              crtContext.globalAlpha = column === playhead
+                ? 0.28 + rowEnergy * 0.65
+                : 0.18 + rowEnergy * 0.72;
+              crtContext.fillRect(x + 2, y + 2, Math.max(1, cellWidth - 4), Math.max(1, cellHeight - 4));
+            }
+          }
         }
         crtContext.globalAlpha = 1;
         crtContext.restore();
@@ -1691,36 +1788,128 @@ export function createBoxScene(
           }
         }
         crtContext.globalAlpha = 1;
-      } else if (visualizerMode === 'rotozoom') {
-        const cellSize = 10;
-        const rotation = time * (0.22 + treble * 1.2);
-        const zoom = 0.055 + bass * 0.035 + Math.sin(time * 0.8) * 0.008;
-        const cosine = Math.cos(rotation);
-        const sine = Math.sin(rotation);
-        for (let y = 0; y < height; y += cellSize) {
-          for (let x = 0; x < width; x += cellSize) {
-            const centeredX = x - width / 2;
-            const centeredY = y - height / 2;
-            const textureX = (centeredX * cosine - centeredY * sine) * zoom + time * (4 + mid * 12);
-            const textureY = (centeredX * sine + centeredY * cosine) * zoom - time * (3 + treble * 10);
-            const checker = (Math.floor(textureX) + Math.floor(textureY)) & 1;
-            const pulse = 0.35 + smoothedEnergy * 0.65;
-            crtContext.fillStyle = checker ? '#e66a32' : '#17373f';
-            crtContext.globalAlpha = checker ? pulse : 0.32 + bass * 0.24;
-            crtContext.fillRect(x, y, cellSize + 1, cellSize + 1);
-          }
+      } else if (visualizerMode === 'vinyl') {
+        crtContext.save();
+        crtContext.fillStyle = 'rgba(7,8,12,.68)';
+        crtContext.fillRect(0, 0, width, height);
+        const platterX = width * 0.42;
+        const platterY = height * 0.53;
+        const platterRadius = Math.min(width, height) * 0.34;
+        crtContext.fillStyle = '#20242a';
+        crtContext.fillRect(18, 20, width - 36, height - 40);
+        crtContext.fillStyle = '#050708';
+        crtContext.beginPath();
+        crtContext.arc(platterX, platterY, platterRadius, 0, Math.PI * 2);
+        crtContext.fill();
+        for (let groove = 1; groove <= 14; groove++) {
+          const grooveEnergy = sensitiveBand((groove - 1) / 14, groove / 14, 2);
+          crtContext.strokeStyle = groove % 3 ? '#243e43' : '#e66a32';
+          crtContext.globalAlpha = 0.18 + grooveEnergy * 0.3;
+          crtContext.lineWidth = 1 + grooveEnergy;
+          crtContext.beginPath();
+          crtContext.arc(platterX, platterY, platterRadius * groove / 15, 0, Math.PI * 2);
+          crtContext.stroke();
+        }
+        const labelRadius = platterRadius * (0.25 + bass * 0.035);
+        crtContext.fillStyle = '#e66a32';
+        crtContext.globalAlpha = 0.8;
+        crtContext.beginPath();
+        crtContext.arc(platterX, platterY, labelRadius, 0, Math.PI * 2);
+        crtContext.fill();
+        crtContext.fillStyle = '#f4d789';
+        crtContext.beginPath();
+        crtContext.arc(platterX, platterY, 4 + beat * 5, 0, Math.PI * 2);
+        crtContext.fill();
+        const markerAngle = time * (1.25 + smoothedEnergy * 1.2);
+        crtContext.fillRect(
+          platterX + Math.cos(markerAngle) * labelRadius * 0.68 - 3,
+          platterY + Math.sin(markerAngle) * labelRadius * 0.68 - 3,
+          6,
+          6,
+        );
+        crtContext.strokeStyle = '#c8d7d3';
+        crtContext.lineWidth = 7;
+        crtContext.globalAlpha = 0.82;
+        crtContext.beginPath();
+        crtContext.moveTo(width * 0.84, height * 0.24);
+        crtContext.lineTo(width * 0.78, height * 0.42);
+        crtContext.lineTo(width * 0.69, height * (0.57 + mid * 0.06));
+        crtContext.stroke();
+        crtContext.fillStyle = '#64c9bd';
+        crtContext.fillRect(width * 0.67, height * (0.55 + mid * 0.06), 15, 8);
+        crtContext.fillStyle = '#f4d789';
+        crtContext.font = '700 9px monospace';
+        crtContext.textAlign = 'right';
+        crtContext.fillText('33 RPM / AUDIO CUT', width - 22, height - 24);
+        crtContext.globalAlpha = 1;
+        crtContext.restore();
+      } else if (visualizerMode === 'synthwave') {
+        crtContext.save();
+        crtContext.fillStyle = 'rgba(12,3,30,.7)';
+        crtContext.fillRect(0, 0, width, height);
+        const horizon = height * 0.57;
+        const sunX = width / 2;
+        const sunY = height * 0.34;
+        const sunRadius = 46 + bass * 14;
+        crtContext.save();
+        crtContext.beginPath();
+        crtContext.arc(sunX, sunY, sunRadius, 0, Math.PI * 2);
+        crtContext.clip();
+        const sunGradient = crtContext.createLinearGradient(0, sunY - sunRadius, 0, sunY + sunRadius);
+        sunGradient.addColorStop(0, '#64e8ff');
+        sunGradient.addColorStop(0.5, '#f083ff');
+        sunGradient.addColorStop(1, '#ff6a46');
+        crtContext.fillStyle = sunGradient;
+        crtContext.fillRect(sunX - sunRadius, sunY - sunRadius, sunRadius * 2, sunRadius * 2);
+        crtContext.fillStyle = 'rgba(25,6,55,.72)';
+        for (let stripe = 0; stripe < 8; stripe++) {
+          const y = sunY - 5 + stripe * 9;
+          crtContext.fillRect(sunX - sunRadius, y, sunRadius * 2, 3 + stripe * 0.35);
+        }
+        crtContext.restore();
+
+        const buildings = 18;
+        for (let building = 0; building < buildings; building++) {
+          const buildingEnergy = sensitiveBand(building / buildings, (building + 1) / buildings, 2);
+          const buildingWidth = width / buildings + 1;
+          const buildingHeight = 12 + buildingEnergy * 78;
+          const x = building * width / buildings;
+          crtContext.fillStyle = building % 3 ? '#24143f' : '#34194f';
+          crtContext.fillRect(x, horizon - buildingHeight, buildingWidth, buildingHeight);
+          crtContext.fillStyle = building % 2 ? '#ff72db' : '#63e7ff';
+          crtContext.globalAlpha = 0.34 + buildingEnergy * 0.52;
+          crtContext.fillRect(x + buildingWidth * 0.42, horizon - buildingHeight, 2, buildingHeight);
         }
         crtContext.globalAlpha = 1;
+        crtContext.strokeStyle = '#4de8ff';
+        crtContext.lineWidth = 1.5;
+        for (let lane = -8; lane <= 8; lane++) {
+          crtContext.beginPath();
+          crtContext.moveTo(width / 2, horizon);
+          crtContext.lineTo(width / 2 + lane * 42, height);
+          crtContext.stroke();
+        }
+        for (let line = 0; line < 10; line++) {
+          const progress = line / 10;
+          const y = horizon + Math.pow(progress, 1.8) * (height - horizon);
+          crtContext.globalAlpha = 0.2 + progress * 0.65;
+          crtContext.beginPath();
+          crtContext.moveTo(0, y);
+          crtContext.lineTo(width, y);
+          crtContext.stroke();
+        }
+        crtContext.globalAlpha = 1;
+        crtContext.restore();
       } else if (visualizerMode === 'stars') {
         crtContext.save();
         crtContext.translate(width / 2, height / 2);
         for (let star = 0; star < 64; star++) {
           const bandEnergy = sensitiveBand(star / 64, (star + 1) / 64, 2.15);
-          const depth = (star * 0.173 + time * (0.12 + smoothedEnergy * 0.95)) % 1;
-          const angle = star * 2.399 + time * (0.08 + treble * 0.85);
-          const radius = Math.pow(depth, 0.72) * (112 + bandEnergy * 50);
-          const size = 1 + depth * 3 + bandEnergy * 7;
-          crtContext.globalAlpha = 0.35 + depth * 0.45 + bandEnergy * 0.2;
+          const depth = (star * 0.173 + time * (0.055 + smoothedEnergy * 0.14)) % 1;
+          const angle = star * 2.399 + time * (0.018 + treble * 0.08);
+          const radius = Math.pow(depth, 0.72) * (112 + bandEnergy * 16);
+          const size = 1 + depth * 2.4 + bandEnergy * 2.2;
+          crtContext.globalAlpha = 0.26 + depth * 0.42 + bandEnergy * 0.12;
           crtContext.fillRect(
             Math.cos(angle) * radius - size / 2,
             Math.sin(angle) * radius * 0.68 - size / 2,
@@ -1730,21 +1919,49 @@ export function createBoxScene(
         }
         crtContext.globalAlpha = 1;
         crtContext.restore();
-      } else {
-        for (let row = 0; row < 14; row++) {
-          const bandEnergy = sensitiveBand(row / 14, (row + 1) / 14, 2.2);
-          const displacement = Math.sin(time * (9 + treble * 24) + row * 1.73)
-            * (5 + bandEnergy * 31) + beat * 52;
-          const y = 18 + row * 15;
-          crtContext.globalAlpha = 0.22 + bandEnergy * 0.78;
-          crtContext.fillRect(
-            Math.max(0, displacement),
-            y,
-            Math.max(8, width - Math.abs(displacement)),
-            2 + bandEnergy * 7,
-          );
+      } else if (visualizerMode === 'fireworks') {
+        crtContext.save();
+        crtContext.fillStyle = 'rgba(3,5,16,.76)';
+        crtContext.fillRect(0, 0, width, height);
+        const colors = ['#f4d789', '#e66a32', '#64c9bd', '#d88cff', '#f06eaa'];
+        const burstCount = 8;
+        for (let burst = 0; burst < burstCount; burst++) {
+          const bandEnergy = sensitiveBand(burst / burstCount, (burst + 1) / burstCount, 2);
+          const phase = (
+            time * (0.105 + burst * 0.004 + smoothedEnergy * 0.035)
+            + burst / burstCount
+          ) % 1;
+          const centerX = width * (0.16 + (burst * 0.173 % 0.68));
+          const centerY = height * (0.2 + (burst * 0.271 % 0.48));
+          const radius = Math.pow(phase, 0.72) * (58 + bandEnergy * 106);
+          const fade = Math.pow(Math.sin(phase * Math.PI), 0.62);
+          const particles = 18 + burst % 3 * 5;
+          if (phase < 0.16) {
+            const flash = (1 - phase / 0.16) * (8 + bandEnergy * 15 + beat * 10);
+            crtContext.fillStyle = '#fff5ce';
+            crtContext.globalAlpha = 0.4 + bandEnergy * 0.5;
+            crtContext.fillRect(centerX - flash / 2, centerY - flash / 2, flash, flash);
+          }
+          for (let particle = 0; particle < particles; particle++) {
+            const angle = particle / particles * Math.PI * 2 + burst * 0.63;
+            const gravity = phase * phase * 34;
+            const x = centerX + Math.cos(angle) * radius;
+            const y = centerY + Math.sin(angle) * radius * 0.72 + gravity;
+            const size = 3 + bandEnergy * 5 + beat * 3;
+            crtContext.fillStyle = colors[(burst + particle) % colors.length];
+            crtContext.globalAlpha = fade * (0.42 + bandEnergy * 0.58);
+            crtContext.fillRect(x - size / 2, y - size / 2, size, size);
+            crtContext.globalAlpha *= 0.46;
+            crtContext.fillRect(
+              x - Math.cos(angle) * (10 + phase * 9) - size / 2,
+              y - Math.sin(angle) * (8 + phase * 7) - size / 2,
+              size,
+              size,
+            );
+          }
         }
         crtContext.globalAlpha = 1;
+        crtContext.restore();
       }
     }
 

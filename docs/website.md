@@ -151,22 +151,24 @@ adaptive waveform gain keep quieter recordings visibly responsive.
 | `bars` | Nonlinear frequency columns |
 | `atari` | Beat-reactive Pong game with frequency-driven paddles, scored rallies and wall/paddle rebounds accelerated by the music |
 | `tunnel` | Receding perspective rectangles |
-| `rain` | Falling spectral columns |
-| `vectors` | Delayed-waveform XY vector trace |
-| `spiral` | Frequency-modulated single helix |
-| `stars` | Spectral depth field |
+| `rain` | Matrix-style green code streams with bright heads and frequency-sized trails |
+| `tesla` | Central audio coil throwing waveform-modulated electrical bolts |
+| `radar` | Circular phosphor scope with sweep illumination and spectral targets |
+| `stars` | Calm spectral depth field with restrained motion and size response |
 | `plasma` | Chunky multi-field demoscene plasma |
 | `copper` | Moving horizontal raster/copper bands |
-| `kaleido` | Rotating mirrored spectral wedges |
+| `sequencer` | Scanning hardware step grid with frequency-driven pads |
 | `metaballs` | Audio-sized chunky scalar-field blobs |
-| `rotozoom` | Rotating and zooming checker texture |
-| `glitch` | Displaced horizontal image strips |
+| `vinyl` | Reactive turntable platter, grooves, label and tonearm |
+| `synthwave` | Neon sunset, skyline and perspective grid |
+| `fireworks` | Pixel particle bursts with band-driven radius and brightness |
 
-![Contact sheet showing all fourteen CRT signal modes over the same playing cover.](assets/crt-signals-contact-sheet.png)
+![Contact sheet showing the CRT signal modes over the same playing cover.](assets/crt-signals-contact-sheet.png)
 
-*The common cover and camera framing make the visual differences explicit. Redundant
-expanding-ring and duplicate waveform-XY modes were removed before these six new
-families were added.*
+*The common cover and camera framing make the visual differences explicit. The
+fifteen-mode library deliberately separates oscilloscope, spectrum, game, Matrix,
+electrical, radar, starfield, demoscene, hardware, physical-media, synthwave and
+particle families instead of retaining near-duplicate effects.*
 
 An intermittent phosphor scan band also crosses the complete television image from
 top to bottom. This refresh sweep is independent of the selected signal.

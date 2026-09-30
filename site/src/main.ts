@@ -137,15 +137,16 @@ app.innerHTML = `
         <button type="button" data-visualizer="atari" disabled>atari</button>
         <button type="button" data-visualizer="tunnel" disabled>tunnel</button>
         <button type="button" data-visualizer="rain" disabled>rain</button>
-        <button type="button" data-visualizer="vectors" disabled>vectors</button>
-        <button type="button" data-visualizer="spiral" disabled>spiral</button>
+        <button type="button" data-visualizer="tesla" disabled>tesla</button>
+        <button type="button" data-visualizer="radar" disabled>radar</button>
         <button type="button" data-visualizer="stars" disabled>stars</button>
         <button type="button" data-visualizer="plasma" disabled>plasma</button>
         <button type="button" data-visualizer="copper" disabled>copper</button>
-        <button type="button" data-visualizer="kaleido" disabled>kaleido</button>
+        <button type="button" data-visualizer="sequencer" disabled>sequencer</button>
         <button type="button" data-visualizer="metaballs" disabled>metaballs</button>
-        <button type="button" data-visualizer="rotozoom" disabled>rotozoom</button>
-        <button type="button" data-visualizer="glitch" disabled>glitch</button>
+        <button type="button" data-visualizer="vinyl" disabled>vinyl</button>
+        <button type="button" data-visualizer="synthwave" disabled>synthwave</button>
+        <button type="button" data-visualizer="fireworks" disabled>fireworks</button>
       </div>
       <p class="canvas-help">move tapes / drag to player / click tv or wall switches</p>
     </section>
@@ -921,15 +922,16 @@ async function start() {
     'atari',
     'tunnel',
     'rain',
-    'vectors',
-    'spiral',
+    'tesla',
+    'radar',
     'stars',
     'plasma',
     'copper',
-    'kaleido',
+    'sequencer',
     'metaballs',
-    'rotozoom',
-    'glitch',
+    'vinyl',
+    'synthwave',
+    'fireworks',
   ];
   const dailyVisualizer = visualizerModes[Math.floor(Date.now() / 86_400_000) % visualizerModes.length];
   boxScene.setVisualizer(dailyVisualizer);
