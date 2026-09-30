@@ -149,7 +149,7 @@ adaptive waveform gain keep quieter recordings visibly responsive.
 |---|---|
 | `scope` | Adaptive time-domain waveform |
 | `bars` | Nonlinear frequency columns |
-| `atari` | Nested audio-controlled diamonds inspired by Atari Video Music |
+| `atari` | Beat-reactive Pong game with frequency-driven paddles, scored rallies and wall/paddle rebounds accelerated by the music |
 | `tunnel` | Receding perspective rectangles |
 | `rain` | Falling spectral columns |
 | `vectors` | Delayed-waveform XY vector trace |

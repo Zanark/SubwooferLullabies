@@ -1154,6 +1154,20 @@ export function createBoxScene(
   let smoothedEnergy = 0;
   let smoothedBass = 0;
   let smoothedScopePeak = 0.08;
+  const pong = {
+    ballX: 0.5,
+    ballY: 0.5,
+    velocityX: 0.34,
+    velocityY: 0.24,
+    leftPaddleY: 0.5,
+    rightPaddleY: 0.5,
+    leftScore: 0,
+    rightScore: 0,
+    lastTime: 0,
+    beatLatched: false,
+    beatPulse: 0,
+    impactPulse: 0,
+  };
   const crtLightColor = new THREE.Color(0x8fcbd1);
 
   function updateCrtLightColor(image: CanvasImageSource) {
@@ -1349,39 +1363,165 @@ export function createBoxScene(
           crtContext.fillRect(10 + index * 19, height - 28 - barHeight, 11, barHeight);
         }
       } else if (visualizerMode === 'atari') {
+        const delta = pong.lastTime ? Math.min(time - pong.lastTime, 0.05) : 1 / 60;
+        pong.lastTime = time;
+        const beatTriggered = beat > 0.055 && !pong.beatLatched;
+        if (beatTriggered) {
+          pong.beatLatched = true;
+          const horizontalBoost = 0.04 + beat * 0.2;
+          pong.velocityX = Math.sign(pong.velocityX || 1)
+            * Math.min(0.78, Math.abs(pong.velocityX) + horizontalBoost);
+          pong.velocityY += Math.sign(pong.velocityY || (mid > treble ? 1 : -1))
+            * (0.025 + beat * 0.11);
+          pong.beatPulse = 1;
+        } else if (beat < 0.025) {
+          pong.beatLatched = false;
+        }
+
+        const paddleHeight = 0.2 + mid * 0.1;
+        const paddleLimit = paddleHeight / 2 + 0.055;
+        const leftTarget = THREE.MathUtils.clamp(
+          pong.ballY + Math.sin(time * 1.7) * (0.025 + bass * 0.035),
+          paddleLimit,
+          1 - paddleLimit,
+        );
+        const rightTarget = THREE.MathUtils.clamp(
+          pong.ballY + Math.cos(time * 1.43) * (0.025 + treble * 0.04),
+          paddleLimit,
+          1 - paddleLimit,
+        );
+        const leftStep = delta * (0.42 + bass * 0.5);
+        const rightStep = delta * (0.42 + mid * 0.5);
+        pong.leftPaddleY += THREE.MathUtils.clamp(leftTarget - pong.leftPaddleY, -leftStep, leftStep);
+        pong.rightPaddleY += THREE.MathUtils.clamp(rightTarget - pong.rightPaddleY, -rightStep, rightStep);
+
+        pong.ballX += pong.velocityX * delta;
+        pong.ballY += pong.velocityY * delta;
+        const ballRadius = 0.018;
+        if (pong.ballY <= ballRadius || pong.ballY >= 1 - ballRadius) {
+          pong.ballY = THREE.MathUtils.clamp(pong.ballY, ballRadius, 1 - ballRadius);
+          pong.velocityY = pong.ballY < 0.5
+            ? Math.abs(pong.velocityY)
+            : -Math.abs(pong.velocityY);
+          pong.impactPulse = 1;
+        }
+
+        const leftPaddleX = 0.075;
+        const rightPaddleX = 0.925;
+        const hitPaddle = (paddleY: number) => (
+          Math.abs(pong.ballY - paddleY) <= paddleHeight / 2 + ballRadius
+        );
+        if (
+          pong.velocityX < 0
+          && pong.ballX <= leftPaddleX + ballRadius
+          && pong.ballX >= leftPaddleX - ballRadius
+          && hitPaddle(pong.leftPaddleY)
+        ) {
+          const offset = (pong.ballY - pong.leftPaddleY) / (paddleHeight / 2);
+          pong.ballX = leftPaddleX + ballRadius;
+          pong.velocityX = Math.min(0.82, Math.abs(pong.velocityX) * (1.02 + beat * 0.22));
+          pong.velocityY = THREE.MathUtils.clamp(
+            pong.velocityY + offset * 0.24 + (bass - 0.5) * 0.04,
+            -0.62,
+            0.62,
+          );
+          pong.impactPulse = 1;
+        } else if (
+          pong.velocityX > 0
+          && pong.ballX >= rightPaddleX - ballRadius
+          && pong.ballX <= rightPaddleX + ballRadius
+          && hitPaddle(pong.rightPaddleY)
+        ) {
+          const offset = (pong.ballY - pong.rightPaddleY) / (paddleHeight / 2);
+          pong.ballX = rightPaddleX - ballRadius;
+          pong.velocityX = -Math.min(0.82, Math.abs(pong.velocityX) * (1.02 + beat * 0.22));
+          pong.velocityY = THREE.MathUtils.clamp(
+            pong.velocityY + offset * 0.24 + (treble - 0.5) * 0.04,
+            -0.62,
+            0.62,
+          );
+          pong.impactPulse = 1;
+        }
+
+        const resetBall = (direction: number) => {
+          pong.ballX = 0.5;
+          pong.ballY = 0.38 + ((pong.leftScore + pong.rightScore) % 3) * 0.12;
+          pong.velocityX = direction * (0.3 + smoothedEnergy * 0.16);
+          pong.velocityY = ((pong.leftScore + pong.rightScore) % 2 ? -1 : 1)
+            * (0.18 + mid * 0.12);
+          pong.impactPulse = 1;
+        };
+        if (pong.ballX < -ballRadius) {
+          pong.rightScore = (pong.rightScore + 1) % 100;
+          resetBall(-1);
+        } else if (pong.ballX > 1 + ballRadius) {
+          pong.leftScore = (pong.leftScore + 1) % 100;
+          resetBall(1);
+        }
+
+        pong.beatPulse = Math.max(0, pong.beatPulse - delta * 4.8);
+        pong.impactPulse = Math.max(0, pong.impactPulse - delta * 3.7);
+
         crtContext.save();
-        crtContext.translate(width / 2, height / 2);
-        crtContext.lineJoin = 'bevel';
-        for (let copy = -2; copy <= 2; copy++) {
-          const copyEnergy = sensitiveBand((copy + 2) / 5, (copy + 3) / 5, 2);
-          const centerX = copy * 48;
-          const outerWidth = 34 + smoothedBass * 74 + copyEnergy * 24;
-          const outerHeight = 22 + mid * 54 + copyEnergy * 18;
-          const innerWidth = 12 + treble * 38 + beat * 34;
-          const innerHeight = 8 + smoothedEnergy * 28 + copyEnergy * 12;
-          const tilt = Math.sin(time * 0.9 + copy * 0.8) * (0.08 + treble * 0.2);
-          crtContext.save();
-          crtContext.translate(centerX, Math.sin(time * 1.2 + copy) * 8);
-          crtContext.rotate(tilt);
-          crtContext.globalAlpha = 0.34 + copyEnergy * 0.66;
-          crtContext.fillStyle = copy % 2 ? '#e66a32' : '#f4d789';
-          crtContext.beginPath();
-          crtContext.moveTo(0, -outerHeight);
-          crtContext.lineTo(outerWidth, 0);
-          crtContext.lineTo(0, outerHeight);
-          crtContext.lineTo(-outerWidth, 0);
-          crtContext.closePath();
-          crtContext.fill();
-          crtContext.fillStyle = '#071214';
-          crtContext.globalAlpha = 0.56 + treble * 0.22;
-          crtContext.beginPath();
-          crtContext.moveTo(0, -innerHeight);
-          crtContext.lineTo(innerWidth, 0);
-          crtContext.lineTo(0, innerHeight);
-          crtContext.lineTo(-innerWidth, 0);
-          crtContext.closePath();
-          crtContext.fill();
-          crtContext.restore();
+        crtContext.fillStyle = `rgba(3, 9, 10, ${0.72 - smoothedEnergy * 0.12})`;
+        crtContext.fillRect(0, 0, width, height);
+        crtContext.strokeStyle = '#f4d789';
+        crtContext.lineWidth = 3;
+        crtContext.strokeRect(8, 8, width - 16, height - 16);
+
+        crtContext.globalAlpha = 0.35 + treble * 0.35;
+        crtContext.fillStyle = '#64c9bd';
+        for (let line = 0; line < 9; line++) {
+          const lineEnergy = sensitiveBand(line / 9, (line + 1) / 9, 2);
+          const lineWidth = 2 + Math.floor(lineEnergy * 18);
+          crtContext.fillRect(
+            width / 2 - lineWidth / 2,
+            18 + line * ((height - 36) / 8),
+            lineWidth,
+            3,
+          );
+        }
+        crtContext.globalAlpha = 1;
+
+        const paddleWidth = Math.max(6, Math.round(width * 0.022));
+        const paddleHeightPixels = Math.round(height * paddleHeight);
+        const leftY = Math.round(height * pong.leftPaddleY - paddleHeightPixels / 2);
+        const rightY = Math.round(height * pong.rightPaddleY - paddleHeightPixels / 2);
+        const leftX = Math.round(width * leftPaddleX - paddleWidth / 2);
+        const rightX = Math.round(width * rightPaddleX - paddleWidth / 2);
+        crtContext.fillStyle = '#e66a32';
+        crtContext.fillRect(leftX, leftY, paddleWidth, paddleHeightPixels);
+        crtContext.fillStyle = '#64c9bd';
+        crtContext.fillRect(rightX, rightY, paddleWidth, paddleHeightPixels);
+
+        const ballX = Math.round(width * pong.ballX);
+        const ballY = Math.round(height * pong.ballY);
+        const pulseSize = Math.round(6 + pong.beatPulse * 5 + pong.impactPulse * 3);
+        crtContext.globalCompositeOperation = 'screen';
+        crtContext.globalAlpha = 0.18 + pong.beatPulse * 0.34 + pong.impactPulse * 0.28;
+        crtContext.fillStyle = '#64c9bd';
+        crtContext.fillRect(ballX - pulseSize, ballY - pulseSize, pulseSize * 2, pulseSize * 2);
+        crtContext.globalAlpha = 1;
+        crtContext.fillStyle = '#fff4bc';
+        crtContext.fillRect(ballX - 4, ballY - 4, 8, 8);
+        crtContext.globalCompositeOperation = 'source-over';
+
+        crtContext.fillStyle = '#f4d789';
+        crtContext.font = '700 23px monospace';
+        crtContext.textAlign = 'center';
+        crtContext.textBaseline = 'top';
+        crtContext.fillText(
+          `${String(pong.leftScore).padStart(2, '0')}  ${String(pong.rightScore).padStart(2, '0')}`,
+          width / 2,
+          14,
+        );
+        crtContext.font = '700 8px monospace';
+        crtContext.textAlign = 'left';
+        crtContext.fillText('BEAT PONG', 14, height - 20);
+        if (beatTriggered) {
+          crtContext.textAlign = 'right';
+          crtContext.fillStyle = '#e66a32';
+          crtContext.fillText('BEAT!', width - 14, height - 20);
         }
         crtContext.globalAlpha = 1;
         crtContext.restore();
@@ -1937,6 +2077,7 @@ export function createBoxScene(
       waveformData = new Uint8Array(analyser.fftSize);
     },
     setVisualizer(mode: VisualizerMode) {
+      if (mode === 'atari' && visualizerMode !== 'atari') pong.lastTime = 0;
       visualizerMode = mode;
     },
     setSearchMatches(titles: string[]) {
