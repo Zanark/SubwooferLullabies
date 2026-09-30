@@ -2305,7 +2305,7 @@ body.theater-mode .transport-controls > .play-button {
   .desk {
     grid-template-areas:
       "library library library library library queue"
-      "player player room room room room";
+      "room room room room player player";
     grid-template-columns: repeat(6, minmax(0, 1fr));
     grid-template-rows: minmax(260px, .75fr) minmax(340px, 1.25fr);
     gap: 18px;
