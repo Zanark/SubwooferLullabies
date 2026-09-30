@@ -21,15 +21,18 @@ export type HandCursorController = SceneController & {
 export type VisualizerMode =
   | 'scope'
   | 'bars'
-  | 'radar'
-  | 'orbit'
   | 'tunnel'
   | 'rain'
   | 'vectors'
-  | 'pulse'
   | 'spiral'
   | 'stars'
-  | 'glitch';
+  | 'glitch'
+  | 'atari'
+  | 'plasma'
+  | 'copper'
+  | 'kaleido'
+  | 'metaballs'
+  | 'rotozoom';
 
 export type BoxSceneController = SceneController & {
   setTrack(song: VisualSong): Promise<void>;
@@ -1340,51 +1343,42 @@ export function createBoxScene(
           const barHeight = Math.max(4, bandEnergy * 188);
           crtContext.fillRect(10 + index * 19, height - 28 - barHeight, 11, barHeight);
         }
-      } else if (visualizerMode === 'radar') {
+      } else if (visualizerMode === 'atari') {
         crtContext.save();
         crtContext.translate(width / 2, height / 2);
-        for (let ring = 0; ring < 4; ring++) {
-          const ringEnergy = sensitiveBand(ring * 0.18, 0.28 + ring * 0.18, 1.95);
-          const radius = 18 + ring * 21 + ringEnergy * 31 + beat * 26;
+        crtContext.lineJoin = 'bevel';
+        for (let copy = -2; copy <= 2; copy++) {
+          const copyEnergy = sensitiveBand((copy + 2) / 5, (copy + 3) / 5, 2);
+          const centerX = copy * 48;
+          const outerWidth = 34 + smoothedBass * 74 + copyEnergy * 24;
+          const outerHeight = 22 + mid * 54 + copyEnergy * 18;
+          const innerWidth = 12 + treble * 38 + beat * 34;
+          const innerHeight = 8 + smoothedEnergy * 28 + copyEnergy * 12;
+          const tilt = Math.sin(time * 0.9 + copy * 0.8) * (0.08 + treble * 0.2);
+          crtContext.save();
+          crtContext.translate(centerX, Math.sin(time * 1.2 + copy) * 8);
+          crtContext.rotate(tilt);
+          crtContext.globalAlpha = 0.34 + copyEnergy * 0.66;
+          crtContext.fillStyle = copy % 2 ? '#e66a32' : '#f4d789';
           crtContext.beginPath();
-          for (let point = 0; point <= 32; point++) {
-            const angle = point / 32 * Math.PI * 2;
-            const bin = frequencyData.length
-              ? THREE.MathUtils.clamp(
-                Math.pow(frequencyData[Math.min(frequencyData.length - 1, point * 3)] / 255, 0.68) * 1.9,
-                0,
-                1,
-              )
-              : 0;
-            const pulse = Math.sin(angle * 5 + time * (1.5 + mid * 6)) * (4 + bin * 22);
-            const x = Math.cos(angle) * (radius + pulse);
-            const y = Math.sin(angle) * (radius + pulse);
-            if (point === 0) crtContext.moveTo(x, y);
-            else crtContext.lineTo(x, y);
-          }
+          crtContext.moveTo(0, -outerHeight);
+          crtContext.lineTo(outerWidth, 0);
+          crtContext.lineTo(0, outerHeight);
+          crtContext.lineTo(-outerWidth, 0);
           crtContext.closePath();
-          crtContext.stroke();
+          crtContext.fill();
+          crtContext.fillStyle = '#071214';
+          crtContext.globalAlpha = 0.56 + treble * 0.22;
+          crtContext.beginPath();
+          crtContext.moveTo(0, -innerHeight);
+          crtContext.lineTo(innerWidth, 0);
+          crtContext.lineTo(0, innerHeight);
+          crtContext.lineTo(-innerWidth, 0);
+          crtContext.closePath();
+          crtContext.fill();
+          crtContext.restore();
         }
-        crtContext.restore();
-      } else if (visualizerMode === 'orbit') {
-        crtContext.save();
-        crtContext.translate(width / 2, height / 2);
-        crtContext.beginPath();
-        for (let point = 0; point <= 160; point++) {
-          const phase = point / 160 * Math.PI * 2;
-          const sampleIndex = waveformData.length
-            ? Math.min(waveformData.length - 1, Math.floor(point / 160 * waveformData.length))
-            : 0;
-          const sample = waveformData.length
-            ? THREE.MathUtils.clamp((waveformData[sampleIndex] - 128) / 128 * waveformGain, -1, 1)
-            : 0;
-          const x = Math.sin(phase * 3 + time * (0.8 + treble * 4.6)) * (82 + smoothedEnergy * 68);
-          const y = Math.sin(phase * 4 - time * (0.9 + mid * 4.8)) * (48 + bass * 62)
-            + sample * 42;
-          if (point === 0) crtContext.moveTo(x, y);
-          else crtContext.lineTo(x, y);
-        }
-        crtContext.stroke();
+        crtContext.globalAlpha = 1;
         crtContext.restore();
       } else if (visualizerMode === 'tunnel') {
         crtContext.save();
@@ -1439,21 +1433,6 @@ export function createBoxScene(
         }
         crtContext.stroke();
         crtContext.restore();
-      } else if (visualizerMode === 'pulse') {
-        crtContext.save();
-        crtContext.translate(width / 2, height / 2);
-        crtContext.lineWidth = 3 + beat * 7;
-        for (let ring = 0; ring < 7; ring++) {
-          const phase = (ring / 7 + time * (0.28 + smoothedEnergy * 1.2)) % 1;
-          const ringEnergy = sensitiveBand(ring / 9, Math.min(1, ring / 9 + 0.22), 2);
-          const radius = 8 + phase * (116 + ringEnergy * 34);
-          crtContext.globalAlpha = 1 - phase * 0.78;
-          crtContext.beginPath();
-          crtContext.arc(0, 0, radius, 0, Math.PI * 2);
-          crtContext.stroke();
-        }
-        crtContext.globalAlpha = 1;
-        crtContext.restore();
       } else if (visualizerMode === 'spiral') {
         crtContext.save();
         crtContext.translate(width / 2, height / 2);
@@ -1470,6 +1449,123 @@ export function createBoxScene(
         }
         crtContext.stroke();
         crtContext.restore();
+      } else if (visualizerMode === 'plasma') {
+        const cellSize = 12;
+        for (let y = 0; y < height; y += cellSize) {
+          for (let x = 0; x < width; x += cellSize) {
+            const wave = Math.sin(x * 0.045 + time * (0.7 + bass * 3))
+              + Math.sin(y * 0.062 - time * (0.9 + mid * 3.4))
+              + Math.sin((x + y) * 0.034 + time * (0.5 + treble * 4))
+              + Math.sin(Math.hypot(x - width / 2, y - height / 2) * 0.055 - time * 2.2);
+            const level = (wave + 4) / 8;
+            const hue = (18 + level * 155 + time * 18 + treble * 80) % 360;
+            const lightness = 18 + level * 44 + energy * 18;
+            crtContext.fillStyle = `hsl(${hue} 82% ${lightness}%)`;
+            crtContext.globalAlpha = 0.42 + level * 0.48;
+            crtContext.fillRect(x, y, cellSize + 1, cellSize + 1);
+          }
+        }
+        crtContext.globalAlpha = 1;
+      } else if (visualizerMode === 'copper') {
+        crtContext.save();
+        crtContext.globalCompositeOperation = 'screen';
+        for (let bar = 0; bar < 9; bar++) {
+          const bandEnergy = sensitiveBand(bar / 9, (bar + 1) / 9, 2.2);
+          const centerY = (
+            height / 2
+            + Math.sin(time * (0.7 + bar * 0.07) + bar * 0.82) * (74 + bandEnergy * 34)
+          );
+          const thickness = 5 + bandEnergy * 17 + beat * 8;
+          const gradient = crtContext.createLinearGradient(0, centerY - thickness, 0, centerY + thickness);
+          gradient.addColorStop(0, 'rgba(230,106,50,0)');
+          gradient.addColorStop(0.34, `rgba(230,106,50,${0.2 + bandEnergy * 0.55})`);
+          gradient.addColorStop(0.5, `rgba(244,215,137,${0.5 + bandEnergy * 0.5})`);
+          gradient.addColorStop(0.66, `rgba(100,201,189,${0.2 + treble * 0.5})`);
+          gradient.addColorStop(1, 'rgba(100,201,189,0)');
+          crtContext.fillStyle = gradient;
+          crtContext.fillRect(0, centerY - thickness, width, thickness * 2);
+        }
+        crtContext.restore();
+      } else if (visualizerMode === 'kaleido') {
+        crtContext.save();
+        crtContext.translate(width / 2, height / 2);
+        const segmentCount = 12;
+        for (let segment = 0; segment < segmentCount; segment++) {
+          const angle = segment / segmentCount * Math.PI * 2 + time * (0.15 + treble * 0.7);
+          const bandEnergy = sensitiveBand(segment / segmentCount, (segment + 1) / segmentCount, 2.1);
+          const inner = 12 + bass * 26;
+          const outer = 64 + bandEnergy * 92;
+          const spread = 0.16 + mid * 0.12;
+          crtContext.fillStyle = segment % 2 ? '#e66a32' : '#64c9bd';
+          crtContext.globalAlpha = 0.22 + bandEnergy * 0.62;
+          crtContext.beginPath();
+          crtContext.moveTo(Math.cos(angle) * inner, Math.sin(angle) * inner);
+          crtContext.lineTo(Math.cos(angle - spread) * outer, Math.sin(angle - spread) * outer);
+          crtContext.lineTo(
+            Math.cos(angle) * (outer * (0.58 + beat * 0.3)),
+            Math.sin(angle) * (outer * (0.58 + beat * 0.3)),
+          );
+          crtContext.lineTo(Math.cos(angle + spread) * outer, Math.sin(angle + spread) * outer);
+          crtContext.closePath();
+          crtContext.fill();
+        }
+        crtContext.globalAlpha = 1;
+        crtContext.restore();
+      } else if (visualizerMode === 'metaballs') {
+        const cellSize = 8;
+        const blobs = [
+          {
+            x: width * (0.3 + Math.sin(time * 0.7) * 0.15),
+            y: height * (0.46 + Math.cos(time * 0.9) * 0.2),
+            radius: 34 + bass * 54,
+          },
+          {
+            x: width * (0.68 + Math.cos(time * 0.58) * 0.18),
+            y: height * (0.42 + Math.sin(time * 1.1) * 0.23),
+            radius: 28 + mid * 50,
+          },
+          {
+            x: width * (0.5 + Math.sin(time * 1.34) * 0.22),
+            y: height * (0.68 + Math.cos(time * 0.76) * 0.13),
+            radius: 22 + treble * 46,
+          },
+        ];
+        for (let y = 0; y < height; y += cellSize) {
+          for (let x = 0; x < width; x += cellSize) {
+            let field = 0;
+            for (const blob of blobs) {
+              const dx = x - blob.x;
+              const dy = y - blob.y;
+              field += blob.radius * blob.radius / Math.max(80, dx * dx + dy * dy);
+            }
+            if (field < 0.72) continue;
+            const level = THREE.MathUtils.clamp((field - 0.72) * 1.45, 0, 1);
+            crtContext.fillStyle = level > 0.62 ? '#f4d789' : level > 0.28 ? '#e66a32' : '#64c9bd';
+            crtContext.globalAlpha = 0.34 + level * 0.58;
+            crtContext.fillRect(x, y, cellSize, cellSize);
+          }
+        }
+        crtContext.globalAlpha = 1;
+      } else if (visualizerMode === 'rotozoom') {
+        const cellSize = 10;
+        const rotation = time * (0.22 + treble * 1.2);
+        const zoom = 0.055 + bass * 0.035 + Math.sin(time * 0.8) * 0.008;
+        const cosine = Math.cos(rotation);
+        const sine = Math.sin(rotation);
+        for (let y = 0; y < height; y += cellSize) {
+          for (let x = 0; x < width; x += cellSize) {
+            const centeredX = x - width / 2;
+            const centeredY = y - height / 2;
+            const textureX = (centeredX * cosine - centeredY * sine) * zoom + time * (4 + mid * 12);
+            const textureY = (centeredX * sine + centeredY * cosine) * zoom - time * (3 + treble * 10);
+            const checker = (Math.floor(textureX) + Math.floor(textureY)) & 1;
+            const pulse = 0.35 + smoothedEnergy * 0.65;
+            crtContext.fillStyle = checker ? '#e66a32' : '#17373f';
+            crtContext.globalAlpha = checker ? pulse : 0.32 + bass * 0.24;
+            crtContext.fillRect(x, y, cellSize + 1, cellSize + 1);
+          }
+        }
+        crtContext.globalAlpha = 1;
       } else if (visualizerMode === 'stars') {
         crtContext.save();
         crtContext.translate(width / 2, height / 2);

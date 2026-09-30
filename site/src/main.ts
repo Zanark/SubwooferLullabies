@@ -134,14 +134,17 @@ app.innerHTML = `
         <span>crt signal</span>
         <button type="button" data-visualizer="scope" disabled>scope</button>
         <button type="button" data-visualizer="bars" disabled>bars</button>
-        <button type="button" data-visualizer="radar" disabled>radar</button>
-        <button type="button" data-visualizer="orbit" disabled>orbit</button>
+        <button type="button" data-visualizer="atari" disabled>atari</button>
         <button type="button" data-visualizer="tunnel" disabled>tunnel</button>
         <button type="button" data-visualizer="rain" disabled>rain</button>
         <button type="button" data-visualizer="vectors" disabled>vectors</button>
-        <button type="button" data-visualizer="pulse" disabled>pulse</button>
         <button type="button" data-visualizer="spiral" disabled>spiral</button>
         <button type="button" data-visualizer="stars" disabled>stars</button>
+        <button type="button" data-visualizer="plasma" disabled>plasma</button>
+        <button type="button" data-visualizer="copper" disabled>copper</button>
+        <button type="button" data-visualizer="kaleido" disabled>kaleido</button>
+        <button type="button" data-visualizer="metaballs" disabled>metaballs</button>
+        <button type="button" data-visualizer="rotozoom" disabled>rotozoom</button>
         <button type="button" data-visualizer="glitch" disabled>glitch</button>
       </div>
       <p class="canvas-help">move tapes / drag to player / click tv or wall switches</p>
@@ -862,14 +865,17 @@ async function start() {
   const visualizerModes: VisualizerMode[] = [
     'scope',
     'bars',
-    'radar',
-    'orbit',
+    'atari',
     'tunnel',
     'rain',
     'vectors',
-    'pulse',
     'spiral',
     'stars',
+    'plasma',
+    'copper',
+    'kaleido',
+    'metaballs',
+    'rotozoom',
     'glitch',
   ];
   const dailyVisualizer = visualizerModes[Math.floor(Date.now() / 86_400_000) % visualizerModes.length];
