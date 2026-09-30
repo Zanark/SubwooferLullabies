@@ -2668,3 +2668,21 @@ footer {
     font-size: 11px;
   }
 }
+
+@media (min-width: 1921px) {
+  .masthead,
+  .desk {
+    width: calc(100% - 80px);
+    max-width: 2200px;
+    margin-inline: auto;
+  }
+
+  .cover-grid {
+    grid-template-columns: repeat(3, minmax(190px, 260px));
+    justify-content: space-evenly;
+  }
+
+  .cover-grid .cover-card {
+    max-width: 260px;
+  }
+}
