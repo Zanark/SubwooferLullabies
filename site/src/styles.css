@@ -2763,3 +2763,147 @@ footer {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* The queue is intentionally oversized for long-distance readability. */
+.queue-panel {
+  padding: 22px;
+}
+
+.queue-head {
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+}
+
+.queue-head span {
+  font-size: 48px;
+  line-height: 1.05;
+}
+
+.queue-head strong {
+  font-size: 78px;
+  line-height: 1;
+}
+
+.queue-head output {
+  min-width: 112px;
+  padding: 10px 12px;
+  font-size: 66px;
+  line-height: 1;
+}
+
+.queue-actions {
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.queue-actions button,
+.queue-reorder button {
+  font-size: 54px;
+  line-height: 1.05;
+  white-space: normal;
+}
+
+.queue-actions button {
+  min-height: 110px;
+  padding: 12px;
+}
+
+.queue-list {
+  gap: 10px;
+}
+
+.queue-item {
+  min-height: 120px;
+}
+
+.queue-item.is-external {
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+  padding-inline: 12px;
+}
+
+.queue-source {
+  font-size: 42px;
+}
+
+.queue-play {
+  grid-template-columns: 72px minmax(0, 1fr);
+  padding-inline: 12px;
+}
+
+.queue-index {
+  font-size: 48px;
+}
+
+.queue-title-text {
+  font-size: 60px;
+}
+
+.queue-reorder {
+  grid-template-columns: repeat(3, 60px);
+  gap: 5px;
+  padding: 8px;
+}
+
+.queue-empty {
+  position: static;
+  margin: auto 0;
+  font-size: 54px;
+  line-height: 1.35;
+}
+
+@media (min-width: 1181px) {
+  body {
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+  }
+
+  .desk {
+    grid-template-areas:
+      "library library library queue queue queue"
+      "room room room room player player";
+    grid-template-rows: minmax(720px, .9fr) minmax(300px, 1.1fr);
+    height: auto;
+    min-height: calc(100vh - 102px);
+  }
+}
+
+@media (max-width: 650px) {
+  .queue-panel {
+    min-height: 1100px;
+  }
+
+  .queue-head span {
+    letter-spacing: 0;
+  }
+
+  .queue-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .queue-actions button {
+    min-height: 92px;
+  }
+
+  .queue-reorder {
+    grid-template-columns: repeat(3, 54px);
+  }
+
+  .queue-item,
+  .queue-item.is-external {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 220px;
+  }
+
+  .queue-play {
+    min-height: 110px;
+  }
+
+  .queue-reorder {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+  }
+}
