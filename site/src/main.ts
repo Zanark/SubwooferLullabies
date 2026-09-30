@@ -619,6 +619,7 @@ function setTransportEnabled(enabled: boolean) {
   for (const button of [playButton, rewindButton, stopButton, forwardButton]) {
     button.disabled = !enabled;
   }
+  playerScene?.setTransportEnabled(enabled);
 }
 
 async function togglePlayback() {
@@ -855,7 +856,25 @@ async function start() {
   playerScene = createPlayerScene(required<HTMLCanvasElement>('player-3d'), (value) => {
     audio.volume = value;
     volume.value = String(value);
+  }, (action) => {
+    const button = {
+      rewind: rewindButton,
+      play: playButton,
+      stop: stopButton,
+      forward: forwardButton,
+    }[action];
+    button.click();
   });
+  const transportFocusTargets = [
+    ['rewind', rewindButton],
+    ['play', playButton],
+    ['stop', stopButton],
+    ['forward', forwardButton],
+  ] as const;
+  for (const [action, button] of transportFocusTargets) {
+    button.addEventListener('focus', () => playerScene.setTransportFocus(action));
+    button.addEventListener('blur', () => playerScene.setTransportFocus(null));
+  }
   playerScene.setVolume(audio.volume);
   handCursorScene = createHandCursorScene(required<HTMLCanvasElement>('hand-3d'));
   showcaseScene = createShowcaseScene(required<HTMLCanvasElement>('showcase-3d'));

@@ -34,6 +34,8 @@ export type VisualizerMode =
   | 'metaballs'
   | 'rotozoom';
 
+export type TransportAction = 'rewind' | 'play' | 'stop' | 'forward';
+
 export type BoxSceneController = SceneController & {
   setTrack(song: VisualSong): Promise<void>;
   setPlaying(active: boolean): void;
@@ -46,6 +48,8 @@ export type BoxSceneController = SceneController & {
 export type PlayerSceneController = SceneController & {
   setCassette(song: VisualSong): Promise<void>;
   setPlaying(value: boolean): void;
+  setTransportEnabled(value: boolean): void;
+  setTransportFocus(action: TransportAction | null): void;
   setVolume(value: number): void;
   setProgress(value: number): void;
 };
@@ -1967,6 +1971,7 @@ export function createBoxScene(
 export function createPlayerScene(
   canvas: HTMLCanvasElement,
   onVolumeChange: (value: number) => void = () => {},
+  onTransport: (action: TransportAction) => void = () => {},
 ): PlayerSceneController {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
@@ -1986,9 +1991,6 @@ export function createPlayerScene(
   rig.add(box(6.68, 6.9, 1.42, COLORS.blue, [-0.08, 0.08, 0.02]));
   rig.add(box(6.4, 0.12, 1.48, COLORS.orange, [0, 2.15, 0.08]));
 
-  for (let index = 0; index < 4; index++) {
-    rig.add(box(1.15, 0.36, 0.95, index === 1 ? COLORS.orange : COLORS.metal, [-2.35 + index * 1.55, 3.9, 0]));
-  }
   rig.add(box(0.26, 5.1, 1.48, COLORS.metal, [3.63, 0.05, 0]));
 
   const brand = new THREE.Mesh(
@@ -2011,8 +2013,123 @@ export function createPlayerScene(
   cassette.group.visible = false;
   rig.add(cassette.group);
 
+  type TransportKey = {
+    action: TransportAction;
+    cap: THREE.Group;
+    button: THREE.Mesh;
+    face: THREE.Mesh;
+  };
+
+  const transportDeck = new THREE.Group();
+  transportDeck.position.set(0, -2.18, 0.84);
+  transportDeck.add(box(6.35, 1.18, 0.34, COLORS.dark, [0, 0, 0]));
+  transportDeck.add(box(6.08, 0.08, 0.4, COLORS.orange, [0, 0.49, 0.08]));
+  const transportKeys: TransportKey[] = [];
+  const keyDefinitions: Array<{
+    action: TransportAction;
+    label: string;
+    x: number;
+  }> = [
+    { action: 'rewind', label: 'rew', x: -2.4 },
+    { action: 'play', label: 'play', x: -0.8 },
+    { action: 'stop', label: 'stop', x: 0.8 },
+    { action: 'forward', label: 'ff', x: 2.4 },
+  ];
+
+  const transportTexture = (
+    definition: (typeof keyDefinitions)[number],
+    enabled: boolean,
+    active: boolean,
+  ) => {
+    const textureCanvas = document.createElement('canvas');
+    textureCanvas.width = 256;
+    textureCanvas.height = 160;
+    const context = textureCanvas.getContext('2d');
+    if (!context) throw new Error('Transport texture context unavailable.');
+    context.imageSmoothingEnabled = false;
+    const background = enabled
+      ? definition.action === 'play' ? '#dd8242' : '#c7d0bb'
+      : '#657d81';
+    const foreground = enabled ? '#192124' : '#24383d';
+    context.fillStyle = background;
+    context.fillRect(0, 0, 256, 160);
+    context.fillStyle = 'rgba(255, 255, 255, .24)';
+    context.fillRect(8, 8, 240, 12);
+    context.fillStyle = 'rgba(13, 24, 27, .18)';
+    context.fillRect(8, 140, 240, 12);
+    context.strokeStyle = foreground;
+    context.lineWidth = 10;
+    context.strokeRect(7, 7, 242, 146);
+    context.fillStyle = foreground;
+
+    const triangle = (centerX: number, direction: -1 | 1) => {
+      context.beginPath();
+      context.moveTo(centerX + direction * 25, 66);
+      context.lineTo(centerX - direction * 22, 38);
+      context.lineTo(centerX - direction * 22, 94);
+      context.closePath();
+      context.fill();
+    };
+
+    if (definition.action === 'rewind') {
+      triangle(103, -1);
+      triangle(153, -1);
+    } else if (definition.action === 'forward') {
+      triangle(103, 1);
+      triangle(153, 1);
+    } else if (definition.action === 'stop') {
+      context.fillRect(98, 40, 60, 54);
+    } else if (active) {
+      context.fillRect(90, 38, 24, 58);
+      context.fillRect(142, 38, 24, 58);
+    } else {
+      triangle(126, 1);
+    }
+
+    context.font = '700 28px monospace';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText(
+      definition.action === 'play' && active ? 'PAUSE' : definition.label.toUpperCase(),
+      128,
+      122,
+    );
+    const texture = new THREE.CanvasTexture(textureCanvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.magFilter = THREE.NearestFilter;
+    texture.minFilter = THREE.LinearFilter;
+    texture.userData.owned = true;
+    return texture;
+  };
+
+  for (const definition of keyDefinitions) {
+    transportDeck.add(box(1.48, 1.0, 0.28, COLORS.blueDark, [definition.x, -0.02, 0.18]));
+    const cap = new THREE.Group();
+    cap.position.set(definition.x, -0.02, 0);
+    cap.userData.transportAction = definition.action;
+    const button = box(
+      1.3,
+      0.82,
+      0.38,
+      definition.action === 'play' ? COLORS.orange : COLORS.metal,
+      [0, 0, 0.4],
+    );
+    button.userData.transportAction = definition.action;
+    cap.add(button);
+    const face = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.16, 0.68),
+      textureMaterial(transportTexture(definition, false, false)),
+    );
+    face.position.set(0, 0, 0.6);
+    face.userData.transportAction = definition.action;
+    cap.add(face);
+    transportDeck.add(cap);
+    transportKeys.push({ action: definition.action, cap, button, face });
+  }
+  rig.add(transportDeck);
+
   const controls = new THREE.Group();
-  controls.position.set(0, -2.92, 0.8);
+  controls.position.set(0, -3.12, 0.8);
   const volumeMin = -2.25;
   const volumeMax = 2.25;
   controls.add(box(4.7, 0.12, 0.12, 0x718883, [0, -0.16, 0]));
@@ -2048,6 +2165,51 @@ export function createPlayerScene(
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   let draggingVolume = false;
+  let transportEnabled = false;
+  let pressedTransport: TransportKey | null = null;
+  let hoveredTransport: TransportKey | null = null;
+  let focusedTransport: TransportKey | null = null;
+  let playing = false;
+
+  const refreshTransportKeys = () => {
+    for (const key of transportKeys) {
+      const definition = keyDefinitions.find((candidate) => candidate.action === key.action)!;
+      const keyPlaying = key.action === 'play' && playing;
+      disposeMaterial(key.face.material);
+      key.face.material = textureMaterial(transportTexture(definition, transportEnabled, keyPlaying));
+      const buttonMaterial = key.button.material as THREE.MeshStandardMaterial;
+      buttonMaterial.color.setHex(
+        transportEnabled
+          ? key.action === 'play' ? COLORS.orange : COLORS.metal
+          : COLORS.blueDark,
+      );
+      buttonMaterial.emissive.setHex(
+        transportEnabled && (key === hoveredTransport || key === focusedTransport || keyPlaying)
+          ? 0x2b9f92
+          : 0x000000,
+      );
+      buttonMaterial.emissiveIntensity = keyPlaying
+        ? 0.42
+        : key === focusedTransport ? 0.36 : key === hoveredTransport ? 0.28 : 0;
+    }
+  };
+
+  const setRayFromPointer = (event: PointerEvent) => {
+    const bounds = canvas.getBoundingClientRect();
+    pointer.set(
+      ((event.clientX - bounds.left) / bounds.width) * 2 - 1,
+      -((event.clientY - bounds.top) / bounds.height) * 2 + 1,
+    );
+    raycaster.setFromCamera(pointer, camera);
+  };
+
+  const transportKeyAt = (event: PointerEvent) => {
+    setRayFromPointer(event);
+    const hit = raycaster.intersectObjects(transportKeys.map((key) => key.cap), true)[0];
+    if (!hit) return null;
+    const action = hit.object.userData.transportAction as TransportAction | undefined;
+    return transportKeys.find((key) => key.action === action) ?? null;
+  };
 
   const setVolume = (value: number, notify = false) => {
     const normalized = THREE.MathUtils.clamp(value, 0, 1);
@@ -2056,12 +2218,7 @@ export function createPlayerScene(
   };
 
   const updatePointer = (event: PointerEvent) => {
-    const bounds = canvas.getBoundingClientRect();
-    pointer.set(
-      ((event.clientX - bounds.left) / bounds.width) * 2 - 1,
-      -((event.clientY - bounds.top) / bounds.height) * 2 + 1,
-    );
-    raycaster.setFromCamera(pointer, camera);
+    setRayFromPointer(event);
     return raycaster.intersectObject(volumeHit, false)[0];
   };
 
@@ -2074,6 +2231,15 @@ export function createPlayerScene(
   };
 
   const onPointerDown = (event: PointerEvent) => {
+    const transportKey = transportKeyAt(event);
+    if (transportEnabled && transportKey) {
+      pressedTransport = transportKey;
+      transportKey.cap.position.z = -0.12;
+      canvas.setPointerCapture(event.pointerId);
+      canvas.classList.add('is-pressing-transport');
+      event.preventDefault();
+      return;
+    }
     if (!updateVolumeFromPointer(event)) return;
     draggingVolume = true;
     canvas.setPointerCapture(event.pointerId);
@@ -2081,26 +2247,62 @@ export function createPlayerScene(
     event.preventDefault();
   };
   const onPointerMove = (event: PointerEvent) => {
+    if (pressedTransport) {
+      event.preventDefault();
+      return;
+    }
     if (draggingVolume) {
       updateVolumeFromPointer(event);
       event.preventDefault();
       return;
     }
+    const nextTransport = transportEnabled ? transportKeyAt(event) : null;
+    if (nextTransport !== hoveredTransport) {
+      if (hoveredTransport) hoveredTransport.cap.position.z = 0;
+      hoveredTransport = nextTransport;
+      if (hoveredTransport) hoveredTransport.cap.position.z = 0.06;
+      refreshTransportKeys();
+    }
+    canvas.classList.toggle('can-press-transport', Boolean(hoveredTransport));
     canvas.classList.toggle('can-adjust-volume', Boolean(updatePointer(event)));
   };
   const onPointerUp = (event: PointerEvent) => {
+    if (pressedTransport) {
+      const releasedKey = transportKeyAt(event);
+      const action = pressedTransport.action;
+      pressedTransport.cap.position.z = releasedKey === pressedTransport ? 0.06 : 0;
+      pressedTransport = null;
+      if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+      canvas.classList.remove('is-pressing-transport');
+      if (transportEnabled && releasedKey?.action === action) onTransport(action);
+      return;
+    }
     if (!draggingVolume) return;
     draggingVolume = false;
     if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
     canvas.classList.remove('is-adjusting-volume');
   };
+  const onPointerCancel = (event: PointerEvent) => {
+    if (pressedTransport) {
+      pressedTransport.cap.position.z = 0;
+      pressedTransport = null;
+      canvas.classList.remove('is-pressing-transport');
+      refreshTransportKeys();
+    }
+    onPointerUp(event);
+  };
   const onPointerLeave = () => {
-    if (!draggingVolume) canvas.classList.remove('can-adjust-volume');
+    if (!draggingVolume && !pressedTransport) {
+      if (hoveredTransport) hoveredTransport.cap.position.z = 0;
+      hoveredTransport = null;
+      refreshTransportKeys();
+      canvas.classList.remove('can-adjust-volume', 'can-press-transport');
+    }
   };
   canvas.addEventListener('pointerdown', onPointerDown);
   canvas.addEventListener('pointermove', onPointerMove);
   canvas.addEventListener('pointerup', onPointerUp);
-  canvas.addEventListener('pointercancel', onPointerUp);
+  canvas.addEventListener('pointercancel', onPointerCancel);
   canvas.addEventListener('pointerleave', onPointerLeave);
 
   const headphoneGroup = new THREE.Group();
@@ -2135,7 +2337,6 @@ export function createPlayerScene(
   ]);
   rig.add(new THREE.Mesh(new THREE.TubeGeometry(cableCurve, 8, 0.08, 5, false), material(COLORS.dark)));
 
-  let playing = false;
   const disposeScene = animateScene(renderer, scene, camera, resize, (time, delta) => {
     const aspect = canvas.clientWidth / Math.max(canvas.clientHeight, 1);
     const cameraScale = Math.max(1, 0.86 / aspect);
@@ -2160,6 +2361,22 @@ export function createPlayerScene(
     },
     setPlaying(value: boolean) {
       playing = value;
+      refreshTransportKeys();
+    },
+    setTransportEnabled(value: boolean) {
+      transportEnabled = value;
+      if (!value) {
+        if (hoveredTransport) hoveredTransport.cap.position.z = 0;
+        hoveredTransport = null;
+        canvas.classList.remove('can-press-transport');
+      }
+      refreshTransportKeys();
+    },
+    setTransportFocus(action: TransportAction | null) {
+      focusedTransport = action
+        ? transportKeys.find((key) => key.action === action) ?? null
+        : null;
+      refreshTransportKeys();
     },
     setVolume(value: number) {
       setVolume(value);
@@ -2174,7 +2391,7 @@ export function createPlayerScene(
       canvas.removeEventListener('pointerdown', onPointerDown);
       canvas.removeEventListener('pointermove', onPointerMove);
       canvas.removeEventListener('pointerup', onPointerUp);
-      canvas.removeEventListener('pointercancel', onPointerUp);
+      canvas.removeEventListener('pointercancel', onPointerCancel);
       canvas.removeEventListener('pointerleave', onPointerLeave);
       disposeScene();
     },

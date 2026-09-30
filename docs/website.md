@@ -84,7 +84,7 @@ focused composition.
 The **SUBWAVE TPS-14** is an original fictional design inspired by the proportions and
 materials of portable cassette players without copying a real manufacturer.
 
-- REW, PLAY/PAUSE, STOP and FF are mechanical-looking controls on the device.
+- REW, PLAY/PAUSE, STOP and FF are separate raycastable 3D keys mounted in recessed sockets across the player's lower front face. Their icons, pressed depth, disabled finish and active PLAY/PAUSE state are rendered as part of the WebGL device rather than as a floating browser-control strip.
 - PLAY/PAUSE produces a short Web Audio transport thunk.
 - The long lower groove is the draggable volume control.
 - The shorter upper groove is a position indicator with no elapsed-time text.

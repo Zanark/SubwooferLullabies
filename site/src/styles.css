@@ -2108,6 +2108,11 @@ body.theater-mode .status {
   cursor: ew-resize;
 }
 
+.player-canvas.can-press-transport,
+.player-canvas.is-pressing-transport {
+  cursor: pointer;
+}
+
 .drop-hint {
   top: 46px;
   z-index: 6;
@@ -2532,6 +2537,34 @@ body.cassette-focus-mode .queue-panel {
   box-shadow:
     0 0 0 2px rgba(122, 219, 207, .32),
     0 0 28px rgba(82, 222, 205, .32);
+}
+
+/* Transport keys are physical Three.js controls; retain these buttons for keyboard and screen-reader access. */
+.transport-controls {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 1px !important;
+  height: 1px !important;
+  gap: 0 !important;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  transform: none !important;
+  white-space: nowrap;
+}
+
+.transport-controls .transport-button,
+.transport-controls .play-button {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
 }
 
 .room-panel.is-crt-focused .canvas-help {
