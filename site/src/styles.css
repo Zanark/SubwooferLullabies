@@ -2531,3 +2531,140 @@ body.theater-mode .status {
     left: 20%;
   }
 }
+
+/* Keep the pixel UI readable at normal browser zoom without losing its compact console rhythm. */
+.eyebrow,
+.mast-copy {
+  font-size: 10px;
+}
+
+.random-play span {
+  font-size: 9px;
+}
+
+.random-play strong {
+  font-size: 13px;
+}
+
+.search span,
+.shelf-head {
+  font-size: 11px;
+}
+
+.search input {
+  font-size: 14px;
+}
+
+.pixel-button {
+  font-size: 10px;
+}
+
+.cover-card strong {
+  font-size: 13px;
+}
+
+.cover-card small {
+  font-size: 10px;
+}
+
+.queue-head span {
+  font-size: 8px;
+}
+
+.queue-head strong {
+  font-size: 13px;
+}
+
+.queue-head output {
+  font-size: 11px;
+}
+
+.queue-actions button,
+.queue-reorder button {
+  font-size: 9px;
+}
+
+.queue-actions button {
+  min-height: 31px;
+}
+
+.queue-item {
+  min-height: 44px;
+}
+
+.queue-source {
+  font-size: 7px;
+}
+
+.queue-index {
+  font-size: 8px;
+}
+
+.queue-title-text {
+  font-size: 10px;
+}
+
+.queue-empty {
+  font-size: 9px;
+}
+
+.drop-hint {
+  font-size: 11px;
+}
+
+.transport-button span {
+  font-size: 13px;
+}
+
+.transport-button small {
+  font-size: 8px;
+}
+
+.status,
+.canvas-help {
+  font-size: 10px;
+}
+
+.crt-back-button,
+.crt-isolation-button {
+  font-size: 10px;
+}
+
+.crt-controls span,
+.crt-controls button {
+  font-size: 9px;
+}
+
+.showcase-copy span {
+  font-size: 11px;
+}
+
+footer {
+  font-size: 10px;
+}
+
+@media (max-width: 650px) {
+  .eyebrow,
+  .mast-copy {
+    font-size: 11px;
+  }
+
+  .search span,
+  .shelf-head,
+  .pixel-button {
+    font-size: 12px;
+  }
+
+  .search input {
+    font-size: 16px;
+  }
+
+  .cover-card strong {
+    font-size: 14px;
+  }
+
+  .cover-card small,
+  .status {
+    font-size: 11px;
+  }
+}
