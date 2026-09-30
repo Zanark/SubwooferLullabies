@@ -1724,38 +1724,79 @@ export function createBoxScene(
         crtContext.fillRect(coilX - 31, baseY + 4, 62, 8);
         crtContext.fillStyle = '#23345a';
         crtContext.fillRect(coilX - 15, domeY + 12, 30, baseY - domeY - 12);
+        const waveformSampleAt = (progress: number) => {
+          if (!waveformData.length) return 0;
+          const wrapped = ((progress % 1) + 1) % 1;
+          const index = Math.min(
+            waveformData.length - 1,
+            Math.floor(wrapped * waveformData.length),
+          );
+          return THREE.MathUtils.clamp(
+            (waveformData[index] - 128) / 128 * waveformGain,
+            -1,
+            1,
+          );
+        };
+        const waveformMotion = THREE.MathUtils.clamp(waveformPeak * waveformGain, 0, 1);
         for (let ring = 0; ring < 11; ring++) {
           const y = domeY + 18 + ring * ((baseY - domeY - 25) / 10);
           const ringEnergy = sensitiveBand(ring / 11, (ring + 1) / 11, 2);
+          const ringWave = Math.abs(waveformSampleAt(time * 0.22 + ring / 11));
+          const ringReaction = Math.max(ringEnergy, ringWave);
           crtContext.fillStyle = ring % 2 ? '#64c9bd' : '#f4d789';
-          crtContext.globalAlpha = 0.45 + ringEnergy * 0.5;
-          crtContext.fillRect(coilX - 21 - ringEnergy * 5, y, 42 + ringEnergy * 10, 3);
+          crtContext.globalAlpha = 0.48 + ringReaction * 0.5;
+          crtContext.fillRect(
+            coilX - 21 - ringReaction * 10,
+            y,
+            42 + ringReaction * 20,
+            3 + ringWave * 2,
+          );
         }
         crtContext.globalAlpha = 1;
         crtContext.fillStyle = '#d9fff9';
         crtContext.beginPath();
-        crtContext.arc(coilX, domeY, 17 + beat * 12, 0, Math.PI * 2);
+        crtContext.arc(coilX, domeY, 17 + waveformMotion * 11 + beat * 15, 0, Math.PI * 2);
         crtContext.fill();
 
-        const boltCount = 4 + Math.round(smoothedEnergy * 3);
+        const boltCount = 6 + Math.round(Math.max(smoothedEnergy, waveformMotion) * 4);
         crtContext.lineCap = 'round';
         for (let bolt = 0; bolt < boltCount; bolt++) {
-          const bandEnergy = sensitiveBand(bolt / boltCount, (bolt + 1) / boltCount, 2.1);
+          const bandEnergy = sensitiveBand(bolt / boltCount, (bolt + 1) / boltCount, 2.35);
+          const waveX = waveformSampleAt(time * 0.18 + bolt / boltCount);
+          const waveY = waveformSampleAt(time * 0.18 + bolt / boltCount + 0.24);
+          const boltReaction = Math.max(bandEnergy, Math.abs(waveX), Math.abs(waveY));
           const side = bolt % 2 ? 1 : -1;
-          const endX = coilX + side * (92 + bandEnergy * 62);
-          const endY = 24 + ((bolt * 53 + time * (18 + treble * 34)) % (height * 0.58));
+          const reach = Math.min(
+            width * 0.46,
+            78 + bandEnergy * 54 + Math.abs(waveX) * 54 + waveformMotion * 18,
+          );
+          const endX = coilX + side * reach;
+          const endY = THREE.MathUtils.clamp(
+            domeY
+              + waveY * height * 0.36
+              + Math.sin(time * (4.5 + treble * 8) + bolt * 1.7) * (12 + treble * 18),
+            18,
+            height * 0.66,
+          );
           crtContext.strokeStyle = bolt % 3 ? '#b9f5ff' : '#f1b5ff';
-          crtContext.lineWidth = 2 + bandEnergy * 3 + beat * 3;
-          crtContext.globalAlpha = 0.48 + bandEnergy * 0.5;
+          crtContext.lineWidth = 1.8 + boltReaction * 3.2 + beat * 4;
+          crtContext.globalAlpha = 0.55 + boltReaction * 0.43;
           crtContext.beginPath();
           crtContext.moveTo(coilX, domeY);
-          const segments = 8;
+          const segments = 10;
           for (let segment = 1; segment <= segments; segment++) {
             const progress = segment / segments;
-            const jitter = Math.sin(time * 31 + bolt * 7.1 + segment * 12.7) * (10 + bandEnergy * 14);
+            const segmentWave = waveformSampleAt(
+              time * 0.34 + bolt / boltCount + progress * 0.2,
+            );
+            const jitter = (
+              segmentWave * (18 + boltReaction * 30)
+              + Math.sin(time * 31 + bolt * 7.1 + segment * 12.7) * (5 + bandEnergy * 8)
+            );
             crtContext.lineTo(
               THREE.MathUtils.lerp(coilX, endX, progress) + (segment === segments ? 0 : jitter),
-              THREE.MathUtils.lerp(domeY, endY, progress),
+              THREE.MathUtils.lerp(domeY, endY, progress)
+                + (segment === segments ? 0 : segmentWave * 8),
             );
           }
           crtContext.stroke();

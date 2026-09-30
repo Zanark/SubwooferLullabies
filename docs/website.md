@@ -159,7 +159,7 @@ adaptive waveform gain keep quieter recordings visibly responsive.
 | `atari` | Beat-reactive Pong with frequency-driven paddles, scored rallies, music-accelerated rebounds and a capped blue transient spark around the ball; pressing Atari resets both scores |
 | `tunnel` | Receding perspective rectangles |
 | `rain` | Matrix-style green code streams with bright heads and frequency-sized trails |
-| `tesla` | Central audio coil throwing waveform-modulated electrical bolts |
+| `tesla` | Central audio coil with vectors-style adaptive waveform sensitivity driving bolt reach, direction, thickness and jagged motion |
 | `radar` | Circular phosphor scope with sweep illumination and spectral targets |
 | `stars` | Calm spectral depth field with restrained motion and size response |
 | `plasma` | Chunky multi-field demoscene plasma |
