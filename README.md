@@ -57,11 +57,18 @@ Generated `AUDIO` files are Git-ignored and are not automatically published.
 ## Playable website
 
 [Open the live PS1 cassette desk](https://zanark.github.io/SubwooferLullabies/).
-Browse or search by song title, move tapes around the desk, then drag one into
-the fictional player. Each tape has a two-second 3D inspection, mechanical
-controls, volume, animated reels and a convex CRT with selectable signals.
-On desktop, the library spans the top while the Walkman and room share the
-bottom row in a one-third/two-thirds split.
+
+![The PS1-style cassette archive with its searchable library, tape queue, Three.js room and fictional portable player.](docs/assets/cassette-archive-room.png)
+
+Browse or search by title, move physical tapes around Zanark's room, load one into
+the fictional player or build a persistent drag-and-drop queue. The complete
+experience includes a transparent two-second cassette inspection, mechanical
+transport controls, animated reels, physical room-light switches, cover-reactive
+lighting and a convex CRT with fourteen live audio-reactive signals.
+
+The illustrated [website guide](docs/website.md) documents every interaction, the
+queue model, all CRT signals, responsive behavior, Three.js/Vite architecture,
+design invariants and the branch-restricted GitHub Pages pipeline.
 
 ```powershell
 npm install
