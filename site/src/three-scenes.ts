@@ -692,6 +692,7 @@ export function createBoxScene(
   songs: VisualSong[],
   onSelect: (title: string) => void,
   onInspect: (title: string) => void,
+  onCassetteFocusChange: (active: boolean) => void,
   onCrtFocusChange: (active: boolean) => void,
   dropTarget: HTMLElement,
   queueTarget: HTMLElement,
@@ -1725,6 +1726,7 @@ export function createBoxScene(
     canvas.style.cursor = 'default';
     dropTarget.classList.remove('awaiting-drop', 'is-over');
     queueTarget.classList.remove('awaiting-drop', 'is-over');
+    onCassetteFocusChange(false);
     handCursor.release(false);
   }
 
@@ -1742,6 +1744,7 @@ export function createBoxScene(
     }
     if (!pressed) return;
     onInspect(String(pressed.userData.title));
+    onCassetteFocusChange(true);
     activePointerId = event.pointerId;
     moved = false;
     startX = event.clientX;
@@ -1815,14 +1818,17 @@ export function createBoxScene(
         if (destination === 'player') onSelect(title);
         else onQueue(title);
       }, 260);
+      window.setTimeout(() => onCassetteFocusChange(false), 320);
     } else if (!moved) {
       chosen.position.copy(chosen.userData.home);
       chosen.rotation.copy(chosen.userData.rotationHome);
       onSelect(String(chosen.userData.title));
+      onCassetteFocusChange(false);
     } else {
       chosen.position.y = (chosen.userData.home as THREE.Vector3).y;
       chosen.userData.home = chosen.position.clone();
       chosen.userData.rotationHome = chosen.rotation.clone();
+      onCassetteFocusChange(false);
     }
   });
   canvas.addEventListener('pointercancel', cancelDrag);

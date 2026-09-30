@@ -2455,6 +2455,7 @@ body.theater-mode .transport-controls > .play-button {
 .library-panel,
 .player-panel,
 .queue-panel,
+.room-panel,
 footer {
   transition: filter .28s steps(5), opacity .28s steps(5);
 }
@@ -2471,6 +2472,66 @@ body.crt-isolation-mode footer {
   filter: brightness(.08) saturate(.35);
   opacity: .16;
   pointer-events: none;
+}
+
+body.cassette-focus-mode {
+  background: #010506;
+}
+
+body.cassette-focus-mode .masthead,
+body.cassette-focus-mode .library-panel,
+body.cassette-focus-mode .room-panel,
+body.cassette-focus-mode footer {
+  filter: brightness(.025) saturate(.15);
+  opacity: .09;
+  pointer-events: none;
+}
+
+body.cassette-focus-mode .player-panel,
+body.cassette-focus-mode .queue-panel {
+  position: relative;
+  z-index: 55;
+  opacity: 1;
+}
+
+body.cassette-focus-mode .player-panel {
+  overflow: visible;
+  border-color: #a8fff0;
+  filter: brightness(1.45) saturate(1.35) contrast(1.08);
+  box-shadow:
+    0 0 0 4px rgba(168, 255, 240, .55),
+    0 0 34px 12px rgba(93, 255, 224, .95),
+    0 0 90px 34px rgba(50, 194, 255, .72),
+    0 0 148px 58px rgba(255, 153, 60, .42),
+    inset 0 0 48px rgba(171, 255, 237, .38);
+}
+
+body.cassette-focus-mode .player-panel::after {
+  position: absolute;
+  z-index: 1;
+  inset: -12% 0;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(212, 255, 242, .7) 0 8%, rgba(89, 255, 221, .34) 22%, rgba(48, 174, 255, .2) 42%, transparent 68%);
+  content: "";
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+body.cassette-focus-mode .walkman-drop {
+  filter:
+    brightness(1.42)
+    saturate(1.38)
+    drop-shadow(0 0 18px rgba(223, 255, 247, 1))
+    drop-shadow(0 0 42px rgba(88, 255, 223, .92))
+    drop-shadow(0 0 76px rgba(255, 151, 58, .7));
+}
+
+body.cassette-focus-mode .queue-panel {
+  border-color: #7adbcf;
+  filter: brightness(1.08) saturate(1.08);
+  box-shadow:
+    0 0 0 2px rgba(122, 219, 207, .32),
+    0 0 28px rgba(82, 222, 205, .32);
 }
 
 .room-panel.is-crt-focused .canvas-help {

@@ -72,6 +72,13 @@ summons a transparent low-poly hand; empty room space and ordinary controls reta
 native pointer. Pointer capture, cancellation handling and edge auto-scroll allow the
 same interaction to work with mouse or touch.
 
+Picking up a physical cassette, dragging a library card or starting the transparent
+two-second cassette showcase automatically enters **player focus**. The masthead,
+library, room and footer dim almost completely while the SUBWAVE player blooms in
+cyan, mint and warm orange light. The queue remains fully visible and interactive so
+the cassette can still be routed to **play now** or **play later** without leaving the
+focused composition.
+
 ## 3. The fictional portable player
 
 The **SUBWAVE TPS-14** is an original fictional design inspired by the proportions and

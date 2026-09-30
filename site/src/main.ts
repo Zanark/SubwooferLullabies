@@ -97,7 +97,7 @@ app.innerHTML = `
       <p id="queue-empty" class="queue-empty">drag a cassette here<br>or select songs above</p>
     </aside>
 
-    <section class="player-panel" aria-label="Cassette player">
+    <section id="player-panel" class="player-panel" aria-label="Cassette player">
       <div id="walkman-drop" class="walkman-drop">
         <p class="drop-hint">drop tape here</p>
         <canvas id="player-3d" class="scene-canvas player-canvas" aria-label="3D cassette player and headphones"></canvas>
@@ -173,6 +173,7 @@ const resultCount = required<HTMLSpanElement>('result-count');
 const search = required<HTMLInputElement>('search');
 const back = required<HTMLButtonElement>('back');
 const dropZone = required<HTMLDivElement>('walkman-drop');
+const playerPanel = required<HTMLElement>('player-panel');
 const queuePanel = required<HTMLElement>('queue-panel');
 const queueList = required<HTMLOListElement>('queue-list');
 const queueCount = required<HTMLOutputElement>('queue-count');
@@ -206,6 +207,7 @@ let queue: QueueEntry[] = [];
 let activeQueueId: string | null = null;
 let currentSource: 'direct' | 'queue' | null = null;
 const selectedTitles = new Set<string>();
+const cassetteFocusReasons = new Set<string>();
 let loading = false;
 let boxScene: ReturnType<typeof createBoxScene>;
 let handCursorScene: ReturnType<typeof createHandCursorScene>;
@@ -224,6 +226,21 @@ function required<T extends HTMLElement>(id: string): T {
 function formatDuration(seconds: number) {
   const minutes = Math.floor(seconds / 60);
   return `${minutes}:${String(Math.round(seconds % 60)).padStart(2, '0')}`;
+}
+
+function setCassetteFocus(reason: string, active: boolean, revealPlayer = false) {
+  if (active) cassetteFocusReasons.add(reason);
+  else cassetteFocusReasons.delete(reason);
+
+  const focused = cassetteFocusReasons.size > 0;
+  document.body.classList.toggle('cassette-focus-mode', focused);
+  playerPanel.classList.toggle('is-cassette-focus-target', focused);
+  queuePanel.classList.toggle('is-cassette-focus-companion', focused);
+
+  if (active && revealPlayer) {
+    const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+    playerPanel.scrollIntoView({ behavior, block: 'center' });
+  }
 }
 
 function enableAudioAnalysis() {
@@ -412,7 +429,9 @@ function songCard(song: Song) {
     event.dataTransfer?.setData('application/x-cassette-title', song.title);
     event.dataTransfer?.setData('text/plain', song.title);
     if (event.dataTransfer) event.dataTransfer.effectAllowed = 'copy';
+    setCassetteFocus('library-drag', true);
   });
+  card.addEventListener('dragend', () => setCassetteFocus('library-drag', false));
   return card;
 }
 
@@ -493,6 +512,7 @@ async function loadCassette(
 ) {
   if (loading) return false;
   loading = true;
+  if (!skipShowcase) setCassetteFocus('cassette-showcase', true, true);
   audio.pause();
   setPlayingState(false);
   setTransportEnabled(false);
@@ -556,6 +576,7 @@ async function loadCassette(
     showcase.hidden = true;
     loading = false;
     randomPlayButton.disabled = false;
+    if (!skipShowcase) setCassetteFocus('cassette-showcase', false);
   }
 
   return loaded;
@@ -847,6 +868,7 @@ async function start() {
       deskPreviewTitle = title;
       renderShelf();
     },
+    (active) => setCassetteFocus('physical-drag', active),
     (active) => {
       roomPanel.classList.toggle('is-crt-focused', active);
       if (!active) {
