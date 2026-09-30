@@ -2529,7 +2529,11 @@ export function createBoxScene(
       waveformData = new Uint8Array(analyser.fftSize);
     },
     setVisualizer(mode: VisualizerMode) {
-      if (mode === 'atari' && visualizerMode !== 'atari') pong.lastTime = 0;
+      if (mode === 'atari') {
+        pong.leftScore = 0;
+        pong.rightScore = 0;
+        if (visualizerMode !== 'atari') pong.lastTime = 0;
+      }
       visualizerMode = mode;
     },
     setSearchMatches(titles: string[]) {
