@@ -111,6 +111,7 @@ function canvasTexture(
   secondary = '',
   background = '#d3c99d',
   foreground = '#173138',
+  fontScale = 1,
 ) {
   const canvas = document.createElement('canvas');
   canvas.width = 512;
@@ -125,13 +126,13 @@ function canvasTexture(
   context.lineWidth = 10;
   context.strokeRect(13, 13, canvas.width - 26, canvas.height - 26);
   context.fillStyle = foreground;
-  context.font = '700 58px monospace';
+  context.font = `700 ${58 * fontScale}px monospace`;
   context.textAlign = 'center';
   context.textBaseline = 'middle';
   const fitted = primary.length > 16 ? primary.slice(0, 16) : primary;
-  context.fillText(fitted, canvas.width / 2, 112);
-  context.font = '700 22px monospace';
-  context.fillText(secondary.toUpperCase(), canvas.width / 2, 184);
+  context.fillText(fitted, canvas.width / 2, fontScale > 1 ? 104 : 112);
+  context.font = `700 ${22 * fontScale}px monospace`;
+  context.fillText(secondary.toUpperCase(), canvas.width / 2, fontScale > 1 ? 194 : 184);
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.magFilter = THREE.NearestFilter;
@@ -2353,7 +2354,7 @@ export function createPlayerScene(
 
   const brand = new THREE.Mesh(
     new THREE.PlaneGeometry(2.3, 0.72),
-    textureMaterial(canvasTexture('SUBWAVE', 'TPS-14', '#416d88', '#edf0d7'), true),
+    textureMaterial(canvasTexture('SUBWAVE', 'TPS-14', '#416d88', '#edf0d7', 2), true),
   );
   brand.position.set(-1.65, 2.85, 0.76);
   rig.add(brand);
@@ -2468,13 +2469,13 @@ export function createPlayerScene(
       triangle(126, 1);
     }
 
-    context.font = '700 28px monospace';
+    context.font = '700 52px monospace';
     context.textAlign = 'center';
     context.textBaseline = 'middle';
     context.fillText(
       definition.action === 'play' && active ? 'PAUSE' : definition.label.toUpperCase(),
       128,
-      122,
+      128,
     );
     const texture = new THREE.CanvasTexture(textureCanvas);
     texture.colorSpace = THREE.SRGBColorSpace;

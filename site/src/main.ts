@@ -47,7 +47,7 @@ app.innerHTML = `
     </div>
     <div class="mast-actions">
       <p class="mast-copy">fourteen original code-composed tapes.<br>choose one, load it, press play.</p>
-      <button id="random-play" class="random-play" type="button" disabled>
+      <button id="random-play" class="random-play" type="button" aria-label="Play a random tape" title="Play a random tape" disabled>
         <svg class="shuffle-icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M3 7h3.7c2.1 0 3.4 1 4.8 3.3l1 1.7c1.3 2.2 2.5 3 4.7 3H21"></path>
           <path d="m18 12 3 3-3 3"></path>
@@ -55,8 +55,7 @@ app.innerHTML = `
           <path d="M14 7h3.9H21"></path>
           <path d="m18 4 3 3-3 3"></path>
         </svg>
-        <span>feeling lucky?</span>
-        <strong>play a random tape</strong>
+        <strong>random tape</strong>
       </button>
     </div>
   </header>
@@ -88,10 +87,18 @@ app.innerHTML = `
         <output id="queue-count">0</output>
       </div>
       <div class="queue-actions" role="group" aria-label="Queue controls">
-        <button id="queue-add" type="button" disabled>add selected</button>
-        <button id="queue-shuffle" type="button" disabled>shuffle</button>
-        <button id="queue-next" type="button" disabled>next</button>
-        <button id="queue-clear" type="button" disabled>clear</button>
+        <button id="queue-add" type="button" aria-label="Add selected cassettes" title="Add selected cassettes" disabled>+</button>
+        <button id="queue-shuffle" type="button" aria-label="Shuffle queue" title="Shuffle queue" disabled>
+          <svg class="queue-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 7h3.7c2.1 0 3.4 1 4.8 3.3l1 1.7c1.3 2.2 2.5 3 4.7 3H21"></path>
+            <path d="m18 12 3 3-3 3"></path>
+            <path d="M3 17h3.7c1.6 0 2.7-.6 3.7-2"></path>
+            <path d="M14 7h7"></path>
+            <path d="m18 4 3 3-3 3"></path>
+          </svg>
+        </button>
+        <button id="queue-next" type="button" aria-label="Play next cassette" title="Play next cassette" disabled>▶|</button>
+        <button id="queue-clear" type="button" aria-label="Clear queue" title="Clear queue" disabled>×</button>
       </div>
       <ol id="queue-list" class="queue-list"></ol>
       <p id="queue-empty" class="queue-empty">drag a cassette here<br>or select songs above</p>
@@ -128,10 +135,10 @@ app.innerHTML = `
 
     <section id="room-panel" class="room-panel box-scene" aria-label="Messy 2010 teenager room">
       <canvas id="box-3d" class="scene-canvas box-canvas" aria-label="Interactive 3D room with loose cassettes on a desk"></canvas>
-      <button id="toggle-crt-isolation" class="crt-isolation-button" type="button" aria-pressed="false" hidden>dim surroundings</button>
-      <button id="exit-crt-focus" class="crt-back-button" type="button" hidden>back to room</button>
+      <button id="toggle-crt-isolation" class="crt-isolation-button" type="button" aria-label="Dim surroundings" title="Dim surroundings" aria-pressed="false" hidden>◐</button>
+      <button id="exit-crt-focus" class="crt-back-button" type="button" aria-label="Back to room" title="Back to room" hidden>↩</button>
       <div class="crt-controls" role="group" aria-label="CRT visualizer">
-        <span>crt signal</span>
+        <span class="crt-signal-icon" aria-label="CRT signal" title="CRT signal">▣</span>
         <button type="button" data-visualizer="scope" disabled>scope</button>
         <button type="button" data-visualizer="bars" disabled>bars</button>
         <button type="button" data-visualizer="atari" disabled>atari</button>
@@ -148,7 +155,7 @@ app.innerHTML = `
         <button type="button" data-visualizer="synthwave" disabled>synthwave</button>
         <button type="button" data-visualizer="fireworks" disabled>fireworks</button>
       </div>
-      <p class="canvas-help">move tapes / drag to player / click tv or wall switches</p>
+      <p class="canvas-help"><span aria-hidden="true">◆</span> tape · <span aria-hidden="true">→</span> player · <span aria-hidden="true">◉</span> tv/switches</p>
     </section>
   </main>
 
@@ -283,14 +290,18 @@ function persistQueue() {
 function updateQueueAddButton() {
   if (selectedTitles.size) {
     queueAddButton.disabled = false;
-    queueAddButton.textContent = `add selected (${selectedTitles.size})`;
+    const label = `Add ${selectedTitles.size} selected ${selectedTitles.size === 1 ? 'cassette' : 'cassettes'}`;
+    queueAddButton.setAttribute('aria-label', label);
+    queueAddButton.title = label;
     return;
   }
   const album = currentAlbum
     ? catalog.albums.find((candidate) => candidate.title === currentAlbum)
     : null;
   queueAddButton.disabled = !album;
-  queueAddButton.textContent = album ? `add album (${album.tracks.length})` : 'add selected';
+  const label = album ? `Add album with ${album.tracks.length} cassettes` : 'Add selected cassettes';
+  queueAddButton.setAttribute('aria-label', label);
+  queueAddButton.title = label;
 }
 
 function renderQueue() {
@@ -301,9 +312,9 @@ function renderQueue() {
     const current = document.createElement('li');
     current.className = 'queue-item is-current is-external';
     current.innerHTML = `
-      <span class="queue-index">now</span>
+      <span class="queue-index queue-current-icon" aria-label="Now playing" title="Now playing">▶</span>
       <span class="queue-title-window"><span class="queue-title-text">${selected.title}</span></span>
-      <span class="queue-source">direct</span>
+      <span class="queue-source queue-source-icon" aria-label="Direct play" title="Direct play">↗</span>
     `;
     queueList.append(current);
   }

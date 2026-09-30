@@ -3021,3 +3021,174 @@ footer {
     width: 100%;
   }
 }
+
+/* Scoped typography: enlarge each scene without changing the approved queue hierarchy. */
+h1 {
+  font-size: clamp(38px, 5vw, 76px);
+}
+
+.eyebrow,
+.mast-copy {
+  font-size: 13.3333px;
+}
+
+.random-play {
+  box-sizing: border-box;
+  min-width: 380px;
+  padding: 18px 24px 18px 76px;
+}
+
+.random-play strong {
+  margin-top: 0;
+  font-size: 26px;
+}
+
+.shuffle-icon {
+  left: 20px;
+  width: 42px;
+  height: 42px;
+}
+
+.search {
+  height: 62px;
+}
+
+.search span,
+.shelf-head {
+  font-size: 14.6667px;
+}
+
+.shelf-head {
+  min-height: 42px;
+}
+
+.search input {
+  font-size: 18.6667px;
+}
+
+.pixel-button {
+  font-size: 13.3333px;
+}
+
+.cover-card strong {
+  font-size: 17.3333px;
+}
+
+.cover-card small {
+  font-size: 13.3333px;
+}
+
+.queue-select {
+  width: 38px;
+  height: 38px;
+  font-size: 22px;
+}
+
+.queue-actions button {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.queue-action-icon {
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+}
+
+.queue-item.is-external {
+  grid-template-columns: 36px minmax(0, 1fr) 36px;
+  column-gap: 8px;
+  padding-inline: 14px;
+}
+
+.queue-current-icon,
+.queue-source-icon {
+  font-size: 20px;
+  line-height: 1;
+  text-align: center;
+}
+
+.drop-hint,
+.showcase-copy span {
+  font-size: 14.6667px;
+}
+
+.status {
+  font-size: 13.3333px;
+}
+
+.transport-button span {
+  font-size: 17.3333px;
+}
+
+.transport-button small {
+  font-size: 10.6667px;
+}
+
+.canvas-help,
+.crt-back-button,
+.crt-isolation-button {
+  font-size: 16.6667px;
+}
+
+.canvas-help {
+  padding: 10px 12px;
+}
+
+.crt-controls {
+  gap: 6px;
+  padding: 9px 10px;
+}
+
+.crt-controls span,
+.crt-controls button {
+  font-size: 15px;
+}
+
+.crt-controls button {
+  padding: 6px 8px;
+}
+
+.crt-back-button,
+.crt-isolation-button {
+  min-width: 42px;
+  min-height: 42px;
+  padding: 7px 10px;
+}
+
+@media (min-width: 1181px) {
+  h1 {
+    font-size: clamp(30px, 3.2vw, 54px);
+  }
+}
+
+@media (max-width: 650px) {
+  .eyebrow,
+  .mast-copy {
+    font-size: 14px;
+  }
+
+  .random-play {
+    min-width: 0;
+    padding: 15px 18px 15px 64px;
+  }
+
+  .random-play strong {
+    font-size: 22px;
+  }
+
+  .shuffle-icon {
+    left: 16px;
+    width: 36px;
+    height: 36px;
+  }
+
+  .queue-item.is-external {
+    grid-template-columns: 36px minmax(0, 1fr) 36px;
+    min-height: 64px;
+  }
+}
