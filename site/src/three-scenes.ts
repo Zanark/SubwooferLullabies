@@ -1610,11 +1610,44 @@ export function createBoxScene(
 
         const ballX = Math.round(width * pong.ballX);
         const ballY = Math.round(height * pong.ballY);
-        const pulseSize = Math.round(6 + pong.beatPulse * 5 + pong.impactPulse * 3);
         crtContext.globalCompositeOperation = 'screen';
-        crtContext.globalAlpha = 0.18 + pong.beatPulse * 0.34 + pong.impactPulse * 0.28;
+        const impactSize = Math.round(6 + pong.impactPulse * 5);
+        crtContext.globalAlpha = 0.12 + pong.impactPulse * 0.28;
         crtContext.fillStyle = '#64c9bd';
-        crtContext.fillRect(ballX - pulseSize, ballY - pulseSize, pulseSize * 2, pulseSize * 2);
+        crtContext.fillRect(ballX - impactSize, ballY - impactSize, impactSize * 2, impactSize * 2);
+
+        if (pong.beatPulse > 0.01) {
+          const sparkLimit = 30;
+          const sparkRadius = Math.min(sparkLimit, 8 + pong.beatPulse * 22);
+          const sparkRotation = time * 1.8;
+          crtContext.strokeStyle = '#52bfff';
+          crtContext.lineWidth = 1.5 + pong.beatPulse * 2.5;
+          crtContext.globalAlpha = 0.52 + pong.beatPulse * 0.38;
+          crtContext.lineCap = 'square';
+          for (let ray = 0; ray < 12; ray++) {
+            const angle = sparkRotation + ray / 12 * Math.PI * 2;
+            const variation = 0.78 + Math.sin(ray * 4.7 + time * 13) * 0.16;
+            const outerRadius = Math.min(sparkLimit, sparkRadius * variation);
+            const innerRadius = 6 + pong.beatPulse * 2;
+            const middleRadius = innerRadius + (outerRadius - innerRadius) * 0.48;
+            const bend = Math.sin(ray * 7.3 + time * 19) * (2 + pong.beatPulse * 3);
+            crtContext.beginPath();
+            crtContext.moveTo(
+              ballX + Math.cos(angle) * innerRadius,
+              ballY + Math.sin(angle) * innerRadius,
+            );
+            crtContext.lineTo(
+              ballX + Math.cos(angle) * middleRadius - Math.sin(angle) * bend,
+              ballY + Math.sin(angle) * middleRadius + Math.cos(angle) * bend,
+            );
+            crtContext.lineTo(
+              ballX + Math.cos(angle) * outerRadius,
+              ballY + Math.sin(angle) * outerRadius,
+            );
+            crtContext.stroke();
+          }
+        }
+
         crtContext.globalAlpha = 1;
         crtContext.fillStyle = '#fff4bc';
         crtContext.fillRect(ballX - 4, ballY - 4, 8, 8);
