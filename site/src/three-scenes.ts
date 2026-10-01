@@ -3283,36 +3283,148 @@ export function createPlayerScene(
   canvas.addEventListener('pointerleave', onPointerLeave);
 
   const headphoneGroup = new THREE.Group();
-  const curve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-4.2, -1.0, -0.45),
-    new THREE.Vector3(-4.1, 3.35, -0.5),
-    new THREE.Vector3(0, 5.5, -0.65),
-    new THREE.Vector3(4.1, 3.35, -0.5),
-    new THREE.Vector3(4.2, -1.0, -0.45),
+  const bandCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-4.15, 1.15, -0.72),
+    new THREE.Vector3(-3.78, 3.8, -0.76),
+    new THREE.Vector3(0, 5.55, -0.82),
+    new THREE.Vector3(3.78, 3.8, -0.76),
+    new THREE.Vector3(4.15, 1.15, -0.72),
   ]);
   const band = new THREE.Mesh(
-    new THREE.TubeGeometry(curve, 14, 0.18, 6, false),
-    material(COLORS.metal, { metalness: 0.2 }),
+    new THREE.TubeGeometry(bandCurve, 20, 0.32, 6, false),
+    material(0x17191b, { roughness: 0.7 }),
   );
   headphoneGroup.add(band);
-  for (const x of [-4.18, 4.18]) {
-    const ear = new THREE.Mesh(
-      new THREE.CapsuleGeometry(0.5, 1.35, 2, 6),
-      material(COLORS.orange),
+
+  const bandHighlightCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-4.1, 1.25, -0.38),
+    new THREE.Vector3(-3.68, 3.76, -0.42),
+    new THREE.Vector3(0, 5.38, -0.48),
+    new THREE.Vector3(3.68, 3.76, -0.42),
+    new THREE.Vector3(4.1, 1.25, -0.38),
+  ]);
+  headphoneGroup.add(new THREE.Mesh(
+    new THREE.TubeGeometry(bandHighlightCurve, 20, 0.085, 5, false),
+    material(0x8d9290, { metalness: 0.42, roughness: 0.42 }),
+  ));
+
+  const grilleHoleGeometry = new THREE.CylinderGeometry(0.035, 0.035, 0.035, 5);
+  const grilleHoleMaterial = material(0x172124, { roughness: 1 });
+  for (const side of [-1, 1]) {
+    const ear = new THREE.Group();
+    ear.position.set(side * 4.16, -1.18, 0.02);
+    ear.rotation.z = side * -0.08;
+
+    const sliderHousing = box(0.62, 1.55, 0.42, 0x17191b, [0, 1.95, -0.5]);
+    const sliderWindow = box(0.34, 0.78, 0.12, 0x485052, [0, 1.94, -0.24]);
+    const exposedRail = box(0.28, 1.5, 0.22, 0xa5aaa4, [0, 0.72, -0.36]);
+    const yoke = box(0.92, 1.05, 0.38, 0x8d9290, [0, -0.08, -0.24]);
+    const pivot = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.11, 0.11, 0.42, 8),
+      material(0x333b3c, { metalness: 0.3 }),
     );
-    ear.position.set(x, -1.0, 0);
-    ear.rotation.z = x < 0 ? 0.12 : -0.12;
+    pivot.rotation.x = Math.PI / 2;
+    pivot.position.set(0, 0.05, 0.04);
+
+    const cupBack = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.02, 1.02, 0.42, 12),
+      material(0x24292a, { roughness: 0.78 }),
+    );
+    cupBack.rotation.z = Math.PI / 2;
+    cupBack.position.set(0, -0.83, 0);
+
+    const foam = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.15, 1.15, 0.58, 12),
+      material(COLORS.orange, {
+        emissive: 0x5f2107,
+        emissiveIntensity: 0.12,
+        roughness: 0.94,
+      }),
+    );
+    foam.rotation.z = Math.PI / 2;
+    foam.position.set(-side * 0.12, -0.83, 0);
+
+    const foamBevel = new THREE.Mesh(
+      new THREE.TorusGeometry(0.84, 0.27, 6, 12),
+      material(0xe27027, { roughness: 0.9 }),
+    );
+    foamBevel.rotation.y = Math.PI / 2;
+    foamBevel.position.set(-side * 0.31, -0.83, 0);
+
+    const earCap = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.74, 0.78, 0.26, 12),
+      material(0xb2b5ad, { metalness: 0.48, roughness: 0.38 }),
+    );
+    earCap.rotation.z = Math.PI / 2;
+    earCap.position.set(side * 0.3, -0.83, 0);
+
+    const earCapInset = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.57, 0.57, 0.05, 12),
+      material(0x7d8583, { metalness: 0.2, roughness: 0.66 }),
+    );
+    earCapInset.rotation.z = Math.PI / 2;
+    earCapInset.position.set(side * 0.43, -0.83, 0);
+
+    for (let row = -2; row <= 2; row++) {
+      for (let column = -3; column <= 3; column++) {
+        if (column * column + row * row > 10) continue;
+        const hole = new THREE.Mesh(grilleHoleGeometry, grilleHoleMaterial);
+        hole.rotation.z = Math.PI / 2;
+        hole.position.set(side * 0.49, -0.83 + row * 0.125, column * 0.13);
+        ear.add(hole);
+      }
+    }
+
+    const channelCanvas = document.createElement('canvas');
+    channelCanvas.width = 64;
+    channelCanvas.height = 64;
+    const channelContext = channelCanvas.getContext('2d')!;
+    channelContext.fillStyle = '#222829';
+    channelContext.font = '700 36px monospace';
+    channelContext.textAlign = 'center';
+    channelContext.textBaseline = 'middle';
+    channelContext.fillText(side < 0 ? 'L' : 'R', 32, 34);
+    const channelMark = new THREE.CanvasTexture(channelCanvas);
+    channelMark.colorSpace = THREE.SRGBColorSpace;
+    channelMark.magFilter = THREE.NearestFilter;
+    channelMark.minFilter = THREE.LinearFilter;
+    channelMark.userData.owned = true;
+    const channelFace = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.18, 0.18),
+      textureMaterial(channelMark),
+    );
+    channelFace.rotation.y = side * Math.PI / 2;
+    channelFace.position.set(side * 0.5, -1.36, 0);
+
+    ear.add(
+      sliderHousing,
+      sliderWindow,
+      exposedRail,
+      yoke,
+      pivot,
+      cupBack,
+      foam,
+      foamBevel,
+      earCap,
+      earCapInset,
+      channelFace,
+    );
     headphoneGroup.add(ear);
   }
   rig.add(headphoneGroup);
 
-  const cableCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(4.2, -1.65, -0.15),
-    new THREE.Vector3(4.7, -3.4, -0.3),
-    new THREE.Vector3(4.35, -5.3, -0.6),
-    new THREE.Vector3(3.5, -6.7, -0.8),
-  ]);
-  rig.add(new THREE.Mesh(new THREE.TubeGeometry(cableCurve, 8, 0.08, 5, false), material(COLORS.dark)));
+  for (const side of [-1, 1]) {
+    const cableCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(side * 4.16, -2.08, -0.02),
+      new THREE.Vector3(side * 4.58, -3.2, -0.18),
+      new THREE.Vector3(side * 4.28, -4.9, -0.5),
+      new THREE.Vector3(side * 3.45, -6.7, -0.82),
+    ]);
+    rig.add(new THREE.Mesh(
+      new THREE.TubeGeometry(cableCurve, 10, 0.075, 5, false),
+      material(COLORS.dark),
+    ));
+  }
 
   const disposeScene = animateScene(renderer, scene, camera, resize, (time, delta) => {
     const aspect = canvas.clientWidth / Math.max(canvas.clientHeight, 1);
