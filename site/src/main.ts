@@ -430,9 +430,12 @@ function songCard(song: Song) {
       ${selectedTitles.has(song.title) ? '✓' : '+'}
     </button>
   `;
-  card.querySelector<HTMLButtonElement>('.cover-card-main')!.addEventListener('click', () => {
+  card.querySelector<HTMLButtonElement>('.cover-card-main')!.addEventListener('click', async () => {
+    if (loading) return;
     activeQueueId = null;
-    void loadCassette(song, false, null, true);
+    playTransportClick();
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    await loadCassette(song, true, null, true);
   });
   card.querySelector<HTMLButtonElement>('.queue-select')!.addEventListener('click', () => {
     if (selectedTitles.has(song.title)) selectedTitles.delete(song.title);

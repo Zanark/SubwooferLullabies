@@ -52,10 +52,11 @@ flowchart TB
     O --> K
 ```
 
-Grid-card clicks load directly into the player without dimming the page, making the
-player glow or running the cassette inspection. Flows that retain the transparent
-inspection rotate the cassette for two seconds, showing its handwritten title on the
-front and the track artwork on the back without replacing the room with a theater.
+Grid-card clicks play the physical transport thunk, wait 30ms, then load and autoplay
+directly without dimming the page, making the player glow or running the cassette
+inspection. Flows that retain the transparent inspection rotate the cassette for two
+seconds, showing its handwritten title on the front and the track artwork on the back
+without replacing the room with a theater.
 
 ## 2. Finding and handling tapes
 
@@ -63,9 +64,10 @@ The library offers three paths into the same physical interaction:
 
 - Search matches song titles only. Matching cassettes rise from the desk, rotate and
   sit under warm spotlights whose sources remain above the visible room framing.
-- Album and standalone cover cards open a grid of songs. Clicking a song loads it
-  directly without player focus or cassette rotation; dragging the card keeps the
-  physical cassette-handling flow. A song can also be selected for the queue.
+- Album and standalone cover cards open a grid of songs. Clicking a song plays the
+  transport thunk and automatically starts it after a 30ms mechanical pause, without
+  player focus or cassette rotation. Dragging the card keeps the physical
+  cassette-handling flow. A song can also be selected for the queue.
 - **Play a random tape** chooses a non-current song without clearing or rearranging
   the saved queue.
 
