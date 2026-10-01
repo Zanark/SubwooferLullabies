@@ -196,7 +196,7 @@ adaptive waveform gain keep quieter recordings visibly responsive.
 | `rain` | Classic time-driven Matrix rain with fixed-speed green code columns, bright heads and fading trails; no audio or beat reactivity |
 | `tesla` | Central audio coil with vectors-style adaptive waveform sensitivity driving bolt reach, direction, thickness and jagged motion |
 | `radar` | Circular phosphor scope with a constant-speed sweep and targets that illuminate only on detected beats |
-| `stars` | Constant-speed radial space flight with outward-moving stars and depth-lengthened trails; no audio reactivity |
+| `stars` | Constant-speed radial space flight behind a centered low-poly pixel spacecraft, with outward-moving stars and depth-lengthened trails; no audio reactivity |
 | `reaction` | Pixelated Gray-Scott reaction-diffusion colonies with beat-seeded growth and frequency-shaped chemistry |
 | `copper` | Moving horizontal raster/copper bands |
 | `boids` | Flocking pixel birds whose speed, spacing and formation react across the live spectrum |
