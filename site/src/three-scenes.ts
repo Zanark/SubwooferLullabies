@@ -1286,8 +1286,13 @@ export function createBoxScene(
   };
   const fireworks = {
     lastTime: 0,
-    beatLatched: false,
-    beatCount: 0,
+    lowEnvelope: 0,
+    highEnvelope: 0,
+    previousLow: 0,
+    previousHigh: 0,
+    lowLatched: false,
+    highLatched: false,
+    lastLaunchTime: -Infinity,
     rockets: [] as {
       x: number;
       y: number;
@@ -2352,23 +2357,46 @@ export function createBoxScene(
           ? Math.min(time - fireworks.lastTime, 0.05)
           : 1 / 60;
         fireworks.lastTime = time;
-        const fireworkBeatTriggered = beat > 0.055 && !fireworks.beatLatched;
-        if (fireworkBeatTriggered) {
-          fireworks.beatLatched = true;
-          fireworks.beatCount += 1;
-          if (fireworks.beatCount % 2 === 0) {
-            fireworks.rockets.push({
-              x: width * (0.12 + Math.random() * 0.76),
-              y: height + 8,
-              targetY: height * (0.14 + Math.random() * 0.5),
-              speed: 125 + Math.random() * 85,
-              drift: -14 + Math.random() * 28,
-              color: Math.floor(Math.random() * colors.length),
-            });
-          }
-        } else if (beat < 0.025) {
-          fireworks.beatLatched = false;
+        const lowSignal = Math.pow(averageBand(0, 0.18), 0.72);
+        const highSignal = Math.pow(averageBand(0.16, 0.58), 0.72);
+        const lowRise = Math.max(0, lowSignal - fireworks.previousLow);
+        const highRise = Math.max(0, highSignal - fireworks.previousHigh);
+        const lowPeak = Math.max(0, lowSignal - fireworks.lowEnvelope);
+        const highPeak = Math.max(0, highSignal - fireworks.highEnvelope);
+        const lowTriggered = lowSignal > 0.075 && (lowPeak > 0.028 || lowRise > 0.018);
+        const highTriggered = highSignal > 0.045 && (highPeak > 0.018 || highRise > 0.012);
+        const lowOnset = lowTriggered && !fireworks.lowLatched;
+        const highOnset = highTriggered && !fireworks.highLatched;
+        if (lowOnset) fireworks.lowLatched = true;
+        else if (lowPeak < 0.012 && lowRise < 0.006) fireworks.lowLatched = false;
+        if (highOnset) fireworks.highLatched = true;
+        else if (highPeak < 0.009 && highRise < 0.004) fireworks.highLatched = false;
+        const launchReady = time - fireworks.lastLaunchTime >= 0.38;
+        if (crtPlaying && launchReady && (lowOnset || highOnset)) {
+          const peakStrength = THREE.MathUtils.clamp(
+            Math.max(
+              lowPeak * 2.5 + lowRise * 1.8,
+              highPeak * 2.8 + highRise * 2.1,
+            ),
+            0,
+            1,
+          );
+          fireworks.lastLaunchTime = time;
+          fireworks.rockets.push({
+            x: width * (0.12 + Math.random() * 0.76),
+            y: height + 8,
+            targetY: height * (0.14 + Math.random() * 0.5),
+            speed: 135 + Math.random() * 75 + peakStrength * 45,
+            drift: -14 + Math.random() * 28,
+            color: Math.floor(Math.random() * colors.length),
+          });
         }
+        fireworks.lowEnvelope += (lowSignal - fireworks.lowEnvelope)
+          * (lowSignal > fireworks.lowEnvelope ? 0.055 : 0.16);
+        fireworks.highEnvelope += (highSignal - fireworks.highEnvelope)
+          * (highSignal > fireworks.highEnvelope ? 0.065 : 0.19);
+        fireworks.previousLow = lowSignal;
+        fireworks.previousHigh = highSignal;
 
         for (let rocket = fireworks.rockets.length - 1; rocket >= 0; rocket--) {
           const activeRocket = fireworks.rockets[rocket];
@@ -2870,8 +2898,13 @@ export function createBoxScene(
       }
       if (mode === 'fireworks' && visualizerMode !== 'fireworks') {
         fireworks.lastTime = 0;
-        fireworks.beatLatched = false;
-        fireworks.beatCount = 0;
+        fireworks.lowEnvelope = 0;
+        fireworks.highEnvelope = 0;
+        fireworks.previousLow = 0;
+        fireworks.previousHigh = 0;
+        fireworks.lowLatched = false;
+        fireworks.highLatched = false;
+        fireworks.lastLaunchTime = -Infinity;
         fireworks.rockets.length = 0;
         fireworks.bursts.length = 0;
       }
