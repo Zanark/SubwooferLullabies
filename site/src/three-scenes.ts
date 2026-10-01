@@ -1300,6 +1300,8 @@ export function createBoxScene(
       speed: number;
       drift: number;
       color: number;
+      sparkSeed: number;
+      trail: { x: number; y: number }[];
     }[],
     bursts: [] as {
       x: number;
@@ -2401,6 +2403,8 @@ export function createBoxScene(
             speed: 135 + Math.random() * 75 + peakStrength * 45,
             drift: -14 + Math.random() * 28,
             color: Math.floor(Math.random() * colors.length),
+            sparkSeed: Math.random() * Math.PI * 2,
+            trail: [],
           });
         }
         fireworks.lowEnvelope += (lowSignal - fireworks.lowEnvelope)
@@ -2414,6 +2418,8 @@ export function createBoxScene(
           const activeRocket = fireworks.rockets[rocket];
           activeRocket.y -= activeRocket.speed * fireworkDelta;
           activeRocket.x += activeRocket.drift * fireworkDelta;
+          activeRocket.trail.unshift({ x: activeRocket.x, y: activeRocket.y });
+          if (activeRocket.trail.length > 14) activeRocket.trail.pop();
           if (activeRocket.y <= activeRocket.targetY) {
             const particleCount = 18 + Math.floor(Math.random() * 15);
             fireworks.bursts.push({
@@ -2433,12 +2439,47 @@ export function createBoxScene(
         }
 
         for (const activeRocket of fireworks.rockets) {
+          crtContext.globalCompositeOperation = 'screen';
+          for (let point = activeRocket.trail.length - 1; point >= 0; point--) {
+            const trailPoint = activeRocket.trail[point];
+            const strength = 1 - point / Math.max(1, activeRocket.trail.length - 1);
+            const taper = Math.pow(strength, 1.35);
+            const wobble = Math.sin(activeRocket.sparkSeed + point * 1.7 + time * 12)
+              * Math.min(3.5, point * 0.24);
+            const x = trailPoint.x + wobble;
+            const size = 1.5 + taper * 3.5;
+            crtContext.fillStyle = colors[activeRocket.color];
+            crtContext.globalAlpha = taper * 0.12;
+            crtContext.fillRect(x - size / 2 - 2, trailPoint.y - size / 2 - 2, size + 4, size + 4);
+            crtContext.globalAlpha = taper * 0.68;
+            crtContext.fillRect(x - size / 2, trailPoint.y - size / 2, size, size);
+            if (point < 5) {
+              crtContext.fillStyle = '#fff5ce';
+              crtContext.globalAlpha = taper * 0.72;
+              crtContext.fillRect(x - 1, trailPoint.y - 1, 2, 2);
+            }
+          }
+
+          for (let spark = 0; spark < 4; spark++) {
+            const sparkAge = (time * 5.5 + activeRocket.sparkSeed + spark * 0.27) % 1;
+            const sparkSide = spark % 2 ? 1 : -1;
+            const sparkX = activeRocket.x
+              + sparkSide * (2 + sparkAge * 7)
+              + Math.sin(activeRocket.sparkSeed * 3 + spark * 2.4) * 2;
+            const sparkY = activeRocket.y + 6 + sparkAge * 19;
+            const sparkSize = sparkAge < 0.45 ? 2 : 1;
+            crtContext.fillStyle = spark % 3 === 0 ? '#fff5ce' : colors[activeRocket.color];
+            crtContext.globalAlpha = Math.pow(1 - sparkAge, 1.4) * 0.78;
+            crtContext.fillRect(sparkX, sparkY, sparkSize, sparkSize);
+          }
+
           crtContext.fillStyle = colors[activeRocket.color];
-          crtContext.globalAlpha = 0.38;
-          crtContext.fillRect(activeRocket.x - 1, activeRocket.y + 5, 3, 22);
+          crtContext.globalAlpha = 0.26;
+          crtContext.fillRect(activeRocket.x - 5, activeRocket.y - 5, 11, 11);
           crtContext.fillStyle = '#fff5ce';
           crtContext.globalAlpha = 0.95;
           crtContext.fillRect(activeRocket.x - 3, activeRocket.y - 3, 7, 7);
+          crtContext.globalCompositeOperation = 'source-over';
         }
 
         for (let burst = fireworks.bursts.length - 1; burst >= 0; burst--) {

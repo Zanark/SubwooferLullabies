@@ -192,7 +192,7 @@ adaptive waveform gain keep quieter recordings visibly responsive.
 | `boids` | Flocking pixel birds whose speed, spacing and formation react across the live spectrum |
 | `metaballs` | Audio-sized chunky scalar-field blobs |
 | `synthwave` | Fixed neon sun and skyline with a slow time-driven perspective road; only mirrored horizon bars react to the live spectrum |
-| `fireworks` | Bottom-launched rockets driven by adaptive low-frequency hits and high-frequency transients, with a short anti-spam cooldown; each rises to a randomized height before an independent pixel-particle burst |
+| `fireworks` | Bottom-launched rockets driven by adaptive low/high transients, with curved layered pixel trails, glowing cores and shed embers before randomized-height particle bursts |
 
 ![Contact sheet showing the CRT signal modes over the same playing cover.](assets/crt-signals-contact-sheet.png)
 
