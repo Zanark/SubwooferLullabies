@@ -167,7 +167,7 @@ adaptive waveform gain keep quieter recordings visibly responsive.
 | `sequencer` | Scanning hardware step grid with frequency-driven pads |
 | `metaballs` | Audio-sized chunky scalar-field blobs |
 | `synthwave` | Fixed neon sun and skyline with a continuously advancing perspective grid and road markers |
-| `fireworks` | Pixel particle bursts with band-driven radius and brightness |
+| `fireworks` | Bottom-launched rockets on every second detected beat, each rising to a randomized height before an independent pixel-particle burst |
 
 ![Contact sheet showing the CRT signal modes over the same playing cover.](assets/crt-signals-contact-sheet.png)
 

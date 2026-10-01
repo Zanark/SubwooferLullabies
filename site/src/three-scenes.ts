@@ -1283,6 +1283,31 @@ export function createBoxScene(
     beatLatched: false,
     blipLevels: new Float32Array(8),
   };
+  const fireworks = {
+    lastTime: 0,
+    beatLatched: false,
+    beatCount: 0,
+    rockets: [] as {
+      x: number;
+      y: number;
+      targetY: number;
+      speed: number;
+      drift: number;
+      color: number;
+    }[],
+    bursts: [] as {
+      x: number;
+      y: number;
+      age: number;
+      duration: number;
+      particles: {
+        angle: number;
+        speed: number;
+        size: number;
+        color: number;
+      }[];
+    }[],
+  };
   const crtLightColor = new THREE.Color(0x8fcbd1);
 
   function updateCrtLightColor(image: CanvasImageSource) {
@@ -2093,37 +2118,81 @@ export function createBoxScene(
         crtContext.fillStyle = 'rgba(3,5,16,.76)';
         crtContext.fillRect(0, 0, width, height);
         const colors = ['#f4d789', '#e66a32', '#64c9bd', '#d88cff', '#f06eaa'];
-        const burstCount = 8;
-        for (let burst = 0; burst < burstCount; burst++) {
-          const bandEnergy = sensitiveBand(burst / burstCount, (burst + 1) / burstCount, 2);
-          const phase = (
-            time * (0.105 + burst * 0.004 + smoothedEnergy * 0.035)
-            + burst / burstCount
-          ) % 1;
-          const centerX = width * (0.16 + (burst * 0.173 % 0.68));
-          const centerY = height * (0.2 + (burst * 0.271 % 0.48));
-          const radius = Math.pow(phase, 0.72) * (58 + bandEnergy * 106);
-          const fade = Math.pow(Math.sin(phase * Math.PI), 0.62);
-          const particles = 18 + burst % 3 * 5;
-          if (phase < 0.16) {
-            const flash = (1 - phase / 0.16) * (8 + bandEnergy * 15 + beat * 10);
-            crtContext.fillStyle = '#fff5ce';
-            crtContext.globalAlpha = 0.4 + bandEnergy * 0.5;
-            crtContext.fillRect(centerX - flash / 2, centerY - flash / 2, flash, flash);
+        const fireworkDelta = fireworks.lastTime
+          ? Math.min(time - fireworks.lastTime, 0.05)
+          : 1 / 60;
+        fireworks.lastTime = time;
+        const fireworkBeatTriggered = beat > 0.055 && !fireworks.beatLatched;
+        if (fireworkBeatTriggered) {
+          fireworks.beatLatched = true;
+          fireworks.beatCount += 1;
+          if (fireworks.beatCount % 2 === 0) {
+            fireworks.rockets.push({
+              x: width * (0.12 + Math.random() * 0.76),
+              y: height + 8,
+              targetY: height * (0.14 + Math.random() * 0.5),
+              speed: 125 + Math.random() * 85,
+              drift: -14 + Math.random() * 28,
+              color: Math.floor(Math.random() * colors.length),
+            });
           }
-          for (let particle = 0; particle < particles; particle++) {
-            const angle = particle / particles * Math.PI * 2 + burst * 0.63;
-            const gravity = phase * phase * 34;
-            const x = centerX + Math.cos(angle) * radius;
-            const y = centerY + Math.sin(angle) * radius * 0.72 + gravity;
-            const size = 3 + bandEnergy * 5 + beat * 3;
-            crtContext.fillStyle = colors[(burst + particle) % colors.length];
-            crtContext.globalAlpha = fade * (0.42 + bandEnergy * 0.58);
+        } else if (beat < 0.025) {
+          fireworks.beatLatched = false;
+        }
+
+        for (let rocket = fireworks.rockets.length - 1; rocket >= 0; rocket--) {
+          const activeRocket = fireworks.rockets[rocket];
+          activeRocket.y -= activeRocket.speed * fireworkDelta;
+          activeRocket.x += activeRocket.drift * fireworkDelta;
+          if (activeRocket.y <= activeRocket.targetY) {
+            const particleCount = 18 + Math.floor(Math.random() * 15);
+            fireworks.bursts.push({
+              x: activeRocket.x,
+              y: activeRocket.targetY,
+              age: 0,
+              duration: 1.25 + Math.random() * 0.85,
+              particles: Array.from({ length: particleCount }, (_, particle) => ({
+                angle: particle / particleCount * Math.PI * 2 + Math.random() * 0.22,
+                speed: 42 + Math.random() * 92,
+                size: 2 + Math.random() * 4,
+                color: (activeRocket.color + Math.floor(Math.random() * 3)) % colors.length,
+              })),
+            });
+            fireworks.rockets.splice(rocket, 1);
+          }
+        }
+
+        for (const activeRocket of fireworks.rockets) {
+          crtContext.fillStyle = colors[activeRocket.color];
+          crtContext.globalAlpha = 0.38;
+          crtContext.fillRect(activeRocket.x - 1, activeRocket.y + 5, 3, 22);
+          crtContext.fillStyle = '#fff5ce';
+          crtContext.globalAlpha = 0.95;
+          crtContext.fillRect(activeRocket.x - 3, activeRocket.y - 3, 7, 7);
+        }
+
+        for (let burst = fireworks.bursts.length - 1; burst >= 0; burst--) {
+          const activeBurst = fireworks.bursts[burst];
+          activeBurst.age += fireworkDelta;
+          const progress = activeBurst.age / activeBurst.duration;
+          if (progress >= 1) {
+            fireworks.bursts.splice(burst, 1);
+            continue;
+          }
+          const fade = Math.pow(1 - progress, 0.72);
+          for (const particle of activeBurst.particles) {
+            const distance = particle.speed * activeBurst.age * (1 - progress * 0.2);
+            const gravity = activeBurst.age * activeBurst.age * 34;
+            const x = activeBurst.x + Math.cos(particle.angle) * distance;
+            const y = activeBurst.y + Math.sin(particle.angle) * distance + gravity;
+            const size = particle.size * (0.55 + fade * 0.75);
+            crtContext.fillStyle = colors[particle.color];
+            crtContext.globalAlpha = fade * 0.92;
             crtContext.fillRect(x - size / 2, y - size / 2, size, size);
-            crtContext.globalAlpha *= 0.46;
+            crtContext.globalAlpha = fade * 0.32;
             crtContext.fillRect(
-              x - Math.cos(angle) * (10 + phase * 9) - size / 2,
-              y - Math.sin(angle) * (8 + phase * 7) - size / 2,
+              x - Math.cos(particle.angle) * 9 - size / 2,
+              y - Math.sin(particle.angle) * 7 - size / 2,
               size,
               size,
             );
@@ -2564,6 +2633,13 @@ export function createBoxScene(
         radar.lastTime = 0;
         radar.beatLatched = false;
         radar.blipLevels.fill(0);
+      }
+      if (mode === 'fireworks' && visualizerMode !== 'fireworks') {
+        fireworks.lastTime = 0;
+        fireworks.beatLatched = false;
+        fireworks.beatCount = 0;
+        fireworks.rockets.length = 0;
+        fireworks.bursts.length = 0;
       }
       visualizerMode = mode;
     },
