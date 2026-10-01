@@ -130,6 +130,8 @@ Users can:
 
 The current direct/random track appears separately from the saved entries. This keeps
 spontaneous playback from silently destroying a carefully arranged queue.
+The queue panel keeps a fixed responsive height; long queues scroll vertically inside
+the panel instead of stretching the library/queue row or lengthening the page.
 
 ## 5. Zanark's room
 

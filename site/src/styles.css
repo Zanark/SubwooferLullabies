@@ -1410,10 +1410,12 @@ body.playing .reel {
     margin: 0;
     padding: 0 3px 10px 0;
     overflow-y: auto;
+    overscroll-behavior: contain;
     flex: 1;
     flex-direction: column;
     gap: 5px;
     list-style: none;
+    scrollbar-gutter: stable;
     scrollbar-color: var(--orange) #120c0f;
   }
 
@@ -1422,6 +1424,7 @@ body.playing .reel {
     grid-template-columns: minmax(0, 1fr) auto;
     min-height: 38px;
     border: 1px solid #4e3430;
+    flex: 0 0 auto;
     background: rgba(12, 10, 13, .86);
   }
 
@@ -2218,7 +2221,9 @@ body.theater-mode .status {
   }
 
   .queue-panel {
+    height: 320px;
     min-height: 320px;
+    max-height: 320px;
   }
 
   .cover-grid {
@@ -3273,11 +3278,18 @@ footer {
     height: auto;
     min-height: calc(100vh - 102px);
   }
+
+  .queue-panel {
+    height: 420px;
+    max-height: 420px;
+  }
 }
 
 @media (max-width: 650px) {
   .queue-panel {
+    height: 720px;
     min-height: 720px;
+    max-height: 720px;
   }
 
   .queue-head span {
