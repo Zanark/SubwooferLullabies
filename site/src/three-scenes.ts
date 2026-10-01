@@ -3565,7 +3565,7 @@ export function createPlayerScene(
 
     const earpiece = new THREE.Group();
     earpiece.position.y = -0.83;
-    earpiece.scale.setScalar(2.25);
+    earpiece.scale.setScalar(1.5);
 
     const cupBack = new THREE.Mesh(
       new THREE.CylinderGeometry(1.02, 1.02, 0.42, 12),
