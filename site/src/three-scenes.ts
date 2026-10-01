@@ -2270,16 +2270,28 @@ export function createBoxScene(
 
         const buildings = 18;
         for (let building = 0; building < buildings; building++) {
-          const buildingEnergy = sensitiveBand(building / buildings, (building + 1) / buildings, 2);
           const buildingWidth = width / buildings + 1;
-          const buildingHeight = 12 + buildingEnergy * 78;
+          const buildingHeight = 8 + ((building * 29 + 17) % 21);
           const x = building * width / buildings;
           crtContext.fillStyle = building % 3 ? '#24143f' : '#34194f';
           crtContext.fillRect(x, horizon - buildingHeight, buildingWidth, buildingHeight);
-          crtContext.fillStyle = building % 2 ? '#ff72db' : '#63e7ff';
-          crtContext.globalAlpha = 0.34 + buildingEnergy * 0.52;
-          crtContext.fillRect(x + buildingWidth * 0.42, horizon - buildingHeight, 2, buildingHeight);
         }
+
+        const barPairs = 7;
+        const barSpacing = width * 0.035;
+        for (let bar = 0; bar < barPairs; bar++) {
+          const barEnergy = sensitiveBand(bar / barPairs, (bar + 1) / barPairs, 2.2);
+          const barHeight = 8 + barEnergy * 72;
+          const barWidth = 3 + barEnergy * 2;
+          const inset = 10 + bar * barSpacing;
+          const leftX = inset;
+          const rightX = width - inset - barWidth;
+          crtContext.fillStyle = bar % 2 ? '#ff72db' : '#63e7ff';
+          crtContext.globalAlpha = 0.38 + barEnergy * 0.58;
+          crtContext.fillRect(leftX, horizon - barHeight, barWidth, barHeight);
+          crtContext.fillRect(rightX, horizon - barHeight, barWidth, barHeight);
+        }
+
         crtContext.globalAlpha = 1;
         crtContext.strokeStyle = '#4de8ff';
         crtContext.lineWidth = 1.5;
@@ -2289,7 +2301,7 @@ export function createBoxScene(
           crtContext.lineTo(width / 2 + lane * 42, height);
           crtContext.stroke();
         }
-        const travelPhase = time * 0.7 % 1;
+        const travelPhase = time * 0.12 % 1;
         for (let line = 0; line < 12; line++) {
           const depth = (line / 12 + travelPhase) % 1;
           const y = horizon + Math.pow(depth, 1.8) * (height - horizon);
