@@ -1024,8 +1024,8 @@ export function createBoxScene(
       emissiveIntensity: 0,
     });
     const tick = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.1, 0.035), tickMaterial);
-    tick.position.set(Math.sin(angle) * 0.39, Math.cos(angle) * 0.39, 0.07);
-    tick.rotation.z = -angle;
+    tick.position.set(-Math.sin(angle) * 0.39, Math.cos(angle) * 0.39, 0.07);
+    tick.rotation.z = angle;
     tvVolumeTicks.push(tickMaterial);
     tvVolumeControl.add(tick);
   }
