@@ -4,6 +4,8 @@ const ACTIVATION = String.fromCharCode(105, 110, 101, 122, 105, 118, 97, 110);
 const MESSAGE = 'I never put you on a pedestal, but how I wish you could see yourself through my eyes';
 const DURATION_MS = 8_000;
 const ROTATION_MS = 5_000;
+const PRESENTATION_START_MS = DURATION_MS - 5_000;
+const PRESENTATION_TILT_MS = 1_200;
 
 type AmbientSequence = {
   finished: Promise<void>;
@@ -332,8 +334,14 @@ function createAmbientSequence(): AmbientSequence {
     const elapsed = now - startedAt;
     const seconds = elapsed / 1_000;
     const rotationProgress = Math.min(elapsed, ROTATION_MS) / ROTATION_MS;
+    const tiltProgress = THREE.MathUtils.smoothstep(
+      elapsed,
+      PRESENTATION_START_MS,
+      PRESENTATION_START_MS + PRESENTATION_TILT_MS,
+    );
     layer.dataset.stage = elapsed < ROTATION_MS ? 'turning' : 'holding';
     rose.rotation.y = rotationProgress * Math.PI * 2;
+    rose.rotation.x = tiltProgress * 0.62;
     rose.position.y = 0.15 + Math.sin(seconds * 1.6) * 0.045;
     bloom.scale.setScalar(1 + Math.sin(seconds * 2.1) * 0.012);
     glowMaterial.opacity = 0.68 + Math.sin(seconds * 1.8) * 0.1;
