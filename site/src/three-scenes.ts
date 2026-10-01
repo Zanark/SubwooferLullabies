@@ -3417,12 +3417,15 @@ export function createPlayerScene(
     pivot.rotation.x = Math.PI / 2;
     pivot.position.set(0, 0.05, 0.04);
 
+    const earpiece = new THREE.Group();
+    earpiece.position.y = -0.83;
+    earpiece.scale.setScalar(1.5);
+
     const cupBack = new THREE.Mesh(
       new THREE.CylinderGeometry(1.02, 1.02, 0.42, 12),
       material(0x24292a, { roughness: 0.78 }),
     );
     cupBack.rotation.z = Math.PI / 2;
-    cupBack.position.set(0, -0.83, 0);
 
     const foam = new THREE.Mesh(
       new THREE.CylinderGeometry(1.15, 1.15, 0.58, 12),
@@ -3433,36 +3436,36 @@ export function createPlayerScene(
       }),
     );
     foam.rotation.z = Math.PI / 2;
-    foam.position.set(-side * 0.12, -0.83, 0);
+    foam.position.x = -side * 0.12;
 
     const foamBevel = new THREE.Mesh(
       new THREE.TorusGeometry(0.84, 0.27, 6, 12),
       material(0xe27027, { roughness: 0.9 }),
     );
     foamBevel.rotation.y = Math.PI / 2;
-    foamBevel.position.set(-side * 0.31, -0.83, 0);
+    foamBevel.position.x = -side * 0.31;
 
     const earCap = new THREE.Mesh(
       new THREE.CylinderGeometry(0.74, 0.78, 0.26, 12),
       material(0xb2b5ad, { metalness: 0.48, roughness: 0.38 }),
     );
     earCap.rotation.z = Math.PI / 2;
-    earCap.position.set(side * 0.3, -0.83, 0);
+    earCap.position.x = side * 0.3;
 
     const earCapInset = new THREE.Mesh(
       new THREE.CylinderGeometry(0.57, 0.57, 0.05, 12),
       material(0x7d8583, { metalness: 0.2, roughness: 0.66 }),
     );
     earCapInset.rotation.z = Math.PI / 2;
-    earCapInset.position.set(side * 0.43, -0.83, 0);
+    earCapInset.position.x = side * 0.43;
 
     for (let row = -2; row <= 2; row++) {
       for (let column = -3; column <= 3; column++) {
         if (column * column + row * row > 10) continue;
         const hole = new THREE.Mesh(grilleHoleGeometry, grilleHoleMaterial);
         hole.rotation.z = Math.PI / 2;
-        hole.position.set(side * 0.49, -0.83 + row * 0.125, column * 0.13);
-        ear.add(hole);
+        hole.position.set(side * 0.49, row * 0.125, column * 0.13);
+        earpiece.add(hole);
       }
     }
 
@@ -3485,20 +3488,23 @@ export function createPlayerScene(
       textureMaterial(channelMark),
     );
     channelFace.rotation.y = side * Math.PI / 2;
-    channelFace.position.set(side * 0.5, -1.36, 0);
+    channelFace.position.set(side * 0.5, -0.53, 0);
 
-    ear.add(
-      sliderHousing,
-      sliderWindow,
-      exposedRail,
-      yoke,
-      pivot,
+    earpiece.add(
       cupBack,
       foam,
       foamBevel,
       earCap,
       earCapInset,
       channelFace,
+    );
+    ear.add(
+      sliderHousing,
+      sliderWindow,
+      exposedRail,
+      yoke,
+      pivot,
+      earpiece,
     );
     headphoneGroup.add(ear);
   }
