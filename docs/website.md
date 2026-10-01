@@ -170,14 +170,14 @@ adaptive waveform gain keep quieter recordings visibly responsive.
 | `scope` | Adaptive time-domain waveform |
 | `bars` | Nonlinear frequency columns |
 | `pong` | Beat-reactive Pong with frequency-driven paddles, scored rallies, music-accelerated rebounds and a capped blue transient spark around the ball; pressing Pong resets both scores |
-| `tunnel` | Receding perspective rectangles |
+| `pipes` | Classic screensaver-inspired multicolor pipes with square turns, rounded joints, beveled highlights and audio-driven thickness |
 | `rain` | Matrix-style green code streams with bright heads and frequency-sized trails |
 | `tesla` | Central audio coil with vectors-style adaptive waveform sensitivity driving bolt reach, direction, thickness and jagged motion |
 | `radar` | Circular phosphor scope with a constant-speed sweep and targets that illuminate only on detected beats |
 | `stars` | Constant-speed radial space flight with outward-moving stars and depth-lengthened trails; no audio reactivity |
-| `plasma` | Chunky multi-field demoscene plasma |
+| `reaction` | Pixelated Gray-Scott reaction-diffusion colonies with beat-seeded growth and frequency-shaped chemistry |
 | `copper` | Moving horizontal raster/copper bands |
-| `sequencer` | Scanning hardware step grid with frequency-driven pads |
+| `boids` | Flocking pixel birds whose speed, spacing and formation react across the live spectrum |
 | `metaballs` | Audio-sized chunky scalar-field blobs |
 | `synthwave` | Fixed neon sun and skyline with a continuously advancing perspective grid and road markers |
 | `fireworks` | Bottom-launched rockets on every second detected beat, each rising to a randomized height before an independent pixel-particle burst |
@@ -186,7 +186,7 @@ adaptive waveform gain keep quieter recordings visibly responsive.
 
 *The common cover and camera framing make the visual differences explicit. The
 fourteen-mode library deliberately separates oscilloscope, spectrum, game, Matrix,
-electrical, radar, starfield, demoscene, hardware, synthwave and
+electrical, radar, starfield, screensaver, simulation, synthwave and
 particle families instead of retaining near-duplicate effects.*
 
 An intermittent phosphor scan band also crosses the complete television image from

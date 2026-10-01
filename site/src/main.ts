@@ -152,14 +152,14 @@ app.innerHTML = `
           <button type="button" data-visualizer="scope" disabled>scope</button>
           <button type="button" data-visualizer="bars" disabled>bars</button>
           <button type="button" data-visualizer="atari" disabled>pong</button>
-          <button type="button" data-visualizer="tunnel" disabled>tunnel</button>
+          <button type="button" data-visualizer="pipes" disabled>pipes</button>
           <button type="button" data-visualizer="rain" disabled>rain</button>
           <button type="button" data-visualizer="tesla" disabled>tesla</button>
           <button type="button" data-visualizer="radar" disabled>radar</button>
           <button type="button" data-visualizer="stars" disabled>stars</button>
-          <button type="button" data-visualizer="plasma" disabled>plasma</button>
+          <button type="button" data-visualizer="reaction" disabled>reaction</button>
           <button type="button" data-visualizer="copper" disabled>copper</button>
-          <button type="button" data-visualizer="sequencer" disabled>sequencer</button>
+          <button type="button" data-visualizer="boids" disabled>boids</button>
           <button type="button" data-visualizer="metaballs" disabled>metaballs</button>
           <button type="button" data-visualizer="synthwave" disabled>synthwave</button>
           <button type="button" data-visualizer="fireworks" disabled>fireworks</button>
@@ -1025,14 +1025,14 @@ async function start() {
     'scope',
     'bars',
     'atari',
-    'tunnel',
+    'pipes',
     'rain',
     'tesla',
     'radar',
     'stars',
-    'plasma',
+    'reaction',
     'copper',
-    'sequencer',
+    'boids',
     'metaballs',
     'synthwave',
     'fireworks',

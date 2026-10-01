@@ -21,15 +21,15 @@ export type HandCursorController = SceneController & {
 export type VisualizerMode =
   | 'scope'
   | 'bars'
-  | 'tunnel'
+  | 'pipes'
   | 'rain'
   | 'tesla'
   | 'radar'
   | 'stars'
   | 'atari'
-  | 'plasma'
+  | 'reaction'
   | 'copper'
-  | 'sequencer'
+  | 'boids'
   | 'metaballs'
   | 'synthwave'
   | 'fireworks';
@@ -1308,6 +1308,44 @@ export function createBoxScene(
       }[];
     }[],
   };
+  const pipes = {
+    lastTime: 0,
+    stepAccumulator: 0,
+    heads: [] as {
+      x: number;
+      y: number;
+      direction: number;
+      color: number;
+      steps: number;
+    }[],
+    segments: [] as {
+      x1: number;
+      y1: number;
+      x2: number;
+      y2: number;
+      direction: number;
+      color: number;
+    }[],
+  };
+  const boids = {
+    lastTime: 0,
+    agents: [] as {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+    }[],
+  };
+  const reaction = {
+    width: 72,
+    height: 48,
+    u: new Float32Array(72 * 48),
+    v: new Float32Array(72 * 48),
+    nextU: new Float32Array(72 * 48),
+    nextV: new Float32Array(72 * 48),
+    seeded: false,
+    beatLatched: false,
+  };
   const crtLightColor = new THREE.Color(0x8fcbd1);
 
   function updateCrtLightColor(image: CanvasImageSource) {
@@ -1701,17 +1739,85 @@ export function createBoxScene(
         }
         crtContext.globalAlpha = 1;
         crtContext.restore();
-      } else if (visualizerMode === 'tunnel') {
+      } else if (visualizerMode === 'pipes') {
         crtContext.save();
-        crtContext.translate(width / 2, height / 2);
-        for (let frame = 0; frame < 9; frame++) {
-          const phase = (frame / 9 + time * (0.18 + smoothedEnergy * 1.35)) % 1;
-          const frameWidth = 22 + phase * (230 + bass * 52);
-          const frameHeight = 14 + phase * (150 + mid * 54);
-          crtContext.globalAlpha = 1 - phase * 0.72;
-          crtContext.strokeRect(-frameWidth / 2, -frameHeight / 2, frameWidth, frameHeight);
+        crtContext.fillStyle = 'rgba(3,7,13,.72)';
+        crtContext.fillRect(0, 0, width, height);
+        const pipeColors = ['#4de4ff', '#f4d789', '#e66a32', '#c88cff', '#73f59a'];
+        const grid = 18;
+        if (!pipes.heads.length) {
+          pipes.heads.push(
+            { x: grid * 3, y: grid * 4, direction: 0, color: 0, steps: 0 },
+            { x: width - grid * 4, y: grid * 7, direction: 2, color: 2, steps: 0 },
+            { x: grid * 8, y: height - grid * 3, direction: 3, color: 4, steps: 0 },
+          );
+        }
+        const pipeDelta = pipes.lastTime ? Math.min(time - pipes.lastTime, 0.08) : 1 / 60;
+        pipes.lastTime = time;
+        pipes.stepAccumulator += pipeDelta * (7 + smoothedEnergy * 9);
+        while (pipes.stepAccumulator >= 1) {
+          pipes.stepAccumulator -= 1;
+          for (const head of pipes.heads) {
+            const oldX = head.x;
+            const oldY = head.y;
+            const turnSignal = Math.sin(head.steps * 5.73 + head.color * 2.1 + time);
+            if (head.steps % 4 === 0 && (Math.abs(turnSignal) > 0.55 || beat > 0.055)) {
+              head.direction = (head.direction + (turnSignal > 0 ? 1 : 3)) % 4;
+            }
+            const deltaX = head.direction === 0 ? grid : head.direction === 2 ? -grid : 0;
+            const deltaY = head.direction === 1 ? grid : head.direction === 3 ? -grid : 0;
+            head.x += deltaX;
+            head.y += deltaY;
+            if (head.x < grid || head.x > width - grid || head.y < grid || head.y > height - grid) {
+              head.direction = (head.direction + 2) % 4;
+              head.x = THREE.MathUtils.clamp(oldX, grid, width - grid);
+              head.y = THREE.MathUtils.clamp(oldY, grid, height - grid);
+              head.color = (head.color + 1) % pipeColors.length;
+            } else {
+              pipes.segments.push({
+                x1: oldX,
+                y1: oldY,
+                x2: head.x,
+                y2: head.y,
+                direction: head.direction,
+                color: head.color,
+              });
+              head.steps += 1;
+            }
+          }
+          if (pipes.segments.length > 150) pipes.segments.splice(0, pipes.segments.length - 150);
+        }
+        for (let index = 0; index < pipes.segments.length; index++) {
+          const segment = pipes.segments[index];
+          const age = index / Math.max(1, pipes.segments.length - 1);
+          const pipeWidth = 7 + sensitiveBand(segment.color / 5, (segment.color + 1) / 5, 2) * 5;
+          crtContext.lineCap = 'square';
+          crtContext.strokeStyle = '#081116';
+          crtContext.lineWidth = pipeWidth + 5;
+          crtContext.globalAlpha = 0.28 + age * 0.56;
+          crtContext.beginPath();
+          crtContext.moveTo(segment.x1, segment.y1);
+          crtContext.lineTo(segment.x2, segment.y2);
+          crtContext.stroke();
+          crtContext.strokeStyle = pipeColors[segment.color];
+          crtContext.lineWidth = pipeWidth;
+          crtContext.globalAlpha = 0.34 + age * 0.66;
+          crtContext.stroke();
+          crtContext.strokeStyle = '#efffff';
+          crtContext.lineWidth = Math.max(1, pipeWidth * 0.22);
+          crtContext.globalAlpha = 0.16 + age * 0.44;
+          crtContext.beginPath();
+          crtContext.moveTo(segment.x1 + (segment.direction % 2 ? -2 : 0), segment.y1 + (segment.direction % 2 ? 0 : -2));
+          crtContext.lineTo(segment.x2 + (segment.direction % 2 ? -2 : 0), segment.y2 + (segment.direction % 2 ? 0 : -2));
+          crtContext.stroke();
+          crtContext.fillStyle = pipeColors[segment.color];
+          crtContext.globalAlpha = 0.42 + age * 0.58;
+          crtContext.beginPath();
+          crtContext.arc(segment.x2, segment.y2, pipeWidth * 0.72, 0, Math.PI * 2);
+          crtContext.fill();
         }
         crtContext.globalAlpha = 1;
+        crtContext.lineWidth = 1;
         crtContext.restore();
       } else if (visualizerMode === 'rain') {
         crtContext.save();
@@ -1910,20 +2016,86 @@ export function createBoxScene(
         }
         crtContext.globalAlpha = 1;
         crtContext.restore();
-      } else if (visualizerMode === 'plasma') {
-        const cellSize = 12;
-        for (let y = 0; y < height; y += cellSize) {
-          for (let x = 0; x < width; x += cellSize) {
-            const wave = Math.sin(x * 0.045 + time * (0.7 + bass * 3))
-              + Math.sin(y * 0.062 - time * (0.9 + mid * 3.4))
-              + Math.sin((x + y) * 0.034 + time * (0.5 + treble * 4))
-              + Math.sin(Math.hypot(x - width / 2, y - height / 2) * 0.055 - time * 2.2);
-            const level = (wave + 4) / 8;
-            const hue = (18 + level * 155 + time * 18 + treble * 80) % 360;
-            const lightness = 18 + level * 44 + energy * 18;
-            crtContext.fillStyle = `hsl(${hue} 82% ${lightness}%)`;
-            crtContext.globalAlpha = 0.42 + level * 0.48;
-            crtContext.fillRect(x, y, cellSize + 1, cellSize + 1);
+      } else if (visualizerMode === 'reaction') {
+        const gridWidth = reaction.width;
+        const gridHeight = reaction.height;
+        if (!reaction.seeded) {
+          reaction.u.fill(1);
+          reaction.v.fill(0);
+          for (let seed = 0; seed < 7; seed++) {
+            const seedX = 8 + seed * 9;
+            const seedY = 9 + (seed * 13 % 29);
+            for (let y = -2; y <= 2; y++) {
+              for (let x = -2; x <= 2; x++) {
+                const index = (seedY + y) * gridWidth + seedX + x;
+                reaction.v[index] = 0.82;
+                reaction.u[index] = 0.18;
+              }
+            }
+          }
+          reaction.seeded = true;
+        }
+        const reactionBeat = beat > 0.055 && !reaction.beatLatched;
+        if (reactionBeat) {
+          reaction.beatLatched = true;
+          const pulseX = 4 + Math.floor((Math.sin(time * 1.7) * 0.5 + 0.5) * (gridWidth - 9));
+          const pulseY = 4 + Math.floor((Math.cos(time * 1.13) * 0.5 + 0.5) * (gridHeight - 9));
+          for (let y = -2; y <= 2; y++) {
+            for (let x = -2; x <= 2; x++) {
+              reaction.v[(pulseY + y) * gridWidth + pulseX + x] = 1;
+            }
+          }
+        } else if (beat < 0.025) {
+          reaction.beatLatched = false;
+        }
+        const feed = 0.033 + bass * 0.008;
+        const kill = 0.061 + treble * 0.006;
+        for (let iteration = 0; iteration < 2; iteration++) {
+          for (let y = 1; y < gridHeight - 1; y++) {
+            for (let x = 1; x < gridWidth - 1; x++) {
+              const index = y * gridWidth + x;
+              const u = reaction.u[index];
+              const v = reaction.v[index];
+              const laplaceU = reaction.u[index - 1] + reaction.u[index + 1]
+                + reaction.u[index - gridWidth] + reaction.u[index + gridWidth] - u * 4;
+              const laplaceV = reaction.v[index - 1] + reaction.v[index + 1]
+                + reaction.v[index - gridWidth] + reaction.v[index + gridWidth] - v * 4;
+              const reactionRate = u * v * v;
+              reaction.nextU[index] = THREE.MathUtils.clamp(
+                u + (0.19 * laplaceU - reactionRate + feed * (1 - u)),
+                0,
+                1,
+              );
+              reaction.nextV[index] = THREE.MathUtils.clamp(
+                v + (0.095 * laplaceV + reactionRate - (kill + feed) * v),
+                0,
+                1,
+              );
+            }
+          }
+          [reaction.u, reaction.nextU] = [reaction.nextU, reaction.u];
+          [reaction.v, reaction.nextV] = [reaction.nextV, reaction.v];
+        }
+        crtContext.fillStyle = 'rgba(4,6,18,.72)';
+        crtContext.fillRect(0, 0, width, height);
+        const cellWidth = width / gridWidth;
+        const cellHeight = height / gridHeight;
+        for (let y = 1; y < gridHeight - 1; y++) {
+          for (let x = 1; x < gridWidth - 1; x++) {
+            const level = THREE.MathUtils.clamp(
+              (reaction.v[y * gridWidth + x] - reaction.u[y * gridWidth + x] * 0.18) * 1.45,
+              0,
+              1,
+            );
+            if (level < 0.08) continue;
+            crtContext.fillStyle = level > 0.68 ? '#f4d789' : level > 0.34 ? '#d06cff' : '#4de4ff';
+            crtContext.globalAlpha = 0.2 + level * 0.78;
+            crtContext.fillRect(
+              x * cellWidth,
+              y * cellHeight,
+              Math.ceil(cellWidth) + 1,
+              Math.ceil(cellHeight) + 1,
+            );
           }
         }
         crtContext.globalAlpha = 1;
@@ -1947,45 +2119,88 @@ export function createBoxScene(
           crtContext.fillRect(0, centerY - thickness, width, thickness * 2);
         }
         crtContext.restore();
-      } else if (visualizerMode === 'sequencer') {
+      } else if (visualizerMode === 'boids') {
         crtContext.save();
-        crtContext.fillStyle = 'rgba(10,7,16,.7)';
+        crtContext.fillStyle = 'rgba(3,9,17,.72)';
         crtContext.fillRect(0, 0, width, height);
-        const columns = 16;
-        const rows = 8;
-        const marginX = 14;
-        const marginY = 38;
-        const gap = 3;
-        const cellWidth = (width - marginX * 2 - gap * (columns - 1)) / columns;
-        const cellHeight = (height - marginY - 24 - gap * (rows - 1)) / rows;
-        const playhead = Math.floor(time * (3.2 + bass * 4.5)) % columns;
-        crtContext.font = '700 9px monospace';
-        crtContext.textAlign = 'left';
-        crtContext.fillStyle = '#f4d789';
-        crtContext.globalAlpha = 0.9;
-        crtContext.fillText('STEP SIGNAL / 16', marginX, 15);
-        for (let row = 0; row < rows; row++) {
-          const rowEnergy = sensitiveBand(row / rows, (row + 1) / rows, 2);
-          for (let column = 0; column < columns; column++) {
-            const x = marginX + column * (cellWidth + gap);
-            const y = marginY + row * (cellHeight + gap);
-            const programmed = ((column * 3 + row * 5) % 11) < 3;
-            const active = programmed && rowEnergy > 0.2;
-            crtContext.strokeStyle = column === playhead ? '#f4d789' : '#385a61';
-            crtContext.globalAlpha = 0.35 + rowEnergy * 0.45;
-            crtContext.strokeRect(x, y, cellWidth, cellHeight);
-            if (active || column === playhead) {
-              crtContext.fillStyle = column === playhead
-                ? '#f4d789'
-                : row % 2 ? '#e66a32' : '#64c9bd';
-              crtContext.globalAlpha = column === playhead
-                ? 0.28 + rowEnergy * 0.65
-                : 0.18 + rowEnergy * 0.72;
-              crtContext.fillRect(x + 2, y + 2, Math.max(1, cellWidth - 4), Math.max(1, cellHeight - 4));
-            }
+        if (!boids.agents.length) {
+          for (let index = 0; index < 38; index++) {
+            const angle = index * 2.399;
+            boids.agents.push({
+              x: width * (0.16 + (index * 37 % 67) / 100),
+              y: height * (0.16 + (index * 53 % 67) / 100),
+              vx: Math.cos(angle) * 34,
+              vy: Math.sin(angle) * 34,
+            });
           }
         }
+        const boidDelta = boids.lastTime ? Math.min(time - boids.lastTime, 0.04) : 1 / 60;
+        boids.lastTime = time;
+        for (let index = 0; index < boids.agents.length; index++) {
+          const agent = boids.agents[index];
+          let centerX = 0;
+          let centerY = 0;
+          let alignX = 0;
+          let alignY = 0;
+          let separateX = 0;
+          let separateY = 0;
+          let neighbors = 0;
+          for (let otherIndex = 0; otherIndex < boids.agents.length; otherIndex++) {
+            if (otherIndex === index) continue;
+            const other = boids.agents[otherIndex];
+            const dx = other.x - agent.x;
+            const dy = other.y - agent.y;
+            const distanceSquared = dx * dx + dy * dy;
+            if (distanceSquared > 3600) continue;
+            centerX += other.x;
+            centerY += other.y;
+            alignX += other.vx;
+            alignY += other.vy;
+            neighbors += 1;
+            if (distanceSquared < 324) {
+              separateX -= dx / Math.max(9, distanceSquared);
+              separateY -= dy / Math.max(9, distanceSquared);
+            }
+          }
+          if (neighbors) {
+            centerX = centerX / neighbors - agent.x;
+            centerY = centerY / neighbors - agent.y;
+            alignX = alignX / neighbors - agent.vx;
+            alignY = alignY / neighbors - agent.vy;
+            agent.vx += centerX * 0.012 + alignX * 0.035 + separateX * 19;
+            agent.vy += centerY * 0.012 + alignY * 0.035 + separateY * 19;
+          }
+          const centerPull = 0.018 + mid * 0.026;
+          agent.vx += (width / 2 - agent.x) * centerPull * boidDelta;
+          agent.vy += (height / 2 - agent.y) * centerPull * boidDelta;
+          const speed = Math.hypot(agent.vx, agent.vy) || 1;
+          const targetSpeed = 26 + sensitiveBand(index / boids.agents.length, (index + 1) / boids.agents.length, 2) * 72;
+          agent.vx = agent.vx / speed * targetSpeed;
+          agent.vy = agent.vy / speed * targetSpeed;
+          agent.x = (agent.x + agent.vx * boidDelta + width) % width;
+          agent.y = (agent.y + agent.vy * boidDelta + height) % height;
+        }
+        crtContext.globalCompositeOperation = 'screen';
+        for (let index = 0; index < boids.agents.length; index++) {
+          const agent = boids.agents[index];
+          const speed = Math.hypot(agent.vx, agent.vy) || 1;
+          const directionX = agent.vx / speed;
+          const directionY = agent.vy / speed;
+          const sideX = -directionY;
+          const sideY = directionX;
+          const reactionLevel = sensitiveBand(index / boids.agents.length, (index + 1) / boids.agents.length, 2);
+          const size = 4 + reactionLevel * 5;
+          crtContext.fillStyle = index % 5 === 0 ? '#f4d789' : index % 2 ? '#4de4ff' : '#73f59a';
+          crtContext.globalAlpha = 0.38 + reactionLevel * 0.58;
+          crtContext.beginPath();
+          crtContext.moveTo(agent.x + directionX * size, agent.y + directionY * size);
+          crtContext.lineTo(agent.x - directionX * size * 0.7 + sideX * size * 0.58, agent.y - directionY * size * 0.7 + sideY * size * 0.58);
+          crtContext.lineTo(agent.x - directionX * size * 0.7 - sideX * size * 0.58, agent.y - directionY * size * 0.7 - sideY * size * 0.58);
+          crtContext.closePath();
+          crtContext.fill();
+        }
         crtContext.globalAlpha = 1;
+        crtContext.globalCompositeOperation = 'source-over';
         crtContext.restore();
       } else if (visualizerMode === 'metaballs') {
         const cellSize = 8;
@@ -2654,6 +2869,24 @@ export function createBoxScene(
         fireworks.beatCount = 0;
         fireworks.rockets.length = 0;
         fireworks.bursts.length = 0;
+      }
+      if (mode === 'pipes' && visualizerMode !== 'pipes') {
+        pipes.lastTime = 0;
+        pipes.stepAccumulator = 0;
+        pipes.heads.length = 0;
+        pipes.segments.length = 0;
+      }
+      if (mode === 'boids' && visualizerMode !== 'boids') {
+        boids.lastTime = 0;
+        boids.agents.length = 0;
+      }
+      if (mode === 'reaction' && visualizerMode !== 'reaction') {
+        reaction.u.fill(1);
+        reaction.v.fill(0);
+        reaction.nextU.fill(0);
+        reaction.nextV.fill(0);
+        reaction.seeded = false;
+        reaction.beatLatched = false;
       }
       visualizerMode = mode;
     },
