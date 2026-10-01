@@ -2281,12 +2281,14 @@ export function createBoxScene(
           crtContext.fillRect(x, horizon - buildingHeight, buildingWidth, buildingHeight);
         }
 
-        const barPairs = 7;
-        const barSpacing = width * 0.035;
+        const barPairs = 12;
+        const barSpacing = width * 0.025;
+        const beatLift = Math.min(0.48, beat * 5.5);
         for (let bar = 0; bar < barPairs; bar++) {
-          const barEnergy = sensitiveBand(bar / barPairs, (bar + 1) / barPairs, 2.2);
-          const barHeight = 8 + barEnergy * 72;
-          const barWidth = 3 + barEnergy * 2;
+          const measuredEnergy = sensitiveBand(bar / barPairs, (bar + 1) / barPairs, 2.9);
+          const barEnergy = THREE.MathUtils.clamp(measuredEnergy * 0.9 + beatLift, 0, 1);
+          const barHeight = 8 + barEnergy * 82;
+          const barWidth = 2.5 + barEnergy * 2.5;
           const inset = 10 + bar * barSpacing;
           const leftX = inset;
           const rightX = width - inset - barWidth;
