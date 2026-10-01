@@ -280,6 +280,21 @@ function setCassetteFocus(reason: string, active: boolean, revealPlayer = false)
   }
 }
 
+function setPhysicalCassetteHold(title: string | null) {
+  if (!title) {
+    showcase.classList.remove('is-held-preview');
+    showcase.hidden = true;
+    showcaseScene.hide();
+    return;
+  }
+
+  const song = trackByTitle(title);
+  showcase.classList.remove('is-showing');
+  showcase.classList.add('is-held-preview');
+  showcase.hidden = false;
+  void showcaseScene.hold({ ...song, cover: asset(song.cover) });
+}
+
 function enableAudioAnalysis() {
   if (!audioContext) {
     audioContext = new AudioContext();
@@ -990,7 +1005,7 @@ async function start() {
       trackByTitle(title),
       false,
       null,
-      false,
+      true,
       droppedOnPlayer,
     ),
     (title) => {
@@ -998,6 +1013,7 @@ async function start() {
       renderShelf();
     },
     (active) => setCassetteFocus('physical-drag', active),
+    setPhysicalCassetteHold,
     (active) => {
       roomPanel.classList.toggle('is-crt-focused', active);
       if (!active) {

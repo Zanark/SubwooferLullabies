@@ -22,6 +22,7 @@ flowchart TB
     E[Pick a random tape]
     F[Drag a physical desk cassette]
     G[Two-second transparent cassette inspection]
+    P[Held cassette rotates in the dimmed left stage]
     H{Drop destination}
     I[Load into SUBWAVE player]
     J[Append to persistent queue]
@@ -39,7 +40,8 @@ flowchart TB
     C --> D
     D --> I
     E --> G
-    F --> H
+    F --> P
+    P --> H
     G --> I
     H --> I
     H --> J
@@ -74,9 +76,13 @@ The library offers three paths into the same physical interaction:
   the saved queue.
 
 Every physical cassette can be repositioned on the desk. Hovering or dragging a tape
-summons a transparent low-poly hand; empty room space and ordinary controls retain the
-native pointer. Pointer capture, cancellation handling and edge auto-scroll allow the
-same interaction to work with mouse or touch.
+summons a transparent low-poly hand; while the tape remains held, a larger copy rotates
+continuously at three-quarters of the standard inspection speed in the dimmed left
+stage so its handwritten front and artwork back remain visible. Releasing, cancelling
+or dropping the tape removes that held preview immediately. A physically held tape
+loads without replaying the separate two-second inspection. Empty room space and
+ordinary controls retain the native pointer. Pointer capture, cancellation handling
+and edge auto-scroll allow the same interaction to work with mouse or touch.
 
 Picking up a physical cassette, dragging a library card or starting the transparent
 two-second cassette showcase automatically enters **player focus**. The masthead,

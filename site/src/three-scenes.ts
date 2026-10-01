@@ -700,6 +700,7 @@ export function createBoxScene(
   onSelect: (title: string, droppedOnPlayer: boolean) => void,
   onInspect: (title: string) => void,
   onCassetteFocusChange: (active: boolean) => void,
+  onCassetteHoldChange: (title: string | null) => void,
   onCrtFocusChange: (active: boolean) => void,
   onTogglePlayback: () => void,
   onVolumeChange: (value: number) => void,
@@ -2593,6 +2594,7 @@ export function createBoxScene(
     canvas.style.cursor = 'default';
     dropTarget.classList.remove('awaiting-drop', 'is-over');
     queueTarget.classList.remove('awaiting-drop', 'is-over');
+    onCassetteHoldChange(null);
     onCassetteFocusChange(false);
     handCursor.release(false);
   }
@@ -2628,8 +2630,10 @@ export function createBoxScene(
       return;
     }
     if (!pressed) return;
-    onInspect(String(pressed.userData.title));
+    const title = String(pressed.userData.title);
+    onInspect(title);
     onCassetteFocusChange(true);
+    onCassetteHoldChange(title);
     activePointerId = event.pointerId;
     moved = false;
     startX = event.clientX;
@@ -2715,6 +2719,7 @@ export function createBoxScene(
     dropTarget.classList.remove('awaiting-drop', 'is-over');
     queueTarget.classList.remove('awaiting-drop', 'is-over');
     canvas.style.cursor = 'default';
+    onCassetteHoldChange(null);
     handCursor.release(Boolean(destination));
     if (destination) {
       chosen.position.copy(chosen.userData.home);
@@ -3538,11 +3543,36 @@ export function createShowcaseScene(canvas: HTMLCanvasElement) {
   addLighting(scene);
   let cassette: CassetteParts | null = null;
   let animation: { start: number; resolve: () => void } | null = null;
+  let holdStart: number | null = null;
+  let requestId = 0;
+
+  function clearCassette() {
+    if (!cassette) return;
+    scene.remove(cassette.group);
+    disposeObject(cassette.group);
+    cassette = null;
+  }
+
+  function cancelAnimation() {
+    if (!animation) return;
+    const resolve = animation.resolve;
+    animation = null;
+    resolve();
+  }
 
   const dispose = animateScene(renderer, scene, camera, resize, (time) => {
     const aspect = canvas.clientWidth / Math.max(canvas.clientHeight, 1);
     camera.position.z = 10 * Math.max(1, 0.9 / aspect);
-    if (!cassette || !animation) return;
+    if (!cassette) return;
+    if (holdStart !== null) {
+      const elapsed = (performance.now() - holdStart) / 1000;
+      cassette.group.rotation.y = elapsed * Math.PI * 0.75;
+      cassette.group.rotation.x = Math.sin(elapsed * 0.9) * 0.06;
+      cassette.group.scale.setScalar(0.82);
+      cassette.group.position.y = Math.sin(time * 1.8) * 0.06;
+      return;
+    }
+    if (!animation) return;
     const elapsed = Math.min((performance.now() - animation.start) / 2000, 1);
     const eased = elapsed < 0.5
       ? 4 * elapsed * elapsed * elapsed
@@ -3564,11 +3594,12 @@ export function createShowcaseScene(canvas: HTMLCanvasElement) {
       songs.forEach((song) => { void loadCoverTexture(song.cover); });
     },
     async show(song: VisualSong) {
-      if (cassette) {
-        scene.remove(cassette.group);
-        disposeObject(cassette.group);
-      }
+      const pendingRequest = ++requestId;
+      holdStart = null;
+      cancelAnimation();
+      clearCassette();
       const cover = await loadCoverTexture(song.cover);
+      if (pendingRequest !== requestId) return;
       cassette = createCassette(song.title, cover);
       cassette.group.scale.setScalar(0.72);
       scene.add(cassette.group);
@@ -3576,6 +3607,30 @@ export function createShowcaseScene(canvas: HTMLCanvasElement) {
         animation = { start: performance.now(), resolve };
       });
     },
-    dispose,
+    async hold(song: VisualSong) {
+      const pendingRequest = ++requestId;
+      holdStart = null;
+      cancelAnimation();
+      clearCassette();
+      const cover = await loadCoverTexture(song.cover);
+      if (pendingRequest !== requestId) return;
+      cassette = createCassette(song.title, cover);
+      cassette.group.scale.setScalar(0.82);
+      scene.add(cassette.group);
+      holdStart = performance.now();
+    },
+    hide() {
+      requestId++;
+      holdStart = null;
+      cancelAnimation();
+      clearCassette();
+    },
+    dispose() {
+      requestId++;
+      holdStart = null;
+      cancelAnimation();
+      clearCassette();
+      dispose();
+    },
   };
 }
