@@ -2096,22 +2096,36 @@ export function createBoxScene(
         crtContext.restore();
       } else if (visualizerMode === 'stars') {
         crtContext.save();
+        crtContext.fillStyle = 'rgba(2,4,18,.72)';
+        crtContext.fillRect(0, 0, width, height);
         crtContext.translate(width / 2, height / 2);
-        for (let star = 0; star < 64; star++) {
-          const bandEnergy = sensitiveBand(star / 64, (star + 1) / 64, 2.15);
-          const depth = (star * 0.173 + time * (0.055 + smoothedEnergy * 0.14)) % 1;
-          const angle = star * 2.399 + time * (0.018 + treble * 0.08);
-          const radius = Math.pow(depth, 0.72) * (112 + bandEnergy * 16);
-          const size = 1 + depth * 2.4 + bandEnergy * 2.2;
-          crtContext.globalAlpha = 0.26 + depth * 0.42 + bandEnergy * 0.12;
-          crtContext.fillRect(
-            Math.cos(angle) * radius - size / 2,
-            Math.sin(angle) * radius * 0.68 - size / 2,
-            size,
-            size,
-          );
+        const starCount = 96;
+        const maximumRadius = Math.hypot(width / 2, height / 2) * 1.08;
+        for (let star = 0; star < starCount; star++) {
+          const depth = (star * 0.137 + time * 0.22) % 1;
+          const angle = star * 2.399 + Math.sin(star * 4.73) * 0.24;
+          const spread = 0.66 + (star * 37 % 31) / 100;
+          const radius = Math.pow(depth, 1.62) * maximumRadius * spread;
+          const trailDepth = Math.max(0, depth - 0.025 - depth * 0.045);
+          const trailRadius = Math.pow(trailDepth, 1.62) * maximumRadius * spread;
+          const x = Math.cos(angle) * radius;
+          const y = Math.sin(angle) * radius * 0.72;
+          const trailX = Math.cos(angle) * trailRadius;
+          const trailY = Math.sin(angle) * trailRadius * 0.72;
+          const size = 1 + depth * 4.2;
+          crtContext.strokeStyle = star % 5 === 0 ? '#f4d789' : '#c9fbff';
+          crtContext.lineWidth = 0.6 + depth * 2.2;
+          crtContext.globalAlpha = 0.16 + depth * 0.66;
+          crtContext.beginPath();
+          crtContext.moveTo(trailX, trailY);
+          crtContext.lineTo(x, y);
+          crtContext.stroke();
+          crtContext.fillStyle = star % 5 === 0 ? '#fff1b5' : '#eaffff';
+          crtContext.globalAlpha = 0.38 + depth * 0.62;
+          crtContext.fillRect(x - size / 2, y - size / 2, size, size);
         }
         crtContext.globalAlpha = 1;
+        crtContext.lineWidth = 1;
         crtContext.restore();
       } else if (visualizerMode === 'fireworks') {
         crtContext.save();
