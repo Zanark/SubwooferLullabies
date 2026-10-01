@@ -1279,6 +1279,11 @@ export function createBoxScene(
     beatPulse: 0,
     impactPulse: 0,
   };
+  const radar = {
+    lastTime: 0,
+    beatLatched: false,
+    blipLevels: new Float32Array(8),
+  };
   const crtLightColor = new THREE.Color(0x8fcbd1);
 
   function updateCrtLightColor(image: CanvasImageSource) {
@@ -1828,12 +1833,37 @@ export function createBoxScene(
         crtContext.moveTo(0, -radarRadius);
         crtContext.lineTo(0, radarRadius);
         crtContext.stroke();
-        const sweepAngle = time * (0.45 + smoothedEnergy * 0.3);
+        const radarDelta = radar.lastTime ? Math.min(time - radar.lastTime, 0.05) : 1 / 60;
+        radar.lastTime = time;
+        const radarBeatTriggered = beat > 0.055 && !radar.beatLatched;
+        if (radarBeatTriggered) {
+          radar.beatLatched = true;
+          let strongestBlip = 0;
+          let strongestLevel = -1;
+          for (let blip = 0; blip < radar.blipLevels.length; blip++) {
+            const level = sensitiveBand(blip / 8, (blip + 1) / 8, 2);
+            if (level > strongestLevel) {
+              strongestLevel = level;
+              strongestBlip = blip;
+            }
+          }
+          radar.blipLevels[strongestBlip] = 1;
+          if (beat > 0.11) {
+            radar.blipLevels[(strongestBlip + 3) % radar.blipLevels.length] = 0.82;
+          }
+        } else if (beat < 0.025) {
+          radar.beatLatched = false;
+        }
+        for (let blip = 0; blip < radar.blipLevels.length; blip++) {
+          radar.blipLevels[blip] = Math.max(0, radar.blipLevels[blip] - radarDelta * 1.45);
+        }
+
+        const sweepAngle = time * 0.72;
         const sweep = crtContext.createRadialGradient(0, 0, 0, 0, 0, radarRadius);
         sweep.addColorStop(0, 'rgba(118,255,157,.72)');
         sweep.addColorStop(1, 'rgba(118,255,157,0)');
         crtContext.fillStyle = sweep;
-        crtContext.globalAlpha = 0.35 + bass * 0.28;
+        crtContext.globalAlpha = 0.46;
         crtContext.beginPath();
         crtContext.moveTo(0, 0);
         crtContext.arc(0, 0, radarRadius, sweepAngle - 0.34, sweepAngle);
@@ -1846,16 +1876,12 @@ export function createBoxScene(
         crtContext.lineTo(Math.cos(sweepAngle) * radarRadius, Math.sin(sweepAngle) * radarRadius);
         crtContext.stroke();
         for (let blip = 0; blip < 8; blip++) {
-          const bandEnergy = sensitiveBand(blip / 8, (blip + 1) / 8, 2);
-          const angle = blip * 2.399 + time * 0.04;
+          const beatLevel = radar.blipLevels[blip];
+          const angle = blip * 2.399;
           const radius = radarRadius * (0.2 + blip % 4 * 0.18);
-          const sweepDistance = Math.abs(Math.atan2(
-            Math.sin(sweepAngle - angle),
-            Math.cos(sweepAngle - angle),
-          ));
-          crtContext.fillStyle = sweepDistance < 0.42 ? '#effff3' : '#54f58c';
-          crtContext.globalAlpha = 0.18 + bandEnergy * 0.72 + (sweepDistance < 0.42 ? 0.35 : 0);
-          const size = 2 + bandEnergy * 5;
+          crtContext.fillStyle = beatLevel > 0.02 ? '#effff3' : '#54f58c';
+          crtContext.globalAlpha = 0.16 + beatLevel * 0.84;
+          const size = 2 + beatLevel * 7;
           crtContext.fillRect(Math.cos(angle) * radius - size / 2, Math.sin(angle) * radius - size / 2, size, size);
         }
         crtContext.globalAlpha = 1;
@@ -2574,6 +2600,11 @@ export function createBoxScene(
         pong.leftScore = 0;
         pong.rightScore = 0;
         if (visualizerMode !== 'atari') pong.lastTime = 0;
+      }
+      if (mode === 'radar' && visualizerMode !== 'radar') {
+        radar.lastTime = 0;
+        radar.beatLatched = false;
+        radar.blipLevels.fill(0);
       }
       visualizerMode = mode;
     },

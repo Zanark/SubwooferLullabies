@@ -160,7 +160,7 @@ adaptive waveform gain keep quieter recordings visibly responsive.
 | `tunnel` | Receding perspective rectangles |
 | `rain` | Matrix-style green code streams with bright heads and frequency-sized trails |
 | `tesla` | Central audio coil with vectors-style adaptive waveform sensitivity driving bolt reach, direction, thickness and jagged motion |
-| `radar` | Circular phosphor scope with sweep illumination and spectral targets |
+| `radar` | Circular phosphor scope with a constant-speed sweep and targets that illuminate only on detected beats |
 | `stars` | Calm spectral depth field with restrained motion and size response |
 | `plasma` | Chunky multi-field demoscene plasma |
 | `copper` | Moving horizontal raster/copper bands |
