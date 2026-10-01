@@ -166,15 +166,14 @@ adaptive waveform gain keep quieter recordings visibly responsive.
 | `copper` | Moving horizontal raster/copper bands |
 | `sequencer` | Scanning hardware step grid with frequency-driven pads |
 | `metaballs` | Audio-sized chunky scalar-field blobs |
-| `vinyl` | Reactive turntable platter, grooves, label and tonearm |
 | `synthwave` | Neon sunset, skyline and perspective grid |
 | `fireworks` | Pixel particle bursts with band-driven radius and brightness |
 
 ![Contact sheet showing the CRT signal modes over the same playing cover.](assets/crt-signals-contact-sheet.png)
 
 *The common cover and camera framing make the visual differences explicit. The
-fifteen-mode library deliberately separates oscilloscope, spectrum, game, Matrix,
-electrical, radar, starfield, demoscene, hardware, physical-media, synthwave and
+fourteen-mode library deliberately separates oscilloscope, spectrum, game, Matrix,
+electrical, radar, starfield, demoscene, hardware, synthwave and
 particle families instead of retaining near-duplicate effects.*
 
 An intermittent phosphor scan band also crosses the complete television image from

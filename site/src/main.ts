@@ -151,7 +151,6 @@ app.innerHTML = `
         <button type="button" data-visualizer="copper" disabled>copper</button>
         <button type="button" data-visualizer="sequencer" disabled>sequencer</button>
         <button type="button" data-visualizer="metaballs" disabled>metaballs</button>
-        <button type="button" data-visualizer="vinyl" disabled>vinyl</button>
         <button type="button" data-visualizer="synthwave" disabled>synthwave</button>
         <button type="button" data-visualizer="fireworks" disabled>fireworks</button>
       </div>
@@ -968,7 +967,6 @@ async function start() {
     'copper',
     'sequencer',
     'metaballs',
-    'vinyl',
     'synthwave',
     'fireworks',
   ];

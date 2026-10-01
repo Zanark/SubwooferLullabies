@@ -31,7 +31,6 @@ export type VisualizerMode =
   | 'copper'
   | 'sequencer'
   | 'metaballs'
-  | 'vinyl'
   | 'synthwave'
   | 'fireworks';
 
@@ -1998,61 +1997,6 @@ export function createBoxScene(
           }
         }
         crtContext.globalAlpha = 1;
-      } else if (visualizerMode === 'vinyl') {
-        crtContext.save();
-        crtContext.fillStyle = 'rgba(7,8,12,.68)';
-        crtContext.fillRect(0, 0, width, height);
-        const platterX = width * 0.42;
-        const platterY = height * 0.53;
-        const platterRadius = Math.min(width, height) * 0.34;
-        crtContext.fillStyle = '#20242a';
-        crtContext.fillRect(18, 20, width - 36, height - 40);
-        crtContext.fillStyle = '#050708';
-        crtContext.beginPath();
-        crtContext.arc(platterX, platterY, platterRadius, 0, Math.PI * 2);
-        crtContext.fill();
-        for (let groove = 1; groove <= 14; groove++) {
-          const grooveEnergy = sensitiveBand((groove - 1) / 14, groove / 14, 2);
-          crtContext.strokeStyle = groove % 3 ? '#243e43' : '#e66a32';
-          crtContext.globalAlpha = 0.18 + grooveEnergy * 0.3;
-          crtContext.lineWidth = 1 + grooveEnergy;
-          crtContext.beginPath();
-          crtContext.arc(platterX, platterY, platterRadius * groove / 15, 0, Math.PI * 2);
-          crtContext.stroke();
-        }
-        const labelRadius = platterRadius * (0.25 + bass * 0.035);
-        crtContext.fillStyle = '#e66a32';
-        crtContext.globalAlpha = 0.8;
-        crtContext.beginPath();
-        crtContext.arc(platterX, platterY, labelRadius, 0, Math.PI * 2);
-        crtContext.fill();
-        crtContext.fillStyle = '#f4d789';
-        crtContext.beginPath();
-        crtContext.arc(platterX, platterY, 4 + beat * 5, 0, Math.PI * 2);
-        crtContext.fill();
-        const markerAngle = time * (1.25 + smoothedEnergy * 1.2);
-        crtContext.fillRect(
-          platterX + Math.cos(markerAngle) * labelRadius * 0.68 - 3,
-          platterY + Math.sin(markerAngle) * labelRadius * 0.68 - 3,
-          6,
-          6,
-        );
-        crtContext.strokeStyle = '#c8d7d3';
-        crtContext.lineWidth = 7;
-        crtContext.globalAlpha = 0.82;
-        crtContext.beginPath();
-        crtContext.moveTo(width * 0.84, height * 0.24);
-        crtContext.lineTo(width * 0.78, height * 0.42);
-        crtContext.lineTo(width * 0.69, height * (0.57 + mid * 0.06));
-        crtContext.stroke();
-        crtContext.fillStyle = '#64c9bd';
-        crtContext.fillRect(width * 0.67, height * (0.55 + mid * 0.06), 15, 8);
-        crtContext.fillStyle = '#f4d789';
-        crtContext.font = '700 9px monospace';
-        crtContext.textAlign = 'right';
-        crtContext.fillText('33 RPM / AUDIO CUT', width - 22, height - 24);
-        crtContext.globalAlpha = 1;
-        crtContext.restore();
       } else if (visualizerMode === 'synthwave') {
         crtContext.save();
         crtContext.fillStyle = 'rgba(12,3,30,.7)';
