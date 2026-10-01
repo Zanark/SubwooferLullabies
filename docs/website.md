@@ -17,8 +17,8 @@ SUBWAVE player occupies the right third.*
 flowchart TB
     A[Open the cassette archive]
     B{Choose a tape}
-    C[Search by lowercase song title]
-    D[Open an album or standalone cover]
+    C[Search or open an album]
+    D[Click a song in the grid]
     E[Pick a random tape]
     F[Drag a physical desk cassette]
     G[Two-second transparent cassette inspection]
@@ -36,8 +36,8 @@ flowchart TB
     B --> D
     B --> E
     B --> F
-    C --> G
-    D --> G
+    C --> D
+    D --> I
     E --> G
     F --> H
     G --> I
@@ -52,9 +52,10 @@ flowchart TB
     O --> K
 ```
 
-The inspection layer stays transparent so the room never disappears behind a
-separate theater screen. The cassette rotates for two seconds, showing its handwritten
-title on the front and the track artwork on the back, before entering the player.
+Grid-card clicks load directly into the player without dimming the page, making the
+player glow or running the cassette inspection. Flows that retain the transparent
+inspection rotate the cassette for two seconds, showing its handwritten title on the
+front and the track artwork on the back without replacing the room with a theater.
 
 ## 2. Finding and handling tapes
 
@@ -62,8 +63,9 @@ The library offers three paths into the same physical interaction:
 
 - Search matches song titles only. Matching cassettes rise from the desk, rotate and
   sit under warm spotlights whose sources remain above the visible room framing.
-- Album and standalone cover cards open a grid of songs. A song can be loaded
-  immediately or selected for the queue.
+- Album and standalone cover cards open a grid of songs. Clicking a song loads it
+  directly without player focus or cassette rotation; dragging the card keeps the
+  physical cassette-handling flow. A song can also be selected for the queue.
 - **Play a random tape** chooses a non-current song without clearing or rearranging
   the saved queue.
 

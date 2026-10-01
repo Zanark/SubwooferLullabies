@@ -432,7 +432,7 @@ function songCard(song: Song) {
   `;
   card.querySelector<HTMLButtonElement>('.cover-card-main')!.addEventListener('click', () => {
     activeQueueId = null;
-    void loadCassette(song);
+    void loadCassette(song, false, null, true);
   });
   card.querySelector<HTMLButtonElement>('.queue-select')!.addEventListener('click', () => {
     if (selectedTitles.has(song.title)) selectedTitles.delete(song.title);
