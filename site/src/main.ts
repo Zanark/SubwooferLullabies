@@ -55,7 +55,16 @@ app.innerHTML = `
           <path d="M14 7h3.9H21"></path>
           <path d="m18 4 3 3-3 3"></path>
         </svg>
-        <strong>random tape</strong>
+        <strong>
+          random tape
+          <svg class="random-tape-icon" viewBox="0 0 30 22" aria-hidden="true">
+            <path d="M2 2h26v18H2z"></path>
+            <path d="M6 5h18v8H6z"></path>
+            <circle cx="10" cy="9" r="2.2"></circle>
+            <circle cx="20" cy="9" r="2.2"></circle>
+            <path d="M8 17h14l-2-3H10z"></path>
+          </svg>
+        </strong>
       </button>
     </div>
   </header>

@@ -3232,7 +3232,20 @@ h1 {
 
 .random-play strong {
   margin-top: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 26px;
+}
+
+.random-tape-icon {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 25px;
+  fill: rgba(255, 239, 185, .2);
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linejoin: miter;
 }
 
 .shuffle-icon {
@@ -3371,7 +3384,13 @@ h1 {
   }
 
   .random-play strong {
+    gap: 8px;
     font-size: 22px;
+  }
+
+  .random-tape-icon {
+    width: 30px;
+    height: 22px;
   }
 
   .shuffle-icon {
