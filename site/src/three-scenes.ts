@@ -2004,7 +2004,7 @@ export function createBoxScene(
         const horizon = height * 0.57;
         const sunX = width / 2;
         const sunY = height * 0.34;
-        const sunRadius = 46 + bass * 14;
+        const sunRadius = 46;
         crtContext.save();
         crtContext.beginPath();
         crtContext.arc(sunX, sunY, sunRadius, 0, Math.PI * 2);
@@ -2043,16 +2043,31 @@ export function createBoxScene(
           crtContext.lineTo(width / 2 + lane * 42, height);
           crtContext.stroke();
         }
-        for (let line = 0; line < 10; line++) {
-          const progress = line / 10;
-          const y = horizon + Math.pow(progress, 1.8) * (height - horizon);
-          crtContext.globalAlpha = 0.2 + progress * 0.65;
+        const travelPhase = time * 0.7 % 1;
+        for (let line = 0; line < 12; line++) {
+          const depth = (line / 12 + travelPhase) % 1;
+          const y = horizon + Math.pow(depth, 1.8) * (height - horizon);
+          crtContext.globalAlpha = 0.18 + depth * 0.72;
+          crtContext.lineWidth = 1 + depth * 2.2;
           crtContext.beginPath();
           crtContext.moveTo(0, y);
           crtContext.lineTo(width, y);
           crtContext.stroke();
         }
+        crtContext.fillStyle = '#ff72db';
+        for (let marker = 0; marker < 9; marker++) {
+          const depth = (marker / 9 + travelPhase) % 1;
+          const nearScale = Math.pow(depth, 1.75);
+          const y = horizon + nearScale * (height - horizon);
+          const offset = 10 + nearScale * width * 0.19;
+          const markerWidth = 2 + nearScale * 8;
+          const markerHeight = 1 + nearScale * 5;
+          crtContext.globalAlpha = 0.22 + depth * 0.72;
+          crtContext.fillRect(width / 2 - offset - markerWidth, y, markerWidth, markerHeight);
+          crtContext.fillRect(width / 2 + offset, y, markerWidth, markerHeight);
+        }
         crtContext.globalAlpha = 1;
+        crtContext.lineWidth = 1;
         crtContext.restore();
       } else if (visualizerMode === 'stars') {
         crtContext.save();

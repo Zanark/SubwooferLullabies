@@ -166,7 +166,7 @@ adaptive waveform gain keep quieter recordings visibly responsive.
 | `copper` | Moving horizontal raster/copper bands |
 | `sequencer` | Scanning hardware step grid with frequency-driven pads |
 | `metaballs` | Audio-sized chunky scalar-field blobs |
-| `synthwave` | Neon sunset, skyline and perspective grid |
+| `synthwave` | Fixed neon sun and skyline with a continuously advancing perspective grid and road markers |
 | `fireworks` | Pixel particle bursts with band-driven radius and brightness |
 
 ![Contact sheet showing the CRT signal modes over the same playing cover.](assets/crt-signals-contact-sheet.png)
