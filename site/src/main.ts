@@ -1,4 +1,5 @@
 import './styles.css';
+import { installAmbientSequence } from './ambient-scene';
 import {
   createBoxScene,
   createHandCursorScene,
@@ -201,6 +202,7 @@ const shelf = required<HTMLDivElement>('shelf');
 const shelfLabel = required<HTMLParagraphElement>('shelf-label');
 const resultCount = required<HTMLSpanElement>('result-count');
 const search = required<HTMLInputElement>('search');
+installAmbientSequence(search);
 const back = required<HTMLButtonElement>('back');
 const dropZone = required<HTMLDivElement>('walkman-drop');
 const playerPanel = required<HTMLElement>('player-panel');

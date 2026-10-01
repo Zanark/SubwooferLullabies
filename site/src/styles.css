@@ -48,6 +48,117 @@ body::before {
   mix-blend-mode: multiply;
 }
 
+.ambient-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(99, 12, 39, .38), transparent 30%),
+    radial-gradient(circle at 50% 44%, rgba(24, 5, 19, .78), rgba(2, 2, 8, .97) 72%);
+  transition: opacity .6s ease;
+}
+
+.ambient-layer::before,
+.ambient-layer::after {
+  position: absolute;
+  z-index: 1;
+  content: "";
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(18px);
+}
+
+.ambient-layer::before {
+  top: 9%;
+  left: 50%;
+  width: min(62vw, 720px);
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  opacity: .48;
+  background: radial-gradient(circle, rgba(255, 68, 101, .3), rgba(95, 8, 44, .08) 52%, transparent 72%);
+  animation: ambient-halo 2.6s ease-in-out infinite alternate;
+}
+
+.ambient-layer::after {
+  right: 10%;
+  bottom: 8%;
+  width: min(28vw, 320px);
+  aspect-ratio: 1;
+  opacity: .2;
+  background: radial-gradient(circle, rgba(81, 255, 151, .28), transparent 68%);
+}
+
+.ambient-layer.is-visible {
+  opacity: 1;
+}
+
+.ambient-layer.is-leaving {
+  opacity: 0;
+  transition-duration: .8s;
+}
+
+.ambient-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+}
+
+.ambient-caption {
+  position: absolute;
+  right: 24px;
+  bottom: clamp(24px, 3.2vh, 38px);
+  left: 24px;
+  z-index: 3;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 18px 24px;
+  color: #ffe5e8;
+  font-size: clamp(14px, 1.8vw, 25px);
+  font-weight: 700;
+  line-height: 1.55;
+  letter-spacing: .035em;
+  text-align: center;
+  text-wrap: balance;
+  text-shadow:
+    0 2px 0 #420719,
+    0 0 12px rgba(255, 83, 112, .72),
+    0 0 30px rgba(255, 83, 112, .35);
+  border-top: 1px solid rgba(255, 182, 194, .34);
+  border-bottom: 1px solid rgba(255, 182, 194, .34);
+  background: linear-gradient(90deg, transparent, rgba(20, 3, 13, .78) 14% 86%, transparent);
+}
+
+@keyframes ambient-halo {
+  from {
+    transform: translateX(-50%) scale(.94);
+    opacity: .36;
+  }
+
+  to {
+    transform: translateX(-50%) scale(1.06);
+    opacity: .56;
+  }
+}
+
+@media (max-width: 650px) {
+  .ambient-caption {
+    right: 14px;
+    bottom: 28px;
+    left: 14px;
+    padding: 14px 12px;
+    font-size: clamp(13px, 4.1vw, 18px);
+    line-height: 1.45;
+  }
+}
+
 button,
 input {
   font: inherit;
