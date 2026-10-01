@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1510" height="890" viewBox="0 0 1510 890" role="img" aria-labelledby="title description">
+  <title id="title">Subwoofer Lullabies cassette back-cover production template</title>
+  <desc id="description">A 1510 by 890 pixel cassette artwork template showing trim, safe area, two reel guard zones, hub holes and the lower mechanical keepout.</desc>
+  <defs>
+    <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+      <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#6f7e80" stroke-width="1" opacity=".18"/>
+    </pattern>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity=".45"/>
+    </filter>
+  </defs>
+
+  <rect width="1510" height="890" fill="#11191b"/>
+  <rect width="1510" height="890" fill="url(#grid)"/>
+
+  <g id="guides" font-family="Cascadia Mono, Consolas, monospace">
+    <rect x="1" y="1" width="1508" height="888" fill="none" stroke="#f47d32" stroke-width="3"/>
+    <rect x="75" y="45" width="1360" height="800" rx="8" fill="none" stroke="#e8dc9b" stroke-width="3" stroke-dasharray="16 10"/>
+
+    <g id="left-reel-guides">
+      <circle cx="295" cy="555" r="240" fill="#ff496f" opacity=".08" stroke="#ff8da5" stroke-width="3" stroke-dasharray="14 10"/>
+      <circle cx="295" cy="555" r="210" fill="#f47d32" opacity=".12" stroke="#f47d32" stroke-width="4"/>
+      <circle cx="295" cy="555" r="105" fill="#05090a" opacity=".82" stroke="#f5ece0" stroke-width="4"/>
+      <line x1="265" y1="555" x2="325" y2="555" stroke="#f5ece0" stroke-width="2"/>
+      <line x1="295" y1="525" x2="295" y2="585" stroke="#f5ece0" stroke-width="2"/>
+    </g>
+
+    <g id="right-reel-guides">
+      <circle cx="1215" cy="555" r="240" fill="#ff496f" opacity=".08" stroke="#ff8da5" stroke-width="3" stroke-dasharray="14 10"/>
+      <circle cx="1215" cy="555" r="210" fill="#f47d32" opacity=".12" stroke="#f47d32" stroke-width="4"/>
+      <circle cx="1215" cy="555" r="105" fill="#05090a" opacity=".82" stroke="#f5ece0" stroke-width="4"/>
+      <line x1="1185" y1="555" x2="1245" y2="555" stroke="#f5ece0" stroke-width="2"/>
+      <line x1="1215" y1="525" x2="1215" y2="585" stroke="#f5ece0" stroke-width="2"/>
+    </g>
+
+    <g id="lower-mechanical-guide" transform="rotate(4.01 755 850)">
+      <rect x="292.5" y="742.5" width="925" height="215" fill="#42cbd3" opacity=".14" stroke="#72e0e6" stroke-width="3"/>
+    </g>
+
+    <line x1="755" y1="0" x2="755" y2="890" stroke="#a8b6b7" stroke-width="2" stroke-dasharray="8 12" opacity=".55"/>
+    <line x1="0" y1="445" x2="1510" y2="445" stroke="#a8b6b7" stroke-width="2" stroke-dasharray="8 12" opacity=".35"/>
+
+    <g filter="url(#shadow)">
+      <rect x="454" y="40" width="602" height="130" rx="10" fill="#101719" stroke="#6be0dc" stroke-width="2"/>
+      <text x="755" y="78" fill="#f5ece0" font-size="24" font-weight="700" text-anchor="middle">CASSETTE BACK ARTWORK TEMPLATE</text>
+      <text x="755" y="110" fill="#75dbd6" font-size="18" text-anchor="middle">1510 x 890 px - exact 151:89 aspect ratio</text>
+      <text x="755" y="140" fill="#d8c98d" font-size="16" text-anchor="middle">Compose original horizontal art. Do not stretch a square cover.</text>
+    </g>
+
+    <g font-size="18" font-weight="700">
+      <text x="295" y="550" fill="#f5ece0" text-anchor="middle">LEFT HUB</text>
+      <text x="295" y="577" fill="#f5ece0" text-anchor="middle">HOLE</text>
+      <text x="1215" y="550" fill="#f5ece0" text-anchor="middle">RIGHT HUB</text>
+      <text x="1215" y="577" fill="#f5ece0" text-anchor="middle">HOLE</text>
+    </g>
+
+    <g font-size="15">
+      <text x="75" y="32" fill="#f47d32">ARTWORK/TRIM EDGE</text>
+      <text x="86" y="72" fill="#e8dc9b">TYPE + FOCAL SAFE AREA</text>
+      <text x="755" y="862" fill="#72e0e6" text-anchor="middle">LOWER MECHANICAL KEEPOUT - BACKGROUND TEXTURE ONLY</text>
+      <text x="295" y="302" fill="#ff8da5" text-anchor="middle">R 240 DESIGN GUARD</text>
+      <text x="1215" y="302" fill="#ff8da5" text-anchor="middle">R 240 DESIGN GUARD</text>
+    </g>
+  </g>
+</svg>

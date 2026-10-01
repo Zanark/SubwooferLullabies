@@ -60,6 +60,11 @@ inspection. Flows that retain the transparent inspection rotate the cassette for
 seconds, showing its handwritten title on the front and the track artwork on the back
 without replacing the room with a theater.
 
+Dedicated horizontal cassette-back artwork must follow the exact geometry, reel-hole
+keepouts, safe areas and export contract in the
+[cassette back-cover design specification](cassette-back-cover-design-spec.md). Square
+song covers remain separate assets for the library and CRT.
+
 ## 2. Finding and handling tapes
 
 The library offers three paths into the same physical interaction:
