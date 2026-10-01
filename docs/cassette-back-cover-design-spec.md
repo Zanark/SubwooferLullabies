@@ -269,4 +269,3 @@ The design agent should only create the fourteen files. A later implementation c
 6. Test the back in the held-cassette rotation, random inspection, room tapes and inserted player.
 
 Current code uses an opaque `MeshBasicMaterial` for the back plane, so transparent circles in a PNG would not create physical holes today. That is why this specification reserves the hole areas but requires an opaque export. The geometry/masking implementation must be handled separately and must use the exact coordinates documented above.
-
