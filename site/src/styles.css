@@ -1955,14 +1955,6 @@ footer {
   color: #f18342;
 }
 
-.canvas-help {
-  right: 30px;
-  bottom: 22px;
-  padding: 7px 9px;
-  background: rgba(26, 15, 20, .72);
-  color: #d0a878;
-}
-
 .walkman-drop {
   width: 100%;
   height: 100%;
@@ -2268,19 +2260,6 @@ body.theater-mode .status {
   touch-action: none;
 }
 
-.canvas-help {
-  position: absolute;
-  right: 22px;
-  bottom: 16px;
-  z-index: 7;
-  margin: 0;
-  color: #66858a;
-  font-size: 8px;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  pointer-events: none;
-}
-
 .player-panel {
   background:
     radial-gradient(circle at 50% 48%, rgba(92, 137, 140, .2), transparent 45%),
@@ -2389,10 +2368,6 @@ body.theater-mode .status {
 
   .walkman-drop {
     width: 100%;
-  }
-
-  .canvas-help {
-    display: none;
   }
 
   .play-button {
@@ -2617,12 +2592,6 @@ body.theater-mode .transport-controls > .play-button {
   box-shadow: 4px 4px 0 rgba(9, 5, 7, .72);
 }
 
-.room-panel .canvas-help {
-  top: 14px;
-  right: 18px;
-  bottom: auto;
-}
-
 .crt-back-button,
 .crt-isolation-button {
   position: absolute;
@@ -2765,10 +2734,6 @@ body.cassette-focus-mode .queue-panel {
   overflow: hidden;
   clip: rect(0 0 0 0);
   clip-path: inset(50%);
-}
-
-.room-panel.is-crt-focused .canvas-help {
-  display: none;
 }
 
 .crt-controls span {
@@ -2918,8 +2883,7 @@ h1 {
   font-size: 5.3333px;
 }
 
-.status,
-.canvas-help {
+.status {
   font-size: 6.6667px;
 }
 
@@ -3335,14 +3299,9 @@ h1 {
   font-size: 10.6667px;
 }
 
-.canvas-help,
 .crt-back-button,
 .crt-isolation-button {
   font-size: 16.6667px;
-}
-
-.canvas-help {
-  padding: 10px 12px;
 }
 
 .crt-controls {

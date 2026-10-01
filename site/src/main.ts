@@ -178,7 +178,6 @@ app.innerHTML = `
         </svg>
       </button>
       <button id="exit-crt-focus" class="crt-back-button" type="button" aria-label="Back to room" title="Back to room" hidden>↩</button>
-      <p class="canvas-help"><span aria-hidden="true">◆</span> tape · <span aria-hidden="true">→</span> player · <span aria-hidden="true">◉</span> tv/switches</p>
     </section>
   </main>
 
