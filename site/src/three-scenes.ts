@@ -54,6 +54,7 @@ export type PlayerSceneController = SceneController & {
   setTransportFocus(action: TransportAction | null): void;
   setVolume(value: number): void;
   setProgress(value: number): void;
+  resetView(): void;
 };
 
 type CassetteParts = {
@@ -3102,7 +3103,8 @@ export function createPlayerScene(
   addLighting(scene);
 
   const rig = new THREE.Group();
-  rig.rotation.set(-0.025, -0.08, -0.015);
+  const defaultRigRotation = new THREE.Euler(-0.025, -0.08, -0.015);
+  rig.rotation.copy(defaultRigRotation);
   rig.position.set(-0.12, -0.25, 0);
   scene.add(rig);
 
@@ -3310,6 +3312,15 @@ export function createPlayerScene(
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   let draggingVolume = false;
+  let orbitPointerId: number | null = null;
+  let orbitStartX = 0;
+  let orbitStartY = 0;
+  let orbitStartYaw = 0;
+  let orbitStartPitch = 0;
+  let orbitYaw = 0;
+  let orbitPitch = 0;
+  let targetOrbitYaw = 0;
+  let targetOrbitPitch = 0;
   let transportEnabled = false;
   let pressedTransport: TransportKey | null = null;
   let hoveredTransport: TransportKey | null = null;
@@ -3377,6 +3388,7 @@ export function createPlayerScene(
   };
 
   const onPointerDown = (event: PointerEvent) => {
+    if (!event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0)) return;
     const transportKey = transportKeyAt(event);
     if (transportEnabled && transportKey) {
       pressedTransport = transportKey;
@@ -3387,10 +3399,20 @@ export function createPlayerScene(
       event.preventDefault();
       return;
     }
-    if (!updateVolumeFromPointer(event)) return;
-    draggingVolume = true;
+    if (updateVolumeFromPointer(event)) {
+      draggingVolume = true;
+      canvas.setPointerCapture(event.pointerId);
+      canvas.classList.add('is-adjusting-volume');
+      event.preventDefault();
+      return;
+    }
+    orbitPointerId = event.pointerId;
+    orbitStartX = event.clientX;
+    orbitStartY = event.clientY;
+    orbitStartYaw = targetOrbitYaw;
+    orbitStartPitch = targetOrbitPitch;
     canvas.setPointerCapture(event.pointerId);
-    canvas.classList.add('is-adjusting-volume');
+    canvas.classList.add('is-rotating-player');
     event.preventDefault();
   };
   const onPointerMove = (event: PointerEvent) => {
@@ -3400,6 +3422,22 @@ export function createPlayerScene(
     }
     if (draggingVolume) {
       updateVolumeFromPointer(event);
+      event.preventDefault();
+      return;
+    }
+    if (orbitPointerId === event.pointerId) {
+      const bounds = canvas.getBoundingClientRect();
+      const orbitScale = Math.PI / Math.max(bounds.width, 320);
+      targetOrbitYaw = THREE.MathUtils.clamp(
+        orbitStartYaw + (event.clientX - orbitStartX) * orbitScale,
+        -1.45,
+        1.45,
+      );
+      targetOrbitPitch = THREE.MathUtils.clamp(
+        orbitStartPitch + (event.clientY - orbitStartY) * orbitScale,
+        -0.55,
+        0.55,
+      );
       event.preventDefault();
       return;
     }
@@ -3424,10 +3462,17 @@ export function createPlayerScene(
       if (transportEnabled && releasedKey?.action === action) onTransport(action);
       return;
     }
-    if (!draggingVolume) return;
-    draggingVolume = false;
-    if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
-    canvas.classList.remove('is-adjusting-volume');
+    if (draggingVolume) {
+      draggingVolume = false;
+      if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+      canvas.classList.remove('is-adjusting-volume');
+      return;
+    }
+    if (orbitPointerId === event.pointerId) {
+      orbitPointerId = null;
+      if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+      canvas.classList.remove('is-rotating-player');
+    }
   };
   const onPointerCancel = (event: PointerEvent) => {
     if (pressedTransport) {
@@ -3436,10 +3481,14 @@ export function createPlayerScene(
       canvas.classList.remove('is-pressing-transport');
       refreshTransportKeys();
     }
+    if (orbitPointerId === event.pointerId) {
+      orbitPointerId = null;
+      canvas.classList.remove('is-rotating-player');
+    }
     onPointerUp(event);
   };
   const onPointerLeave = () => {
-    if (!draggingVolume && !pressedTransport) {
+    if (!draggingVolume && !pressedTransport && orbitPointerId === null) {
       if (hoveredTransport) hoveredTransport.cap.position.z = 0;
       hoveredTransport = null;
       refreshTransportKeys();
@@ -3607,6 +3656,14 @@ export function createPlayerScene(
     const cameraScale = Math.max(1, 0.86 / aspect);
     camera.position.set(4.8 * cameraScale, 2.2 * cameraScale, 19.5 * cameraScale);
     camera.lookAt(0, 0.15, 0);
+    const orbitDamping = 1 - Math.exp(-delta * 10);
+    orbitYaw = THREE.MathUtils.lerp(orbitYaw, targetOrbitYaw, orbitDamping);
+    orbitPitch = THREE.MathUtils.lerp(orbitPitch, targetOrbitPitch, orbitDamping);
+    rig.rotation.set(
+      defaultRigRotation.x + orbitPitch,
+      defaultRigRotation.y + orbitYaw,
+      defaultRigRotation.z,
+    );
     rig.position.y = Math.sin(time * 0.7) * 0.04;
     if (doorAnimation) {
       const progress = THREE.MathUtils.clamp((time - doorAnimation.start) / 2, 0, 1);
@@ -3694,6 +3751,10 @@ export function createPlayerScene(
       const width = (progressMax - progressMin) * normalized;
       progressFill.scale.x = Math.max(width, 0.001);
       progressThumb.position.x = THREE.MathUtils.lerp(progressMin, progressMax, normalized);
+    },
+    resetView() {
+      targetOrbitYaw = 0;
+      targetOrbitPitch = 0;
     },
     dispose() {
       canvas.removeEventListener('pointerdown', onPointerDown);

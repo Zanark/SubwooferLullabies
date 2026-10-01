@@ -115,6 +115,14 @@ app.innerHTML = `
     </aside>
 
     <section id="player-panel" class="player-panel" aria-label="Cassette player">
+      <button id="reset-player-view" class="reset-player-view" type="button" aria-label="Reset Walkman view" title="Reset Walkman view">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4.5 8.5V4.5h4"></path>
+          <path d="M5.2 6.2A8 8 0 1 1 4 14"></path>
+          <path d="m9 10 3-1.8 3 1.8v4l-3 1.8L9 14Z"></path>
+        </svg>
+      </button>
+      <p class="orbit-hint" aria-hidden="true">drag empty space to rotate</p>
       <div id="walkman-drop" class="walkman-drop">
         <p class="drop-hint">drop tape here</p>
         <canvas id="player-3d" class="scene-canvas player-canvas" aria-label="3D cassette player and headphones"></canvas>
@@ -240,6 +248,7 @@ const announcement = required<HTMLDivElement>('announcement');
 const showcase = required<HTMLDivElement>('showcase');
 const showcaseTitle = required<HTMLElement>('showcase-title');
 const roomPanel = required<HTMLElement>('room-panel');
+const resetPlayerViewButton = required<HTMLButtonElement>('reset-player-view');
 const toggleCrtIsolationButton = required<HTMLButtonElement>('toggle-crt-isolation');
 const toggleCrtFullscreenButton = required<HTMLButtonElement>('toggle-crt-fullscreen');
 const exitCrtFocusButton = required<HTMLButtonElement>('exit-crt-focus');
@@ -1030,6 +1039,7 @@ async function start() {
   }, playCassetteLoadSound, (action) => {
     if (action === 'play' || action === 'stop') playWalkmanButtonSound();
   });
+  resetPlayerViewButton.addEventListener('click', () => playerScene.resetView());
   const transportFocusTargets = [
     ['rewind', rewindButton],
     ['play', playButton],
