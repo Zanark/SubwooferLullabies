@@ -224,6 +224,8 @@ const randomPlayButton = required<HTMLButtonElement>('random-play');
 const audio = required<HTMLAudioElement>('audio');
 const cassetteLoadSound = new Audio(asset('sfx/cassette-load.wav'));
 cassetteLoadSound.preload = 'auto';
+const walkmanButtonSound = new Audio(asset('sfx/button-press.mp3'));
+walkmanButtonSound.preload = 'auto';
 const status = required<HTMLDivElement>('status');
 const announcement = required<HTMLDivElement>('announcement');
 const showcase = required<HTMLDivElement>('showcase');
@@ -781,6 +783,15 @@ function playTransportClick() {
   snap.stop(start + 0.045);
 }
 
+function playWalkmanButtonSound() {
+  walkmanButtonSound.pause();
+  walkmanButtonSound.currentTime = 0;
+  walkmanButtonSound.volume = audio.volume;
+  void walkmanButtonSound.play().catch((error) => {
+    console.warn('Unable to play Walkman button sound.', error);
+  });
+}
+
 function stopPlayback() {
   if (!selected) return;
   audio.pause();
@@ -808,15 +819,19 @@ async function playRandomTape() {
 }
 
 playButton.addEventListener('click', () => {
-  playTransportClick();
+  playWalkmanButtonSound();
   void togglePlayback();
 });
-stopButton.addEventListener('click', stopPlayback);
+stopButton.addEventListener('click', () => {
+  playWalkmanButtonSound();
+  stopPlayback();
+});
 rewindButton.addEventListener('click', () => seekBy(-10));
 forwardButton.addEventListener('click', () => seekBy(10));
 volume.addEventListener('input', () => {
   audio.volume = Number(volume.value);
   cassetteLoadSound.volume = audio.volume;
+  walkmanButtonSound.volume = audio.volume;
   playerScene?.setVolume(audio.volume);
   boxScene?.setVolume(audio.volume);
 });
@@ -967,6 +982,7 @@ async function start() {
   }
   audio.volume = Number(volume.value);
   cassetteLoadSound.volume = audio.volume;
+  walkmanButtonSound.volume = audio.volume;
   renderShelf();
   const albumShelfResizeObserver = new ResizeObserver(() => scheduleAlbumShelfLayout());
   albumShelfResizeObserver.observe(shelf);
@@ -974,6 +990,7 @@ async function start() {
   playerScene = createPlayerScene(required<HTMLCanvasElement>('player-3d'), (value) => {
     audio.volume = value;
     cassetteLoadSound.volume = value;
+    walkmanButtonSound.volume = value;
     volume.value = String(value);
   }, (action) => {
     const button = {
@@ -1025,10 +1042,14 @@ async function start() {
       toggleCrtIsolationButton.hidden = !active;
       exitCrtFocusButton.hidden = !active;
     },
-    () => playButton.click(),
+    () => {
+      playTransportClick();
+      void togglePlayback();
+    },
     (value) => {
       audio.volume = value;
       cassetteLoadSound.volume = value;
+      walkmanButtonSound.volume = value;
       volume.value = String(value);
       playerScene.setVolume(value);
     },

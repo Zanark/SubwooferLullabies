@@ -18,3 +18,18 @@ to `0.5`, applies a 5 ms fade-in and a 180 ms fade-out, and has SHA-256:
 
 The effect is integrated into the cassette-loading interaction and is not
 presented as a standalone sound-effects download.
+
+## Walkman button press
+
+`button-press.mp3` is the exact byte-for-byte copy of the user-supplied file:
+
+- Downloaded filename: `button_press.mp3`
+- Browser metadata duration: `1.28` seconds
+- Encoding reported by Windows: `256 kbps MP3`
+- File size: `40,960` bytes
+- Source and website SHA-256:
+  `5a7c47db4df45f27155bb0d1380fbbf652f997453c3ceac7d7baeb7c40910269`
+
+No external source or license information was supplied or independently
+established. The recording is used only as the interaction sound for the
+fictional Walkman's PLAY/PAUSE and STOP buttons.

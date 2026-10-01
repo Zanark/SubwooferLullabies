@@ -101,6 +101,9 @@ materials of portable cassette players without copying a real manufacturer.
 - Dropping a cassette onto an empty player runs a two-second mechanical loading sequence based on front-compartment portable cassette players: the transparent door pivots outward from its bottom hinge, the cassette descends into the visible inner bay and spindles, and the door closes before transport becomes available. This happens only while the player is empty; later drops retain the established two-second cassette inspection and replacement flow.
 - That first empty-player sequence plays the trimmed `site/public/sfx/cassette-load.wav` mechanical recording in sync with the two-second door animation. The effect follows the shared player/TV volume and does not replay for later cassette replacements. Source, license reference, hashes and the exact trim are recorded in `site/public/sfx/PROVENANCE.md`.
 - PLAY/PAUSE produces a short Web Audio transport thunk.
+- The Walkman's PLAY/PAUSE and STOP keys play the supplied 1.28-second
+  `site/public/sfx/button-press.mp3` recording at the shared player/TV volume.
+  Grid autoplay and the CRT transport retain their existing synthesized thunk.
 - The long lower groove is the draggable volume control.
 - The shorter upper groove is a position indicator with no elapsed-time text.
 - Both visible cassette reels rotate clockwise at a restrained visual speed while
