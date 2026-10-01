@@ -3510,7 +3510,7 @@ export function createPlayerScene(
     new THREE.Vector3(4.15, 1.15, -0.72),
   ]);
   const band = new THREE.Mesh(
-    new THREE.TubeGeometry(bandCurve, 20, 0.32, 6, false),
+    new THREE.TubeGeometry(bandCurve, 20, 0.48, 6, false),
     material(0x17191b, { roughness: 0.7 }),
   );
   headphoneGroup.add(band);
@@ -3523,7 +3523,7 @@ export function createPlayerScene(
     new THREE.Vector3(4.1, 1.25, -0.38),
   ]);
   headphoneGroup.add(new THREE.Mesh(
-    new THREE.TubeGeometry(bandHighlightCurve, 20, 0.085, 5, false),
+    new THREE.TubeGeometry(bandHighlightCurve, 20, 0.1275, 5, false),
     material(0x8d9290, { metalness: 0.42, roughness: 0.42 }),
   ));
 
@@ -3547,7 +3547,7 @@ export function createPlayerScene(
 
     const earpiece = new THREE.Group();
     earpiece.position.y = -0.83;
-    earpiece.scale.setScalar(1.5);
+    earpiece.scale.setScalar(2.25);
 
     const cupBack = new THREE.Mesh(
       new THREE.CylinderGeometry(1.02, 1.02, 0.42, 12),
