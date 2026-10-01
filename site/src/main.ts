@@ -134,26 +134,41 @@ app.innerHTML = `
     </section>
 
     <section id="room-panel" class="room-panel box-scene" aria-label="Messy 2010 teenager room">
+      <aside id="crt-signal-panel" class="crt-signal-panel" aria-label="CRT signal selection">
+        <div class="crt-signal-head">
+          <span class="crt-signal-title"><span aria-hidden="true">▣</span> signals</span>
+          <button id="toggle-signal-panel" class="crt-signal-toggle" type="button" aria-label="Collapse CRT signal panel" title="Collapse CRT signal panel" aria-expanded="true">‹</button>
+        </div>
+        <div class="crt-controls" role="group" aria-label="CRT visualizer">
+          <button type="button" data-visualizer="scope" disabled>scope</button>
+          <button type="button" data-visualizer="bars" disabled>bars</button>
+          <button type="button" data-visualizer="atari" disabled>atari</button>
+          <button type="button" data-visualizer="tunnel" disabled>tunnel</button>
+          <button type="button" data-visualizer="rain" disabled>rain</button>
+          <button type="button" data-visualizer="tesla" disabled>tesla</button>
+          <button type="button" data-visualizer="radar" disabled>radar</button>
+          <button type="button" data-visualizer="stars" disabled>stars</button>
+          <button type="button" data-visualizer="plasma" disabled>plasma</button>
+          <button type="button" data-visualizer="copper" disabled>copper</button>
+          <button type="button" data-visualizer="sequencer" disabled>sequencer</button>
+          <button type="button" data-visualizer="metaballs" disabled>metaballs</button>
+          <button type="button" data-visualizer="synthwave" disabled>synthwave</button>
+          <button type="button" data-visualizer="fireworks" disabled>fireworks</button>
+        </div>
+      </aside>
       <canvas id="box-3d" class="scene-canvas box-canvas" aria-label="Interactive 3D room with loose cassettes on a desk"></canvas>
-      <button id="toggle-crt-isolation" class="crt-isolation-button" type="button" aria-label="Dim surroundings" title="Dim surroundings" aria-pressed="false" hidden>◐</button>
+      <button id="toggle-crt-isolation" class="crt-isolation-button" type="button" aria-label="Dim surroundings" title="Dim surroundings" aria-pressed="false" hidden>
+        <svg class="isolation-icon isolation-icon-dim" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M2.5 12s3.4-5.5 9.5-5.5 9.5 5.5 9.5 5.5-3.4 5.5-9.5 5.5S2.5 12 2.5 12Z"></path>
+          <circle cx="12" cy="12" r="2.7"></circle>
+          <path d="M4 4l16 16"></path>
+        </svg>
+        <svg class="isolation-icon isolation-icon-restore" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M2.5 12s3.4-5.5 9.5-5.5 9.5 5.5 9.5 5.5-3.4 5.5-9.5 5.5S2.5 12 2.5 12Z"></path>
+          <circle cx="12" cy="12" r="2.7"></circle>
+        </svg>
+      </button>
       <button id="exit-crt-focus" class="crt-back-button" type="button" aria-label="Back to room" title="Back to room" hidden>↩</button>
-      <div class="crt-controls" role="group" aria-label="CRT visualizer">
-        <span class="crt-signal-icon" aria-label="CRT signal" title="CRT signal">▣</span>
-        <button type="button" data-visualizer="scope" disabled>scope</button>
-        <button type="button" data-visualizer="bars" disabled>bars</button>
-        <button type="button" data-visualizer="atari" disabled>atari</button>
-        <button type="button" data-visualizer="tunnel" disabled>tunnel</button>
-        <button type="button" data-visualizer="rain" disabled>rain</button>
-        <button type="button" data-visualizer="tesla" disabled>tesla</button>
-        <button type="button" data-visualizer="radar" disabled>radar</button>
-        <button type="button" data-visualizer="stars" disabled>stars</button>
-        <button type="button" data-visualizer="plasma" disabled>plasma</button>
-        <button type="button" data-visualizer="copper" disabled>copper</button>
-        <button type="button" data-visualizer="sequencer" disabled>sequencer</button>
-        <button type="button" data-visualizer="metaballs" disabled>metaballs</button>
-        <button type="button" data-visualizer="synthwave" disabled>synthwave</button>
-        <button type="button" data-visualizer="fireworks" disabled>fireworks</button>
-      </div>
       <p class="canvas-help"><span aria-hidden="true">◆</span> tape · <span aria-hidden="true">→</span> player · <span aria-hidden="true">◉</span> tv/switches</p>
     </section>
   </main>
@@ -206,6 +221,7 @@ const showcaseTitle = required<HTMLElement>('showcase-title');
 const roomPanel = required<HTMLElement>('room-panel');
 const toggleCrtIsolationButton = required<HTMLButtonElement>('toggle-crt-isolation');
 const exitCrtFocusButton = required<HTMLButtonElement>('exit-crt-focus');
+const toggleSignalPanelButton = required<HTMLButtonElement>('toggle-signal-panel');
 const visualizerButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-visualizer]'));
 
 let catalog: Catalog;
@@ -814,6 +830,14 @@ toggleCrtIsolationButton.addEventListener('click', () => {
   const label = active ? 'Restore surroundings' : 'Dim surroundings';
   toggleCrtIsolationButton.setAttribute('aria-label', label);
   toggleCrtIsolationButton.title = label;
+});
+toggleSignalPanelButton.addEventListener('click', () => {
+  const collapsed = roomPanel.classList.toggle('is-signal-rail-collapsed');
+  const label = collapsed ? 'Expand CRT signal panel' : 'Collapse CRT signal panel';
+  toggleSignalPanelButton.textContent = collapsed ? '›' : '‹';
+  toggleSignalPanelButton.setAttribute('aria-expanded', String(!collapsed));
+  toggleSignalPanelButton.setAttribute('aria-label', label);
+  toggleSignalPanelButton.title = label;
 });
 queueAddButton.addEventListener('click', () => {
   if (selectedTitles.size) {

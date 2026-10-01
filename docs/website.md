@@ -146,8 +146,15 @@ cover-colored glow.
 
 Clicking the television moves the room camera into a centered first-person view. The
 screen is a bowed low-poly mesh with recessed bezel, deep cabinet, speaker grille and
-bright phosphor bloom. **Dim surroundings** darkens the rest of the page without
-turning off the room, and **back to room** restores the original camera.
+bright phosphor bloom. A crossed-eye icon darkens the rest of the page without turning
+off the room; it changes to an open-eye icon for restoring visibility. Accessible
+labels and tooltips continue to describe both states, while the top-right back icon
+restores the original camera.
+
+Signal selection now occupies a compact rail to the left of the room instead of
+covering the bottom of the television. Its smaller labels scroll inside the rail when
+needed, and the chevron control collapses it to a narrow tab so the room can reclaim
+the space.
 
 The television's right-side control strip is also functional Three.js geometry. Its
 recessed key mirrors the shared PLAY/PAUSE transport state, while the illuminated

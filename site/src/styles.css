@@ -1492,6 +1492,183 @@ body.playing .reel {
   }
 }
 
+/* Keep CRT signal selection beside the room instead of covering the television. */
+.room-panel {
+  --signal-rail-width: 152px;
+}
+
+.room-panel.is-signal-rail-collapsed {
+  --signal-rail-width: 46px;
+}
+
+.room-panel .box-canvas {
+  right: auto;
+  left: var(--signal-rail-width);
+  width: calc(100% - var(--signal-rail-width));
+  transition: left 180ms steps(4), width 180ms steps(4);
+}
+
+.crt-signal-panel {
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 9;
+  width: var(--signal-rail-width);
+  padding: 10px 8px;
+  border-right: 2px solid #6e4132;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(68, 35, 31, .96), rgba(24, 14, 17, .98)),
+    #180e11;
+  box-shadow: 5px 0 0 rgba(9, 5, 7, .62);
+  transition: width 180ms steps(4);
+}
+
+.crt-signal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-height: 30px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #684133;
+  padding-bottom: 8px;
+}
+
+.crt-signal-title {
+  color: #d0a878;
+  font-size: 9px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.crt-signal-title span {
+  color: var(--orange);
+}
+
+.crt-signal-toggle {
+  display: grid;
+  flex: 0 0 28px;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #815340;
+  padding: 0;
+  color: #211315;
+  background: var(--orange);
+  box-shadow: 2px 2px 0 #090507;
+  cursor: pointer;
+  font: 900 22px/1 monospace;
+}
+
+.crt-signal-toggle:hover,
+.crt-signal-toggle:focus-visible {
+  outline: 2px solid #f0d38c;
+  outline-offset: 2px;
+  background: #f0d38c;
+}
+
+.crt-signal-panel .crt-controls {
+  position: static;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: stretch;
+  gap: 5px;
+  max-width: none;
+  max-height: calc(100% - 46px);
+  padding: 2px 3px 8px 1px;
+  border: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: transparent;
+  box-shadow: none;
+  scrollbar-color: var(--orange) #180e11;
+}
+
+.crt-signal-panel .crt-controls button {
+  width: 100%;
+  padding: 5px 6px;
+  overflow: hidden;
+  font-size: 10px;
+  letter-spacing: .02em;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.room-panel.is-signal-rail-collapsed .crt-signal-panel {
+  padding-inline: 8px;
+}
+
+.room-panel.is-signal-rail-collapsed .crt-signal-title,
+.room-panel.is-signal-rail-collapsed .crt-controls {
+  display: none;
+}
+
+.room-panel.is-signal-rail-collapsed .crt-signal-head {
+  justify-content: center;
+  border-bottom: 0;
+}
+
+.room-panel .crt-isolation-button {
+  left: calc(var(--signal-rail-width) + 18px);
+  width: 42px;
+  height: 42px;
+  padding: 8px;
+  line-height: 0;
+  transition: left 180ms steps(4);
+}
+
+.isolation-icon {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+}
+
+.isolation-icon-restore,
+.crt-isolation-button[aria-pressed="true"] .isolation-icon-dim {
+  display: none;
+}
+
+.crt-isolation-button[aria-pressed="true"] .isolation-icon-restore {
+  display: block;
+}
+
+@media (max-width: 650px) {
+  .room-panel {
+    --signal-rail-width: 112px;
+  }
+
+  .room-panel.is-signal-rail-collapsed {
+    --signal-rail-width: 42px;
+  }
+
+  .crt-signal-panel {
+    padding: 8px 6px;
+  }
+
+  .crt-signal-title {
+    font-size: 8px;
+  }
+
+  .crt-signal-panel .crt-controls {
+    gap: 4px;
+  }
+
+  .crt-signal-panel .crt-controls button {
+    padding: 4px;
+    font-size: 8px;
+  }
+
+  .room-panel .crt-isolation-button {
+    left: calc(var(--signal-rail-width) + 10px);
+  }
+}
+
 /* Full-room 1990s layout: warm laminate, oxide walls, chunky hardware and generous spacing. */
 :root {
   color: #f0ddb2;
