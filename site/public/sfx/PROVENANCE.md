@@ -21,15 +21,26 @@ presented as a standalone sound-effects download.
 
 ## Walkman button press
 
-`button-press.mp3` is the exact byte-for-byte copy of the user-supplied file:
+`button-press.wav` is a timing-corrected interaction derivative of the user-supplied
+file:
 
 - Downloaded filename: `button_press.mp3`
-- Browser metadata duration: `1.28` seconds
-- Encoding reported by Windows: `256 kbps MP3`
-- File size: `40,960` bytes
-- Source and website SHA-256:
+- Source duration: `1.28` seconds
+- Source encoding reported by Windows: `256 kbps MP3`
+- Source file size: `40,960` bytes
+- Source SHA-256:
   `5a7c47db4df45f27155bb0d1380fbbf652f997453c3ceac7d7baeb7c40910269`
+- Retained source interval: `0.388-0.820` seconds
+- Output: mono 44.1 kHz 16-bit PCM WAV
+- Output duration: `0.432` seconds
+- Output file size: `38,146` bytes
+- Processing: 2 ms fade-in and 40 ms fade-out
+- Output SHA-256:
+  `d9322a36999be776f423f6af38f173e0604f8ec91414d34988dc069653a3781a`
 
 No external source or license information was supplied or independently
 established. The recording is used only as the interaction sound for the
-fictional Walkman's PLAY/PAUSE and STOP buttons.
+fictional Walkman's PLAY/PAUSE and STOP buttons. The removed lead-in delayed the
+main audible onset by approximately 400 ms. The physical Three.js controls now
+start this derivative on pointer-down, at the same moment their keycaps begin
+travelling inward.

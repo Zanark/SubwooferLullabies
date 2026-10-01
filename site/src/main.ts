@@ -232,8 +232,9 @@ const randomPlayButton = required<HTMLButtonElement>('random-play');
 const audio = required<HTMLAudioElement>('audio');
 const cassetteLoadSound = new Audio(asset('sfx/cassette-load.wav'));
 cassetteLoadSound.preload = 'auto';
-const walkmanButtonSound = new Audio(asset('sfx/button-press.mp3'));
+const walkmanButtonSound = new Audio(asset('sfx/button-press.wav'));
 walkmanButtonSound.preload = 'auto';
+walkmanButtonSound.load();
 const status = required<HTMLDivElement>('status');
 const announcement = required<HTMLDivElement>('announcement');
 const showcase = required<HTMLDivElement>('showcase');
@@ -827,14 +828,18 @@ async function playRandomTape() {
   await loadCassette(song, true);
 }
 
-playButton.addEventListener('click', () => {
-  playWalkmanButtonSound();
+function activateWalkmanPlay(playSound = true) {
+  if (playSound) playWalkmanButtonSound();
   void togglePlayback();
-});
-stopButton.addEventListener('click', () => {
-  playWalkmanButtonSound();
+}
+
+function activateWalkmanStop(playSound = true) {
+  if (playSound) playWalkmanButtonSound();
   stopPlayback();
-});
+}
+
+playButton.addEventListener('click', () => activateWalkmanPlay());
+stopButton.addEventListener('click', () => activateWalkmanStop());
 rewindButton.addEventListener('click', () => seekBy(-10));
 forwardButton.addEventListener('click', () => seekBy(10));
 volume.addEventListener('input', () => {
@@ -1018,14 +1023,13 @@ async function start() {
     walkmanButtonSound.volume = value;
     volume.value = String(value);
   }, (action) => {
-    const button = {
-      rewind: rewindButton,
-      play: playButton,
-      stop: stopButton,
-      forward: forwardButton,
-    }[action];
-    button.click();
-  }, playCassetteLoadSound);
+    if (action === 'rewind') seekBy(-10);
+    if (action === 'play') activateWalkmanPlay(false);
+    if (action === 'stop') activateWalkmanStop(false);
+    if (action === 'forward') seekBy(10);
+  }, playCassetteLoadSound, (action) => {
+    if (action === 'play' || action === 'stop') playWalkmanButtonSound();
+  });
   const transportFocusTargets = [
     ['rewind', rewindButton],
     ['play', playButton],

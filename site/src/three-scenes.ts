@@ -3015,6 +3015,7 @@ export function createPlayerScene(
   onVolumeChange: (value: number) => void = () => {},
   onTransport: (action: TransportAction) => void = () => {},
   onCassetteDoorLoadStart: () => void = () => {},
+  onTransportPress: (action: TransportAction) => void = () => {},
 ): PlayerSceneController {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
@@ -3305,6 +3306,7 @@ export function createPlayerScene(
       transportKey.cap.position.z = -0.12;
       canvas.setPointerCapture(event.pointerId);
       canvas.classList.add('is-pressing-transport');
+      onTransportPress(transportKey.action);
       event.preventDefault();
       return;
     }
