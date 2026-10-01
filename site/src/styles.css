@@ -249,6 +249,21 @@ h1 span {
   scrollbar-color: var(--cyan) #071317;
 }
 
+.cover-grid.is-album-view {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-content: start;
+  height: var(--album-row-height, auto);
+  max-height: var(--album-row-height, none);
+  overflow-x: hidden;
+  overflow-y: auto;
+  flex: 0 0 var(--album-row-height, auto);
+  scroll-snap-type: y mandatory;
+}
+
+.cover-grid.is-album-view .cover-card {
+  scroll-snap-align: start;
+}
+
 .cover-card {
   min-width: 0;
   border: 0;

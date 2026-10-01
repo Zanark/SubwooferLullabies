@@ -67,7 +67,9 @@ The library offers three paths into the same physical interaction:
 - Album and standalone cover cards open a grid of songs. Clicking a song plays the
   transport thunk and automatically starts it after a 30ms mechanical pause, without
   player focus or cassette rotation. Dragging the card keeps the physical
-  cassette-handling flow. A song can also be selected for the queue.
+  cassette-handling flow. A song can also be selected for the queue. Open albums keep
+  exactly three songs in each row and expose only one complete row at a time; later
+  rows remain inside the fixed library area and are reached by vertical scrolling.
 - **Play a random tape** chooses a non-current song without clearing or rearranging
   the saved queue.
 

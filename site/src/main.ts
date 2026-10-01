@@ -226,6 +226,7 @@ let showcaseScene: ReturnType<typeof createShowcaseScene>;
 let audioContext: AudioContext | null = null;
 let audioSource: MediaElementAudioSourceNode | null = null;
 let audioAnalyser: AnalyserNode | null = null;
+let albumShelfLayoutFrame = 0;
 
 function required<T extends HTMLElement>(id: string): T {
   const element = document.getElementById(id);
@@ -470,8 +471,35 @@ function albumCard(album: Album) {
   return button;
 }
 
+function scheduleAlbumShelfLayout(scrollTop = shelf.scrollTop) {
+  cancelAnimationFrame(albumShelfLayoutFrame);
+  albumShelfLayoutFrame = requestAnimationFrame(() => {
+    if (!shelf.classList.contains('is-album-view')) return;
+    const firstCard = shelf.querySelector<HTMLElement>('.cover-card');
+    if (!firstCard) return;
+    const styles = getComputedStyle(shelf);
+    const rowHeight = Math.ceil(
+      firstCard.getBoundingClientRect().height
+      + Number.parseFloat(styles.paddingTop)
+      + Number.parseFloat(styles.paddingBottom),
+    );
+    const nextHeight = `${rowHeight}px`;
+    if (shelf.style.getPropertyValue('--album-row-height') !== nextHeight) {
+      shelf.style.setProperty('--album-row-height', nextHeight);
+    }
+    shelf.scrollTop = Math.min(scrollTop, Math.max(0, shelf.scrollHeight - shelf.clientHeight));
+  });
+}
+
 function renderShelf() {
   const query = search.value.trim().toLowerCase();
+  const albumView = !deskPreviewTitle && !query && Boolean(currentAlbum);
+  const previousScrollTop = albumView && shelf.dataset.album === currentAlbum ? shelf.scrollTop : 0;
+  shelf.classList.toggle('is-album-view', albumView);
+  if (!albumView) {
+    shelf.style.removeProperty('--album-row-height');
+    delete shelf.dataset.album;
+  }
   shelf.replaceChildren();
   if (deskPreviewTitle) {
     const song = trackByTitle(deskPreviewTitle);
@@ -504,6 +532,8 @@ function renderShelf() {
     shelfLabel.textContent = album?.title ?? 'album';
     back.hidden = false;
     album?.tracks.forEach((title) => shelf.append(songCard(trackByTitle(title))));
+    shelf.dataset.album = currentAlbum;
+    scheduleAlbumShelfLayout(previousScrollTop);
     updateQueueAddButton();
     return;
   }
@@ -889,6 +919,8 @@ async function start() {
   audio.volume = Number(volume.value);
   cassetteLoadSound.volume = audio.volume;
   renderShelf();
+  const albumShelfResizeObserver = new ResizeObserver(() => scheduleAlbumShelfLayout());
+  albumShelfResizeObserver.observe(shelf);
   renderQueue();
   playerScene = createPlayerScene(required<HTMLCanvasElement>('player-3d'), (value) => {
     audio.volume = value;
