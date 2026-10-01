@@ -169,7 +169,7 @@ adaptive waveform gain keep quieter recordings visibly responsive.
 |---|---|
 | `scope` | Adaptive time-domain waveform |
 | `bars` | Nonlinear frequency columns |
-| `atari` | Beat-reactive Pong with frequency-driven paddles, scored rallies, music-accelerated rebounds and a capped blue transient spark around the ball; pressing Atari resets both scores |
+| `pong` | Beat-reactive Pong with frequency-driven paddles, scored rallies, music-accelerated rebounds and a capped blue transient spark around the ball; pressing Pong resets both scores |
 | `tunnel` | Receding perspective rectangles |
 | `rain` | Matrix-style green code streams with bright heads and frequency-sized trails |
 | `tesla` | Central audio coil with vectors-style adaptive waveform sensitivity driving bolt reach, direction, thickness and jagged motion |

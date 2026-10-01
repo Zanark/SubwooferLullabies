@@ -151,7 +151,7 @@ app.innerHTML = `
         <div class="crt-controls" role="group" aria-label="CRT visualizer">
           <button type="button" data-visualizer="scope" disabled>scope</button>
           <button type="button" data-visualizer="bars" disabled>bars</button>
-          <button type="button" data-visualizer="atari" disabled>atari</button>
+          <button type="button" data-visualizer="atari" disabled>pong</button>
           <button type="button" data-visualizer="tunnel" disabled>tunnel</button>
           <button type="button" data-visualizer="rain" disabled>rain</button>
           <button type="button" data-visualizer="tesla" disabled>tesla</button>
