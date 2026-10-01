@@ -193,7 +193,7 @@ adaptive waveform gain keep quieter recordings visibly responsive.
 | `bars` | Nonlinear frequency columns |
 | `pong` | Beat-reactive Pong with frequency-driven paddles, scored rallies, music-accelerated rebounds and a capped blue transient spark around the ball; pressing Pong resets both scores |
 | `pipes` | Classic screensaver-inspired multicolor pipes with square turns, rounded joints, beveled highlights and audio-driven thickness |
-| `rain` | Matrix-style green code streams with bright heads and frequency-sized trails |
+| `rain` | Classic time-driven Matrix rain with fixed-speed green code columns, bright heads and fading trails; no audio or beat reactivity |
 | `tesla` | Central audio coil with vectors-style adaptive waveform sensitivity driving bolt reach, direction, thickness and jagged motion |
 | `radar` | Circular phosphor scope with a constant-speed sweep and targets that illuminate only on detected beats |
 | `stars` | Constant-speed radial space flight with outward-moving stars and depth-lengthened trails; no audio reactivity |

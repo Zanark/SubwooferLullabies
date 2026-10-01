@@ -1837,18 +1837,20 @@ export function createBoxScene(
         const glyphs = '01ZX#$+*';
         const columns = 24;
         for (let column = 0; column < columns; column++) {
-          const columnEnergy = sensitiveBand(column / columns, (column + 1) / columns, 2);
-          const speed = 24 + columnEnergy * 94 + smoothedEnergy * 28;
+          const columnSeed = (column * 73 + 19) % 101;
+          const speed = 28 + columnSeed % 31;
           const head = (time * speed + column * 47) % (height + 150) - 36;
-          const trailLength = 7 + Math.round(columnEnergy * 9);
+          const trailLength = 8 + columnSeed % 8;
           const x = 8 + column * ((width - 16) / (columns - 1));
           for (let trail = 0; trail < trailLength; trail++) {
             const y = head - trail * 14;
             if (y < -12 || y > height + 12) continue;
-            const glyphIndex = Math.abs(Math.floor(column * 5 + trail * 3 + time * (3 + column % 4))) % glyphs.length;
+            const glyphIndex = Math.abs(Math.floor(
+              column * 5 + trail * 3 + time * (3 + columnSeed % 4),
+            )) % glyphs.length;
             const fade = 1 - trail / trailLength;
             crtContext.fillStyle = trail === 0 ? '#eaffef' : trail < 3 ? '#77ff9b' : '#16a34a';
-            crtContext.globalAlpha = trail === 0 ? 0.94 : 0.16 + fade * (0.45 + columnEnergy * 0.34);
+            crtContext.globalAlpha = trail === 0 ? 0.94 : 0.16 + fade * 0.62;
             crtContext.fillText(glyphs[glyphIndex], x, y);
           }
         }
