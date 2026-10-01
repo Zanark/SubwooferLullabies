@@ -178,6 +178,14 @@ app.innerHTML = `
           <circle cx="12" cy="12" r="2.7"></circle>
         </svg>
       </button>
+      <button id="toggle-crt-fullscreen" class="crt-fullscreen-button" type="button" aria-label="Enter room fullscreen" title="Enter room fullscreen" aria-pressed="false" hidden>
+        <svg class="fullscreen-icon fullscreen-icon-enter" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"></path>
+        </svg>
+        <svg class="fullscreen-icon fullscreen-icon-exit" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"></path>
+        </svg>
+      </button>
       <button id="exit-crt-focus" class="crt-back-button" type="button" aria-label="Back to room" title="Back to room" hidden>↩</button>
     </section>
   </main>
@@ -232,6 +240,7 @@ const showcase = required<HTMLDivElement>('showcase');
 const showcaseTitle = required<HTMLElement>('showcase-title');
 const roomPanel = required<HTMLElement>('room-panel');
 const toggleCrtIsolationButton = required<HTMLButtonElement>('toggle-crt-isolation');
+const toggleCrtFullscreenButton = required<HTMLButtonElement>('toggle-crt-fullscreen');
 const exitCrtFocusButton = required<HTMLButtonElement>('exit-crt-focus');
 const toggleSignalPanelButton = required<HTMLButtonElement>('toggle-signal-panel');
 const visualizerButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-visualizer]'));
@@ -871,6 +880,22 @@ toggleCrtIsolationButton.addEventListener('click', () => {
   toggleCrtIsolationButton.setAttribute('aria-label', label);
   toggleCrtIsolationButton.title = label;
 });
+function syncCrtFullscreenButton() {
+  const active = document.fullscreenElement === roomPanel;
+  toggleCrtFullscreenButton.setAttribute('aria-pressed', String(active));
+  const label = active ? 'Exit room fullscreen' : 'Enter room fullscreen';
+  toggleCrtFullscreenButton.setAttribute('aria-label', label);
+  toggleCrtFullscreenButton.title = label;
+}
+toggleCrtFullscreenButton.addEventListener('click', async () => {
+  try {
+    if (document.fullscreenElement === roomPanel) await document.exitFullscreen();
+    else await roomPanel.requestFullscreen();
+  } catch (error) {
+    console.warn('Unable to change CRT room fullscreen state.', error);
+  }
+});
+document.addEventListener('fullscreenchange', syncCrtFullscreenButton);
 toggleSignalPanelButton.addEventListener('click', () => {
   const collapsed = roomPanel.classList.toggle('is-signal-rail-collapsed');
   const label = collapsed ? 'Expand CRT signal panel' : 'Collapse CRT signal panel';
@@ -1034,12 +1059,18 @@ async function start() {
     (active) => {
       roomPanel.classList.toggle('is-crt-focused', active);
       if (!active) {
+        if (document.fullscreenElement === roomPanel) {
+          void document.exitFullscreen().catch((error) => {
+            console.warn('Unable to exit CRT room fullscreen.', error);
+          });
+        }
         document.body.classList.remove('crt-isolation-mode');
         toggleCrtIsolationButton.setAttribute('aria-pressed', 'false');
         toggleCrtIsolationButton.setAttribute('aria-label', 'Dim surroundings');
         toggleCrtIsolationButton.title = 'Dim surroundings';
       }
       toggleCrtIsolationButton.hidden = !active;
+      toggleCrtFullscreenButton.hidden = !active;
       exitCrtFocusButton.hidden = !active;
     },
     () => {

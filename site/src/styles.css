@@ -1723,7 +1723,8 @@ body.playing .reel {
   border-bottom: 0;
 }
 
-.room-panel .crt-isolation-button {
+.room-panel .crt-isolation-button,
+.room-panel .crt-fullscreen-button {
   left: calc(var(--signal-rail-width) + 18px);
   width: 42px;
   height: 42px;
@@ -1732,7 +1733,12 @@ body.playing .reel {
   transition: left 180ms steps(4);
 }
 
-.isolation-icon {
+.room-panel .crt-fullscreen-button {
+  top: 66px;
+}
+
+.isolation-icon,
+.fullscreen-icon {
   width: 22px;
   height: 22px;
   fill: none;
@@ -1749,6 +1755,23 @@ body.playing .reel {
 
 .crt-isolation-button[aria-pressed="true"] .isolation-icon-restore {
   display: block;
+}
+
+.fullscreen-icon-exit,
+.crt-fullscreen-button[aria-pressed="true"] .fullscreen-icon-enter {
+  display: none;
+}
+
+.crt-fullscreen-button[aria-pressed="true"] .fullscreen-icon-exit {
+  display: block;
+}
+
+.room-panel:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+  border: 0;
+  background: #09080b;
 }
 
 @media (max-width: 650px) {
@@ -1777,7 +1800,8 @@ body.playing .reel {
     font-size: 8px;
   }
 
-  .room-panel .crt-isolation-button {
+  .room-panel .crt-isolation-button,
+  .room-panel .crt-fullscreen-button {
     left: calc(var(--signal-rail-width) + 10px);
   }
 }
@@ -2732,7 +2756,8 @@ body.theater-mode .transport-controls > .play-button {
 }
 
 .crt-back-button,
-.crt-isolation-button {
+.crt-isolation-button,
+.crt-fullscreen-button {
   position: absolute;
   top: 14px;
   z-index: 10;
@@ -2754,11 +2779,18 @@ body.theater-mode .transport-controls > .play-button {
   left: 18px;
 }
 
+.crt-fullscreen-button {
+  left: 18px;
+}
+
 .crt-back-button:hover,
 .crt-back-button:focus-visible,
 .crt-isolation-button:hover,
 .crt-isolation-button:focus-visible,
-.crt-isolation-button[aria-pressed="true"] {
+.crt-isolation-button[aria-pressed="true"],
+.crt-fullscreen-button:hover,
+.crt-fullscreen-button:focus-visible,
+.crt-fullscreen-button[aria-pressed="true"] {
   outline: 2px solid #f0d38c;
   outline-offset: 2px;
   background: #f0d38c;
@@ -3027,7 +3059,8 @@ h1 {
 }
 
 .crt-back-button,
-.crt-isolation-button {
+.crt-isolation-button,
+.crt-fullscreen-button {
   font-size: 6.6667px;
 }
 
@@ -3446,7 +3479,8 @@ h1 {
 }
 
 .crt-back-button,
-.crt-isolation-button {
+.crt-isolation-button,
+.crt-fullscreen-button {
   font-size: 16.6667px;
 }
 
@@ -3465,7 +3499,8 @@ h1 {
 }
 
 .crt-back-button,
-.crt-isolation-button {
+.crt-isolation-button,
+.crt-fullscreen-button {
   min-width: 42px;
   min-height: 42px;
   padding: 7px 10px;

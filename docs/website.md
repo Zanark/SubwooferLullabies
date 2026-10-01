@@ -163,6 +163,10 @@ off the room; it changes to an open-eye icon for restoring visibility. Accessibl
 labels and tooltips continue to describe both states, while the top-right back icon
 restores the original camera.
 
+An expand icon directly below the eye control places the complete room panel in
+browser fullscreen. The control switches to an exit icon and remains synchronized
+when fullscreen is left through Escape or browser controls.
+
 Signal selection now occupies a compact rail to the left of the room instead of
 covering the bottom of the television. Its smaller labels scroll inside the rail when
 needed, and the chevron control collapses it to a narrow tab so the room can reclaim
