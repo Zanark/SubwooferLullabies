@@ -63,7 +63,8 @@ without replacing the room with a theater.
 Dedicated horizontal cassette-back artwork must follow the exact geometry, reel-hole
 keepouts, safe areas and export contract in the
 [cassette back-cover design specification](cassette-back-cover-design-spec.md). Square
-song covers remain separate assets for the library and CRT.
+song covers remain separate assets for the library and CRT. Every current song now
+has an authored cassette-back family beside its other artwork formats.
 
 ## 2. Finding and handling tapes
 
@@ -151,8 +152,10 @@ materials.
 
 - The panoramic back wall and laminate desk span the complete room viewport.
 - Twenty-seven loose cassettes share the desk with books, CD cases, pencils, a
-  feature phone and a warm table lamp. The room derives its compact seven-column
-  cassette layout from the catalogue size instead of assuming fourteen tracks.
+  feature phone and a warm table lamp. They occupy irregular clutter zones on the
+  cassette side: crooked loose tapes, overlapping groups and uneven three-layer
+  piles with varied rotations and scale. The deterministic scatter stays messy
+  across reloads without becoming a neat catalogue grid.
 - A handmade wooden plaque identifies **Zanark's room**. The earlier film-homage
   posters are parked in code and are not currently mounted.
 - Physical wall switches independently control the overhead light and table lamp.

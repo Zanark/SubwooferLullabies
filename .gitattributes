@@ -2,6 +2,7 @@
 *.strudel -text
 *.spritecanvas.json -text
 artwork/covers/*/design.json -text
+artwork/covers/*/cassette-back-design.json -text
 artwork/covers/*/provenance.json -text
 artwork/albums/*/design.json -text
 artwork/albums/*/provenance.json -text

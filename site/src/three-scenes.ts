@@ -843,33 +843,43 @@ export function createBoxScene(
   const activeTapeGlowTexture = new THREE.CanvasTexture(activeTapeGlowCanvas);
   let activeTape: THREE.Group | null = null;
   let activeTapePlaying = false;
-  const cassetteLayouts: Array<[[number, number, number], [number, number, number], number]> = [
-    [[0.05, -1.775, -1.2], [-Math.PI / 2, 0, -0.32], 0.44],
-    [[1.62, -1.77, -0.72], [-Math.PI / 2, 0, 0.21], 0.44],
-    [[2.88, -1.765, -1.25], [-Math.PI / 2, 0, -0.14], 0.44],
-    [[4.55, -1.77, -0.7], [-Math.PI / 2, 0, 0.31], 0.44],
-    [[6.38, -1.775, -1.18], [-Math.PI / 2, 0, -0.25], 0.44],
-    [[0.48, -1.765, 0.28], [-Math.PI / 2, 0, 0.16], 0.44],
-    [[2.12, -1.76, 0.48], [-Math.PI / 2, 0, -0.28], 0.44],
-    [[3.5, -1.755, -0.05], [-Math.PI / 2, 0, 0.24], 0.44],
-    [[5.2, -1.765, 0.45], [-Math.PI / 2, 0, -0.12], 0.44],
-    [[7.02, -1.76, 0.12], [-Math.PI / 2, 0, 0.29], 0.42],
-    [[1.12, -1.755, 1.38], [-Math.PI / 2, 0, -0.22], 0.43],
-    [[2.76, -1.75, 1.18], [-Math.PI / 2, 0, 0.33], 0.43],
-    [[4.32, -1.745, 1.48], [-Math.PI / 2, 0, -0.3], 0.43],
-    [[6.08, -1.75, 1.27], [-Math.PI / 2, 0, 0.17], 0.43],
+  const cassettePiles: Array<[number, number]> = [
+    [0.25, -1.18],
+    [1.42, 0.28],
+    [0.82, 1.22],
+    [2.45, -0.78],
+    [3.28, 0.72],
+    [4.28, -1.24],
+    [5.18, 0.08],
+    [6.24, 1.08],
+    [7.02, -0.52],
   ];
+  const cassetteNoise = (title: string, salt: number) => {
+    let value = 2166136261 ^ salt;
+    for (const character of title) {
+      value ^= character.charCodeAt(0);
+      value = Math.imul(value, 16777619);
+    }
+    value ^= value >>> 16;
+    value = Math.imul(value, 2246822507);
+    value ^= value >>> 13;
+    return (value >>> 0) / 4294967295;
+  };
   songs.forEach((song, index) => {
     const cassette = createCassette(song.title);
-    const columns = 7;
-    const rows = Math.ceil(songs.length / columns);
-    const expandedLayout: [[number, number, number], [number, number, number], number] = [
-      [0.05 + index % columns * 1.16, -1.77, -1.45 + Math.floor(index / columns) * (2.8 / Math.max(1, rows - 1))],
-      [-Math.PI / 2, 0, (index % 3 - 1) * .05],
-      Math.min(.30, 2.8 / (rows * 2.3)),
+    const pile = cassettePiles[index % cassettePiles.length];
+    const layer = Math.floor(index / cassettePiles.length);
+    const position: [number, number, number] = [
+      pile[0] + (cassetteNoise(song.title, 1) - 0.5) * 0.62 + layer * 0.06,
+      -1.775 + layer * 0.047 + cassetteNoise(song.title, 2) * 0.009,
+      pile[1] + (cassetteNoise(song.title, 3) - 0.5) * 0.5 - layer * 0.035,
     ];
-    const [position, rotation, scale] = songs.length <= cassetteLayouts.length
-      ? cassetteLayouts[index] : expandedLayout;
+    const rotation: [number, number, number] = [
+      -Math.PI / 2 + (cassetteNoise(song.title, 4) - 0.5) * 0.06,
+      (cassetteNoise(song.title, 5) - 0.5) * 0.1,
+      (cassetteNoise(song.title, 6) - 0.5) * 1.25,
+    ];
+    const scale = 0.3 + cassetteNoise(song.title, 7) * 0.055;
     cassette.group.scale.setScalar(scale);
     cassette.group.position.set(...position);
     cassette.group.rotation.set(...rotation);

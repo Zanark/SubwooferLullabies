@@ -485,7 +485,7 @@ function reorderQueue(draggedId: string, targetId: string) {
 function songCard(song: Song) {
   const card = document.createElement('article');
   card.className = 'cover-card song-card';
-  card.classList.toggle('is-imported', Boolean(song.cassette_back));
+  card.classList.toggle('is-imported', song.title !== song.title.toLowerCase());
   card.title = song.title;
   card.classList.toggle('is-held', deskPreviewTitle === song.title);
   card.classList.toggle('is-selected', selectedTitles.has(song.title));

@@ -1,0 +1,52 @@
+{
+  "title": "determination",
+  "size": [
+    3020,
+    1780
+  ],
+  "export": [
+    1510,
+    890
+  ],
+  "preview": [
+    755,
+    445
+  ],
+  "layout": "Complete native scene in a protected central panel over newly composed palette atmosphere; no stretch or square center-crop.",
+  "scene_bounds_export": [
+    545,
+    177.5,
+    965,
+    597.5
+  ],
+  "reel_centers_export": [
+    [
+      295,
+      555
+    ],
+    [
+      1215,
+      555
+    ]
+  ],
+  "reel_guard_radius": 240,
+  "lower_mechanical_keepout_export": {
+    "center": [
+      755,
+      850
+    ],
+    "size": [
+      925,
+      215
+    ],
+    "rotation_degrees": 4.01
+  },
+  "typography": "Upper band only; lowercase title and collection label remain outside all keepouts.",
+  "medium": "pixel",
+  "resampling": "nearest-neighbor scene panel",
+  "source_scene_sha256": "8c695d7a16f506d715664c8c11d9838df90be9ae9c7358daed191c6e2accf582",
+  "master_sha256": "20446da26d46ce2ec2ab1f6470fb17493996cce2c591d5298b4c36712db08d93",
+  "export_sha256": "981c0351666737134b8acc2b3e4d6cc0e2a2cf0d350d63d3fbe7edd7c38ea7bb",
+  "holes": false,
+  "people_added": false
+}

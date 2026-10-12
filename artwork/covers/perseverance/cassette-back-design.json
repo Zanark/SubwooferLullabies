@@ -1,0 +1,52 @@
+{
+  "title": "perseverance",
+  "size": [
+    3020,
+    1780
+  ],
+  "export": [
+    1510,
+    890
+  ],
+  "preview": [
+    755,
+    445
+  ],
+  "layout": "Complete native scene in a protected central panel over newly composed palette atmosphere; no stretch or square center-crop.",
+  "scene_bounds_export": [
+    545,
+    177.5,
+    965,
+    597.5
+  ],
+  "reel_centers_export": [
+    [
+      295,
+      555
+    ],
+    [
+      1215,
+      555
+    ]
+  ],
+  "reel_guard_radius": 240,
+  "lower_mechanical_keepout_export": {
+    "center": [
+      755,
+      850
+    ],
+    "size": [
+      925,
+      215
+    ],
+    "rotation_degrees": 4.01
+  },
+  "typography": "Upper band only; lowercase title and collection label remain outside all keepouts.",
+  "medium": "pixel",
+  "resampling": "nearest-neighbor scene panel",
+  "source_scene_sha256": "d71e0f7b9be1d074b72d3a477a95f6969bb47cd25a2470227112d967d46a4627",
+  "master_sha256": "119db0e1880ea85fbe739cf76c43f6ed7e4690c8637e4b6deed7d3bc5a72591b",
+  "export_sha256": "af3818a4b894281804838559e4da616189ae89d38ec5deb4bf34e61769ec37da",
+  "holes": false,
+  "people_added": false
+}

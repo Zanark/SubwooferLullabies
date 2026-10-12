@@ -1,0 +1,52 @@
+{
+  "title": "relief",
+  "size": [
+    3020,
+    1780
+  ],
+  "export": [
+    1510,
+    890
+  ],
+  "preview": [
+    755,
+    445
+  ],
+  "layout": "Complete native scene in a protected central panel over newly composed palette atmosphere; no stretch or square center-crop.",
+  "scene_bounds_export": [
+    545,
+    177.5,
+    965,
+    597.5
+  ],
+  "reel_centers_export": [
+    [
+      295,
+      555
+    ],
+    [
+      1215,
+      555
+    ]
+  ],
+  "reel_guard_radius": 240,
+  "lower_mechanical_keepout_export": {
+    "center": [
+      755,
+      850
+    ],
+    "size": [
+      925,
+      215
+    ],
+    "rotation_degrees": 4.01
+  },
+  "typography": "Upper band only; lowercase title and collection label remain outside all keepouts.",
+  "medium": "pixel",
+  "resampling": "nearest-neighbor scene panel",
+  "source_scene_sha256": "7395c2ee10f314203da482c74476ead54377528f709a77ef74aae0987d10425e",
+  "master_sha256": "34434b8ca96213ed87e5823b1f5d975d975c3828a7f37f1655331091ea8dc27e",
+  "export_sha256": "3ebe0d2f2be9e4a37d0680aef10bc6fad85fe603d4f856fec60e42eeb21fe1eb",
+  "holes": false,
+  "people_added": false
+}

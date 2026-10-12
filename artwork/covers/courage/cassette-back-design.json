@@ -1,0 +1,52 @@
+{
+  "title": "courage",
+  "size": [
+    3020,
+    1780
+  ],
+  "export": [
+    1510,
+    890
+  ],
+  "preview": [
+    755,
+    445
+  ],
+  "layout": "Complete native scene in a protected central panel over newly composed palette atmosphere; no stretch or square center-crop.",
+  "scene_bounds_export": [
+    545,
+    177.5,
+    965,
+    597.5
+  ],
+  "reel_centers_export": [
+    [
+      295,
+      555
+    ],
+    [
+      1215,
+      555
+    ]
+  ],
+  "reel_guard_radius": 240,
+  "lower_mechanical_keepout_export": {
+    "center": [
+      755,
+      850
+    ],
+    "size": [
+      925,
+      215
+    ],
+    "rotation_degrees": 4.01
+  },
+  "typography": "Upper band only; lowercase title and collection label remain outside all keepouts.",
+  "medium": "pixel",
+  "resampling": "nearest-neighbor scene panel",
+  "source_scene_sha256": "9126b58f7725fc666af1c86b0089cec17a120c0493ff37616ab7b15fa730cb6d",
+  "master_sha256": "f5cba76e8bad8a531f74f2107b87cdff1ec2123d3d693837b5ec5acde6fed2e5",
+  "export_sha256": "bb26c172c8730524828290cc18822cec4497d280837f9d722b7966c69d625ec6",
+  "holes": false,
+  "people_added": false
+}

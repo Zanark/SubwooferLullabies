@@ -1,0 +1,52 @@
+{
+  "title": "hope",
+  "size": [
+    3020,
+    1780
+  ],
+  "export": [
+    1510,
+    890
+  ],
+  "preview": [
+    755,
+    445
+  ],
+  "layout": "Complete native scene in a protected central panel over newly composed palette atmosphere; no stretch or square center-crop.",
+  "scene_bounds_export": [
+    545,
+    177.5,
+    965,
+    597.5
+  ],
+  "reel_centers_export": [
+    [
+      295,
+      555
+    ],
+    [
+      1215,
+      555
+    ]
+  ],
+  "reel_guard_radius": 240,
+  "lower_mechanical_keepout_export": {
+    "center": [
+      755,
+      850
+    ],
+    "size": [
+      925,
+      215
+    ],
+    "rotation_degrees": 4.01
+  },
+  "typography": "Upper band only; lowercase title and collection label remain outside all keepouts.",
+  "medium": "pixel",
+  "resampling": "nearest-neighbor scene panel",
+  "source_scene_sha256": "4e071e9bc24c52e5b16fb39289ad260d2972518a87c301007f77caa0ddff6454",
+  "master_sha256": "bdf7b7797a73e845960be3898fe4df1fce8d5d9608b18edd4541b575111a2d33",
+  "export_sha256": "bf1c639e8dd2f88fd6e2a87db79e253e8d5061ab4a395427dcca36714c1254f8",
+  "holes": false,
+  "people_added": false
+}

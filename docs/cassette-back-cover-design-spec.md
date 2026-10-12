@@ -28,13 +28,18 @@ The existing square files under `site/public/covers` remain canonical for album 
 
 ## 2. Required asset set
 
-Create exactly fourteen song assets under a new directory:
+Create the authored cassette-back variants inside the same folder as each song's
+other artwork formats:
 
 ```text
-site/public/cassette-backs/
+artwork/covers/<song>/cassette-back-master.png
+artwork/covers/<song>/cassette-back.png
+artwork/covers/<song>/cassette-back-preview.jpg
+artwork/covers/<song>/cassette-back-design.json
 ```
 
-Required filenames:
+The website build copies each `cassette-back.png` to the generated, Git-ignored
+`site/public/cassette-backs/` directory. Required generated filenames:
 
 ```text
 anticipation.png

@@ -1,0 +1,52 @@
+{
+  "title": "euphoria",
+  "size": [
+    3020,
+    1780
+  ],
+  "export": [
+    1510,
+    890
+  ],
+  "preview": [
+    755,
+    445
+  ],
+  "layout": "Complete native scene in a protected central panel over newly composed palette atmosphere; no stretch or square center-crop.",
+  "scene_bounds_export": [
+    545,
+    177.5,
+    965,
+    597.5
+  ],
+  "reel_centers_export": [
+    [
+      295,
+      555
+    ],
+    [
+      1215,
+      555
+    ]
+  ],
+  "reel_guard_radius": 240,
+  "lower_mechanical_keepout_export": {
+    "center": [
+      755,
+      850
+    ],
+    "size": [
+      925,
+      215
+    ],
+    "rotation_degrees": 4.01
+  },
+  "typography": "Upper band only; lowercase title and collection label remain outside all keepouts.",
+  "medium": "image",
+  "resampling": "Lanczos scene panel",
+  "source_scene_sha256": "004b247d88ade568e48489a711a8fc0bbd96bbd34a63a600643d70b057965a60",
+  "master_sha256": "e1c7304166c775bae18f91433707483283319c62d49ca22b000c9ac5ed1695fd",
+  "export_sha256": "7a41a1b45ccf654a0e8f01f37a436820467c9b5a33855f7a0e8e5a5c11a2b885",
+  "holes": false,
+  "people_added": false
+}

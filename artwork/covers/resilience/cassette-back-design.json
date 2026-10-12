@@ -1,0 +1,52 @@
+{
+  "title": "resilience",
+  "size": [
+    3020,
+    1780
+  ],
+  "export": [
+    1510,
+    890
+  ],
+  "preview": [
+    755,
+    445
+  ],
+  "layout": "Complete native scene in a protected central panel over newly composed palette atmosphere; no stretch or square center-crop.",
+  "scene_bounds_export": [
+    545,
+    177.5,
+    965,
+    597.5
+  ],
+  "reel_centers_export": [
+    [
+      295,
+      555
+    ],
+    [
+      1215,
+      555
+    ]
+  ],
+  "reel_guard_radius": 240,
+  "lower_mechanical_keepout_export": {
+    "center": [
+      755,
+      850
+    ],
+    "size": [
+      925,
+      215
+    ],
+    "rotation_degrees": 4.01
+  },
+  "typography": "Upper band only; lowercase title and collection label remain outside all keepouts.",
+  "medium": "pixel",
+  "resampling": "nearest-neighbor scene panel",
+  "source_scene_sha256": "a35b5dc44f847a53088b5b889c0b236c2dfe995d40981a9e6ee8d2d59a6a225b",
+  "master_sha256": "447871d07d40cc06b7c4e7b2f30859105a69d0c445f81bb94633f095ceed6b90",
+  "export_sha256": "141da66c5d658accdb64c75e19abadc3ecf60303d725f6c3c5b7d3299a119f6f",
+  "holes": false,
+  "people_added": false
+}
