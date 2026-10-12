@@ -7,3 +7,4 @@ dist/
 node_modules/
 site/public/catalog.json
 site/public/covers/
+site/public/cassette-backs/

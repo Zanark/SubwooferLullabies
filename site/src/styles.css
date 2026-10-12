@@ -3486,6 +3486,24 @@ h1 {
   font-size: 17.3333px;
 }
 
+.cover-card.is-imported strong {
+  min-height: 3.9em;
+  font-size: 14px;
+  line-height: 1.3;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.cover-card.is-imported small {
+  min-height: 3.9em;
+  font-size: 10px;
+  line-height: 1.3;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
 .cover-card small {
   font-size: 13.3333px;
 }

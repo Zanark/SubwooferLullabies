@@ -1,25 +1,34 @@
-import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { loadCatalog } from './catalog.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const publicRoot = join(root, 'site', 'public');
 const coverRoot = join(publicRoot, 'covers');
-const catalog = JSON.parse(await readFile(join(root, 'STRUDEL', 'catalog.json'), 'utf8'));
+const catalog = await loadCatalog();
+const backRoot = join(publicRoot, 'cassette-backs');
 
 await rm(coverRoot, { recursive: true, force: true });
 await mkdir(coverRoot, { recursive: true });
+await mkdir(backRoot, { recursive: true });
 
 for (const song of catalog.songs) {
-  const source = join(root, 'STRUDEL', ...song.bundle_path.split('/'), 'cover.png');
-  await cp(source, join(coverRoot, `${song.title}.png`));
+  const source = song.cover_file
+    ? join(root, song.cover_file)
+    : join(root, 'STRUDEL', ...song.bundle_path.split('/'), 'cover.png');
+  const key = song.asset_key ?? song.title;
+  await cp(source, join(coverRoot, `${key}.png`));
+  if (song.circle_file) await cp(join(root, song.circle_file), join(coverRoot, `${key}-circle.png`));
+  if (song.cassette_back_file) await cp(join(root, song.cassette_back_file), join(backRoot, `${key}.png`));
 }
 
 for (const album of catalog.albums) {
   await cp(
-    join(root, 'STRUDEL', ...album.cover.split('/')),
-    join(coverRoot, `${album.title}.png`),
+    album.cover_file ? join(root, album.cover_file) : join(root, 'STRUDEL', ...album.cover.split('/')),
+    join(coverRoot, `${album.asset_key ?? album.title}.png`),
   );
+  if (album.circle_file) await cp(join(root, album.circle_file), join(coverRoot, `${album.asset_key}-circle.png`));
 }
 
 await writeFile(
@@ -37,14 +46,17 @@ await writeFile(
       album: song.album,
       track_number: song.track_number,
       bundle_path: song.bundle_path,
-      cover: `covers/${song.title}.png`,
-      audio: `audio/${song.title}.mp3`,
+      cover: `covers/${song.asset_key ?? song.title}.png`,
+      audio: `audio/${song.asset_key ?? song.title}.mp3`,
+      ...(song.cassette_back_file ? { cassette_back: `cassette-backs/${song.asset_key}.png` } : {}),
+      ...(song.circle_file ? { cover_circle: `covers/${song.asset_key}-circle.png` } : {}),
     })),
     albums: catalog.albums.map((album) => ({
       title: album.title,
       description: album.description,
       tracks: album.tracks,
-      cover: `covers/${album.title}.png`,
+      cover: `covers/${album.asset_key ?? album.title}.png`,
+      ...(album.circle_file ? { cover_circle: `covers/${album.asset_key}-circle.png` } : {}),
     })),
   }, null, 2)}\n`,
 );

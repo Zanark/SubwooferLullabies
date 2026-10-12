@@ -21,6 +21,7 @@ type Song = {
   track_number: number | null;
   bundle_path: string;
   cover: string;
+  cassette_back?: string;
   audio: string;
 };
 
@@ -36,6 +37,11 @@ type QueueEntry = { id: string; title: string };
 
 const base = import.meta.env.BASE_URL;
 const asset = (path: string) => `${base}${path}`;
+const visualSong = (song: Song) => ({
+  ...song,
+  cover: asset(song.cover),
+  cassette_back: song.cassette_back ? asset(song.cassette_back) : undefined,
+});
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('Application root is missing.');
 
@@ -43,11 +49,11 @@ app.innerHTML = `
   <canvas id="hand-3d" class="hand-cursor-canvas" aria-hidden="true"></canvas>
   <header class="masthead">
     <div>
-      <p class="eyebrow">playable archive / no. 0014</p>
+      <p class="eyebrow" id="archive-count">playable archive</p>
       <h1>subwoofer <span>lullabies</span></h1>
     </div>
     <div class="mast-actions">
-      <p class="mast-copy">fourteen original code-composed tapes.<br>choose one, load it, press play.</p>
+      <p class="mast-copy"><span id="tape-count">original code-composed tapes.</span><br>choose one, load it, press play.</p>
       <button id="random-play" class="random-play" type="button" aria-label="Play a random tape" title="Play a random tape" disabled>
         <svg class="shuffle-icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M3 7h3.7c2.1 0 3.4 1 4.8 3.3l1 1.7c1.3 2.2 2.5 3 4.7 3H21"></path>
@@ -313,7 +319,7 @@ function setPhysicalCassetteHold(title: string | null) {
   showcase.classList.remove('is-showing');
   showcase.classList.add('is-held-preview');
   showcase.hidden = false;
-  void showcaseScene.hold({ ...song, cover: asset(song.cover) });
+  void showcaseScene.hold(visualSong(song));
 }
 
 function enableAudioAnalysis() {
@@ -479,6 +485,8 @@ function reorderQueue(draggedId: string, targetId: string) {
 function songCard(song: Song) {
   const card = document.createElement('article');
   card.className = 'cover-card song-card';
+  card.classList.toggle('is-imported', Boolean(song.cassette_back));
+  card.title = song.title;
   card.classList.toggle('is-held', deskPreviewTitle === song.title);
   card.classList.toggle('is-selected', selectedTitles.has(song.title));
   card.draggable = true;
@@ -659,15 +667,15 @@ async function loadCassette(
     } else if (reduced) {
       await new Promise((resolve) => setTimeout(resolve, 150));
     } else {
-      await showcaseScene.show({ ...song, cover: asset(song.cover) });
+      await showcaseScene.show(visualSong(song));
     }
 
     selected = song;
     activeQueueId = queueEntryId;
     currentSource = queueEntryId ? 'queue' : 'direct';
-    await playerScene.setCassette({ ...song, cover: asset(song.cover) }, animateDoor);
+    await playerScene.setCassette(visualSong(song), animateDoor);
     playerHasCassette = true;
-    await boxScene.setTrack({ ...song, cover: asset(song.cover) });
+    await boxScene.setTrack(visualSong(song));
     setTransportEnabled(true);
     announcement.textContent = `${song.title} cassette loaded`;
     if (autoplay && await activation) {
@@ -1009,6 +1017,8 @@ async function start() {
   const response = await fetch(asset('catalog.json'));
   if (!response.ok) throw new Error(`Catalog failed to load: ${response.status}`);
   catalog = await response.json() as Catalog;
+  required<HTMLElement>('archive-count').textContent = `playable archive / no. ${String(catalog.songs.length).padStart(4, '0')}`;
+  required<HTMLElement>('tape-count').textContent = `${catalog.songs.length} original code-composed tapes.`;
   try {
     const storedQueue = JSON.parse(localStorage.getItem('subwoofer-lullabies-queue') ?? '[]') as QueueEntry[];
     queue = storedQueue.filter((entry) => (
@@ -1053,10 +1063,10 @@ async function start() {
   playerScene.setVolume(audio.volume);
   handCursorScene = createHandCursorScene(required<HTMLCanvasElement>('hand-3d'));
   showcaseScene = createShowcaseScene(required<HTMLCanvasElement>('showcase-3d'));
-  showcaseScene.preload(catalog.songs.map((song) => ({ ...song, cover: asset(song.cover) })));
+  showcaseScene.preload(catalog.songs.map(visualSong));
   boxScene = createBoxScene(
     required<HTMLCanvasElement>('box-3d'),
-    catalog.songs.map((song) => ({ ...song, cover: asset(song.cover) })),
+    catalog.songs.map(visualSong),
     (title, droppedOnPlayer) => loadCassette(
       trackByTitle(title),
       false,

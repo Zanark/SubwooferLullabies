@@ -5,6 +5,7 @@ export type VisualSong = {
   genre: string;
   bpm: number;
   cover: string;
+  cassette_back?: string;
 };
 
 type SceneController = {
@@ -363,14 +364,18 @@ function maskingTapeTexture(title: string) {
   context.fillStyle = 'rgba(107, 76, 38, .16)';
   for (let x = 18; x < 500; x += 19) context.fillRect(x, 11, 2, 88);
   context.fillStyle = '#2c2520';
-  context.font = '700 48px "Segoe Print", "Comic Sans MS", cursive';
+  let fontSize = 48;
+  context.font = `700 ${fontSize}px "Segoe Print", "Comic Sans MS", cursive`;
+  while (context.measureText(title).width > 450 && fontSize > 16) {
+    fontSize -= 1;
+    context.font = `700 ${fontSize}px "Segoe Print", "Comic Sans MS", cursive`;
+  }
   context.textAlign = 'center';
   context.textBaseline = 'middle';
-  const fitted = title.length > 20 ? `${title.slice(0, 19)}…` : title;
   context.save();
   context.translate(canvas.width / 2, canvas.height / 2 + 2);
   context.rotate(-0.018);
-  context.fillText(fitted, 0, 0);
+  context.fillText(title, 0, 0);
   context.restore();
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
@@ -856,18 +861,26 @@ export function createBoxScene(
   ];
   songs.forEach((song, index) => {
     const cassette = createCassette(song.title);
-    const [position, rotation, scale] = cassetteLayouts[index];
+    const columns = 7;
+    const rows = Math.ceil(songs.length / columns);
+    const expandedLayout: [[number, number, number], [number, number, number], number] = [
+      [0.05 + index % columns * 1.16, -1.77, -1.45 + Math.floor(index / columns) * (2.8 / Math.max(1, rows - 1))],
+      [-Math.PI / 2, 0, (index % 3 - 1) * .05],
+      Math.min(.30, 2.8 / (rows * 2.3)),
+    ];
+    const [position, rotation, scale] = songs.length <= cassetteLayouts.length
+      ? cassetteLayouts[index] : expandedLayout;
     cassette.group.scale.setScalar(scale);
     cassette.group.position.set(...position);
     cassette.group.rotation.set(...rotation);
     tapeGroup.add(cassette.group);
-    void loadCoverTexture(song.cover).then((cover) => {
+    void loadCoverTexture(song.cassette_back ?? song.cover).then((cover) => {
       disposeMaterial(cassette.back.material);
       cassette.back.material = textureMaterial(cover);
     });
     cassette.group.userData.home = cassette.group.position.clone();
     cassette.group.userData.rotationHome = cassette.group.rotation.clone();
-    cassette.group.userData.cover = song.cover;
+    cassette.group.userData.cover = song.cassette_back ?? song.cover;
     const glowMaterial = new THREE.MeshBasicMaterial({
       map: activeTapeGlowTexture,
       color: 0xffffff,
@@ -3722,7 +3735,7 @@ export function createPlayerScene(
 
   return {
     async setCassette(song: VisualSong, animateDoor = false) {
-      const cover = await loadCoverTexture(song.cover);
+      const cover = await loadCoverTexture(song.cassette_back ?? song.cover);
       disposeMaterial(cassette.front.material);
       disposeMaterial(cassette.back.material);
       disposeMaterial(cassette.label.material);
@@ -3841,14 +3854,14 @@ export function createShowcaseScene(canvas: HTMLCanvasElement) {
 
   return {
     preload(songs: VisualSong[]) {
-      songs.forEach((song) => { void loadCoverTexture(song.cover); });
+      songs.forEach((song) => { void loadCoverTexture(song.cassette_back ?? song.cover); });
     },
     async show(song: VisualSong) {
       const pendingRequest = ++requestId;
       holdStart = null;
       cancelAnimation();
       clearCassette();
-      const cover = await loadCoverTexture(song.cover);
+      const cover = await loadCoverTexture(song.cassette_back ?? song.cover);
       if (pendingRequest !== requestId) return;
       cassette = createCassette(song.title, cover);
       cassette.group.scale.setScalar(0.72);
@@ -3862,7 +3875,7 @@ export function createShowcaseScene(canvas: HTMLCanvasElement) {
       holdStart = null;
       cancelAnimation();
       clearCassette();
-      const cover = await loadCoverTexture(song.cover);
+      const cover = await loadCoverTexture(song.cassette_back ?? song.cover);
       if (pendingRequest !== requestId) return;
       cassette = createCassette(song.title, cover);
       cassette.group.scale.setScalar(0.82);

@@ -2,6 +2,10 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
+import { createHash } from 'node:crypto';
+import { inspectWav } from '../tools/export_audio.mjs';
+import { validateReleaseDuration } from '../tools/audio_policy.mjs';
+import { loadImportedReleases } from './catalog.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const lameContext = {};
@@ -15,9 +19,35 @@ if (!lamejs?.Mp3Encoder) throw new Error('Bundled lamejs encoder failed to initi
 const manifest = JSON.parse(await readFile(join(root, 'AUDIO', 'manifest.json'), 'utf8'));
 const destination = join(root, 'site', 'public', 'audio');
 const sampleBlock = 1152;
+const catalog = JSON.parse(await readFile(join(root, 'STRUDEL', 'catalog.json'), 'utf8'));
+const sha = bytes => createHash('sha256').update(bytes).digest('hex');
+// Imported finite-score masters already have checked 192kbps MP3s; never re-encode them.
+const imported = await loadImportedReleases();
 
 if (!manifest.complete || manifest.tracks.length !== manifest.expected_tracks) {
   throw new Error('AUDIO manifest is incomplete; refusing to publish partial previews.');
+}
+if (manifest.tracks.length !== catalog.songs.length
+    || new Set(manifest.tracks.map(track => track.title)).size !== manifest.tracks.length) {
+  throw new Error('Audio manifest must match every unique song in the current catalogue.');
+}
+
+// Preflight the complete set before replacing any site's listening preview.
+for (const track of manifest.tracks) {
+  const song = catalog.songs.find(item => item.title === track.title);
+  if (!song || track.source_sha256 !== song.source_sha256
+      || track.end_cycle !== song.end_cycle || track.bpm !== song.bpm) {
+    throw new Error(`${track.title}: stale audio for the current song arrangement.`);
+  }
+  const source = await readFile(join(root, 'STRUDEL', song.bundle_path, `${song.title}.strudel`));
+  const bytes = await readFile(join(root, 'AUDIO', ...track.file.split('/')));
+  const wav = inspectWav(bytes);
+  validateReleaseDuration(wav.duration_seconds, track.title);
+  if (sha(source) !== song.source_sha256 || sha(bytes) !== track.wav_sha256
+      || Math.abs(wav.duration_seconds - song.duration_seconds) > 1 / wav.sample_rate
+      || wav.clipped_samples || wav.rms < 1e-7 || wav.longest_silence_seconds > 20) {
+    throw new Error(`${track.title}: audio/source fingerprint, duration or signal check failed.`);
+  }
 }
 
 function pcmChannels(wav) {
@@ -78,3 +108,4 @@ for (const track of manifest.tracks) {
   await writeFile(join(destination, `${track.title}.mp3`), output);
   console.log(`${track.title}: ${(output.length / 1024 / 1024).toFixed(2)} MiB`);
 }
+console.log(`${imported.reduce((sum, release) => sum + release.songs.length, 0)} imported MP3 masters preserved without re-encoding.`);

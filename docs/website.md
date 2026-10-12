@@ -1,7 +1,7 @@
 # Playable cassette archive
 
 The [Subwoofer Lullabies cassette archive](https://zanark.github.io/SubwooferLullabies/)
-turns the fourteen-track collection into an interactive PS1-style bedroom desk. It is
+turns the twenty-seven-track collection into an interactive PS1-style bedroom desk. It is
 not a flat skin around an audio element: the room, tapes, hand, portable player, wall
 switches and convex television are rendered as low-poly Three.js geometry.
 
@@ -118,9 +118,10 @@ materials of portable cassette players without copying a real manufacturer.
 - Directly loading or randomly choosing a tape changes the current cassette without
   mutating the persistent queue.
 
-Audio is supplied by fourteen committed 160 kbps MP3 derivatives of the verified
-full-length WAV exports. Catalogue `loop` tracks repeat during direct playback;
-queue playback disables looping so the browser can advance to the next entry.
+Audio is supplied by fourteen committed 160 kbps MP3 derivatives of the original
+catalogue plus thirteen checked 192 kbps MP3 masters from **Almost Us**. Catalogue
+`loop` tracks repeat during direct playback; queue playback disables looping so the
+browser can advance to the next entry.
 
 ## 4. Continuous-play queue
 
@@ -149,8 +150,9 @@ geometry, low-resolution textures, nearest-neighbor filtering and flat-shaded
 materials.
 
 - The panoramic back wall and laminate desk span the complete room viewport.
-- Fourteen loose cassettes share the desk with books, CD cases, pencils, a feature
-  phone and a warm table lamp.
+- Twenty-seven loose cassettes share the desk with books, CD cases, pencils, a
+  feature phone and a warm table lamp. The room derives its compact seven-column
+  cassette layout from the catalogue size instead of assuming fourteen tracks.
 - A handmade wooden plaque identifies **Zanark's room**. The earlier film-homage
   posters are parked in code and are not currently mounted.
 - Physical wall switches independently control the overhead light and table lamp.
@@ -233,7 +235,8 @@ remains readable at normal browser zoom.
 
 ```mermaid
 flowchart TB
-    A[tools/song_catalog.json]
+    A[STRUDEL/catalog.json]
+    K[Imported release manifests]
     B[scripts/prepare-site-assets.mjs]
     C[Generated site catalogue and artwork]
     D[site/src/main.ts]
@@ -245,6 +248,7 @@ flowchart TB
     J[GitHub Pages artifact]
 
     A --> B
+    K --> B
     B --> C
     C --> D
     D --> E
