@@ -89,7 +89,7 @@ app.innerHTML = `
           <p id="shelf-label">select an album</p>
           <span id="result-count"></span>
         </div>
-        <div id="shelf" class="cover-grid"></div>
+        <div id="shelf" class="cover-grid is-one-row"></div>
       </div>
 
     </section>
@@ -541,21 +541,22 @@ function albumCard(album: Album) {
   return button;
 }
 
-function scheduleAlbumShelfLayout(scrollTop = shelf.scrollTop) {
+function scheduleShelfLayout(scrollTop = shelf.scrollTop) {
   cancelAnimationFrame(albumShelfLayoutFrame);
   albumShelfLayoutFrame = requestAnimationFrame(() => {
-    if (!shelf.classList.contains('is-album-view')) return;
-    const firstCard = shelf.querySelector<HTMLElement>('.cover-card');
-    if (!firstCard) return;
+    const firstRowCards = [...shelf.querySelectorAll<HTMLElement>('.cover-card')].slice(0, 3);
+    if (!firstRowCards.length) {
+      shelf.style.removeProperty('--shelf-row-height');
+      return;
+    }
     const styles = getComputedStyle(shelf);
     const rowHeight = Math.ceil(
-      firstCard.getBoundingClientRect().height
-      + Number.parseFloat(styles.paddingTop)
-      + Number.parseFloat(styles.paddingBottom),
+      Math.max(...firstRowCards.map((card) => card.getBoundingClientRect().height))
+      + Number.parseFloat(styles.paddingTop),
     );
     const nextHeight = `${rowHeight}px`;
-    if (shelf.style.getPropertyValue('--album-row-height') !== nextHeight) {
-      shelf.style.setProperty('--album-row-height', nextHeight);
+    if (shelf.style.getPropertyValue('--shelf-row-height') !== nextHeight) {
+      shelf.style.setProperty('--shelf-row-height', nextHeight);
     }
     shelf.scrollTop = Math.min(scrollTop, Math.max(0, shelf.scrollHeight - shelf.clientHeight));
   });
@@ -567,7 +568,6 @@ function renderShelf() {
   const previousScrollTop = albumView && shelf.dataset.album === currentAlbum ? shelf.scrollTop : 0;
   shelf.classList.toggle('is-album-view', albumView);
   if (!albumView) {
-    shelf.style.removeProperty('--album-row-height');
     delete shelf.dataset.album;
   }
   shelf.replaceChildren();
@@ -579,6 +579,7 @@ function renderShelf() {
     shelf.append(songCard(song));
     boxScene?.setSearchMatches([]);
     updateQueueAddButton();
+    scheduleShelfLayout();
     return;
   }
   if (query) {
@@ -592,6 +593,7 @@ function renderShelf() {
     }
     boxScene?.setSearchMatches(matches.map((song) => song.title));
     updateQueueAddButton();
+    scheduleShelfLayout();
     return;
   }
 
@@ -603,7 +605,7 @@ function renderShelf() {
     back.hidden = false;
     album?.tracks.forEach((title) => shelf.append(songCard(trackByTitle(title))));
     shelf.dataset.album = currentAlbum;
-    scheduleAlbumShelfLayout(previousScrollTop);
+    scheduleShelfLayout(previousScrollTop);
     updateQueueAddButton();
     return;
   }
@@ -619,6 +621,7 @@ function renderShelf() {
     shelf.append(card);
   }
   updateQueueAddButton();
+  scheduleShelfLayout();
 }
 
 function playCassetteLoadSound() {
@@ -1033,8 +1036,8 @@ async function start() {
   cassetteLoadSound.volume = audio.volume;
   walkmanButtonSound.volume = audio.volume;
   renderShelf();
-  const albumShelfResizeObserver = new ResizeObserver(() => scheduleAlbumShelfLayout());
-  albumShelfResizeObserver.observe(shelf);
+  const shelfResizeObserver = new ResizeObserver(() => scheduleShelfLayout());
+  shelfResizeObserver.observe(shelf);
   renderQueue();
   playerScene = createPlayerScene(required<HTMLCanvasElement>('player-3d'), (value) => {
     audio.volume = value;

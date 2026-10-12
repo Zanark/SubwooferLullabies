@@ -1606,6 +1606,8 @@ body.playing .reel {
   }
 }
 
+
+
 /* Keep CRT signal selection beside the room instead of covering the television. */
 .room-panel {
   --signal-rail-width: 152px;
@@ -3624,4 +3626,25 @@ h1 {
     grid-template-columns: 36px minmax(0, 1fr) 36px;
     min-height: 64px;
   }
+}
+
+/* Every library state is a fixed, scrollable three-cover viewport. */
+.cover-grid.is-one-row {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-content: start;
+  height: var(--shelf-row-height, auto);
+  min-height: 0;
+  max-height: var(--shelf-row-height, none);
+  padding: 5px 12px 18px 4px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  flex: 0 0 var(--shelf-row-height, auto);
+  scroll-snap-type: y mandatory;
+}
+
+.cover-grid.is-one-row .cover-card {
+  width: 100%;
+  max-width: none;
+  justify-self: stretch;
+  scroll-snap-align: start;
 }
